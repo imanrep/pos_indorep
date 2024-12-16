@@ -1,17 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:pos_indorep/model/menu.dart';
 
 class MainProvider with ChangeNotifier {
-  List<String> _items = [];
+  List<Menu> _selectedItems = [];
 
-  List<String> get items => _items;
+  List<Menu> get selectedItems => _selectedItems;
 
-  void addItem(String item) {
-    _items.add(item);
+  void addItem(Menu item) {
+    _selectedItems.add(item);
     notifyListeners();
   }
 
-  void removeItem(String item) {
-    _items.remove(item);
+  void removeItem(Menu item) {
+    _selectedItems.remove(item);
     notifyListeners();
   }
 }
