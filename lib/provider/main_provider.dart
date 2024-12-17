@@ -4,8 +4,18 @@ import 'package:uuid/uuid.dart';
 
 class MainProvider with ChangeNotifier {
   List<Cart> _currentCart = [];
+  double _totalCurrentCart = 0;
 
   List<Cart> get currentCart => _currentCart;
+  double get totalCurrentCart => _totalCurrentCart;
+
+  void calculateTotalCart() {
+    _totalCurrentCart = 0;
+    for (var item in _currentCart) {
+      _totalCurrentCart += item.price * item.qty;
+    }
+    notifyListeners();
+  }
 
   void addItem(Menu item, int qty, String notes) {
     var uuid = Uuid();
@@ -23,12 +33,14 @@ class MainProvider with ChangeNotifier {
       qty: qty,
       notes: notes,
     ));
+    calculateTotalCart();
     notifyListeners();
   }
 
   void incrementQty(String cartId) {
     final cartItem = _currentCart.firstWhere((item) => item.cartId == cartId);
     cartItem.updateQty(cartItem.qty + 1);
+    calculateTotalCart();
     notifyListeners();
   }
 
@@ -36,6 +48,7 @@ class MainProvider with ChangeNotifier {
     final cartItem = _currentCart.firstWhere((item) => item.cartId == cartId);
     if (cartItem.qty > 1) {
       cartItem.updateQty(cartItem.qty - 1);
+      calculateTotalCart();
       notifyListeners();
     }
   }

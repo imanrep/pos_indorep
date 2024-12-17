@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:pos_indorep/screen/home_pages/main_page.dart';
 
-
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
@@ -11,7 +10,6 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-
   int _selectedIndex = 0;
   NavigationRailLabelType labelType = NavigationRailLabelType.all;
   bool showLeading = false;
@@ -20,7 +18,8 @@ class _HomeScreenState extends State<HomeScreen> {
   String currentTime = DateFormat('HH:mm').format(DateTime.now());
   String currentDate = DateFormat('EEEE, dd MMM yyyy').format(DateTime.now());
 
-  final List<NavigationRailDestination> _destinations = const <NavigationRailDestination>[
+  final List<NavigationRailDestination> _destinations =
+      const <NavigationRailDestination>[
     NavigationRailDestination(
       icon: Icon(Icons.home_outlined),
       selectedIcon: Icon(Icons.home_filled),
@@ -43,12 +42,13 @@ class _HomeScreenState extends State<HomeScreen> {
     Placeholder(),
     Placeholder(),
   ];
-  
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        elevation: 2,
+        elevation: 1,
+        shadowColor: Colors.grey,
         title: Row(
           children: [
             Text('INDOREP POS'),
@@ -57,7 +57,10 @@ class _HomeScreenState extends State<HomeScreen> {
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
                 Text('$currentTime'),
-                Text('$currentDate', style: TextStyle(fontSize: 14),),
+                Text(
+                  '$currentDate',
+                  style: TextStyle(fontSize: 14),
+                ),
               ],
             ),
           ],
@@ -74,19 +77,23 @@ class _HomeScreenState extends State<HomeScreen> {
               });
             },
             labelType: labelType,
-            leading: showLeading ? FloatingActionButton(
-              elevation: 0,
-              onPressed: () {
-                // Add your onPressed code here!
-              },
-              child: const Icon(Icons.add),
-            ) : null,
-            trailing: showTrailing ? IconButton(
-              icon: const Icon(Icons.more_horiz),
-              onPressed: () {
-                // Add your onPressed code here!
-              },
-            ) : null,
+            leading: showLeading
+                ? FloatingActionButton(
+                    elevation: 0,
+                    onPressed: () {
+                      // Add your onPressed code here!
+                    },
+                    child: const Icon(Icons.add),
+                  )
+                : null,
+            trailing: showTrailing
+                ? IconButton(
+                    icon: const Icon(Icons.more_horiz),
+                    onPressed: () {
+                      // Add your onPressed code here!
+                    },
+                  )
+                : null,
             destinations: _destinations,
           ),
           const VerticalDivider(thickness: 1, width: 1),
