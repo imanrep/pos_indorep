@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:pos_indorep/screen/home_pages/main_page.dart';
@@ -15,9 +17,6 @@ class _HomeScreenState extends State<HomeScreen> {
   bool showLeading = false;
   bool showTrailing = false;
   double groupAlignment = -1.0;
-  String currentTime = DateFormat('HH:mm').format(DateTime.now());
-  String currentDate = DateFormat('EEEE, dd MMM yyyy').format(DateTime.now());
-
   final List<NavigationRailDestination> _destinations =
       const <NavigationRailDestination>[
     NavigationRailDestination(
@@ -50,20 +49,7 @@ class _HomeScreenState extends State<HomeScreen> {
         elevation: 1,
         shadowColor: Colors.grey,
         title: Row(
-          children: [
-            Text('INDOREP POS'),
-            const Spacer(),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                Text('$currentTime'),
-                Text(
-                  '$currentDate',
-                  style: TextStyle(fontSize: 14),
-                ),
-              ],
-            ),
-          ],
+          children: [Text('INDOREP POS'), const Spacer(), ClockWidget()],
         ),
       ),
       body: Row(
@@ -103,6 +89,29 @@ class _HomeScreenState extends State<HomeScreen> {
           )
         ],
       ),
+    );
+  }
+}
+
+class ClockWidget extends StatelessWidget {
+  const ClockWidget({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder(
+      stream: Stream.periodic(const Duration(seconds: 1)),
+      builder: (context, snapshot) {
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            Text(DateFormat('HH:mm').format(DateTime.now())),
+            Text(
+              DateFormat('EEEE, dd MMM yyyy').format(DateTime.now()),
+              style: TextStyle(fontSize: 14),
+            ),
+          ],
+        );
+      },
     );
   }
 }
