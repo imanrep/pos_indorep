@@ -18,6 +18,35 @@ class Menu {
     required this.price,
     this.option,
   });
+
+  factory Menu.fromMap(Map<String, dynamic> data) {
+    return Menu(
+      menuId: data['menuId'],
+      title: data['title'],
+      category: data['category'],
+      tag: List<String>.from(data['tag']),
+      image: data['image'],
+      desc: data['desc'],
+      price: data['price'].toDouble(),
+      option: data['option'] != null
+          ? List<Option>.from(
+              data['option'].map((x) => Option.fromMap(x)).toList())
+          : null,
+    );
+  }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'menuId': menuId,
+      'title': title,
+      'category': category,
+      'tag': tag,
+      'image': image,
+      'desc': desc,
+      'price': price,
+      'option': option?.map((opt) => opt.toMap()).toList(),
+    };
+  }
 }
 
 class Option {
@@ -32,6 +61,24 @@ class Option {
     required this.type,
     required this.options,
   });
+
+  factory Option.fromMap(Map<String, dynamic> data) {
+    return Option(
+      optionId: data['optionId'],
+      title: data['title'],
+      type: data['type'],
+      options: List<String>.from(data['options']),
+    );
+  }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'optionId': optionId,
+      'title': title,
+      'type': type,
+      'options': options,
+    };
+  }
 }
 
 class SelectedOption {

@@ -1,4 +1,4 @@
-package com.example.pos_indorep
+package com.indorep.pos
 
 import io.flutter.embedding.android.FlutterActivity
 

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:pos_indorep/helper/helper.dart';
+import 'package:pos_indorep/model/example_data.dart';
 import 'package:pos_indorep/provider/main_provider.dart';
-import 'package:pos_indorep/provider/menu_provider.dart';
 import 'package:provider/provider.dart';
 
 class MainPage extends StatefulWidget {
@@ -14,8 +14,10 @@ class MainPage extends StatefulWidget {
 class _MainPageState extends State<MainPage> {
   @override
   Widget build(BuildContext context) {
+    var example = ExampleData();
+    var exampleMenu = example.exampleMenu;
+
     return Consumer<MainProvider>(builder: (context, provider, child) {
-      final menuProvider = Provider.of<MenuProvider>(context, listen: false);
       return Scaffold(
         backgroundColor: Colors.black.withOpacity(0.05),
         body: Row(
@@ -57,10 +59,9 @@ class _MainPageState extends State<MainPage> {
                           crossAxisSpacing: 24.0, // spacing between columns
                         ),
                         padding: EdgeInsets.all(8.0), // padding around the grid
-                        itemCount: menuProvider
-                            .allmenus.length, // total number of items
+                        itemCount: exampleMenu.length, // total number of items
                         itemBuilder: (context, index) {
-                          final item = menuProvider.allmenus[index];
+                          final item = exampleMenu[index];
                           bool isItemSelected = provider.currentCart
                               .any((element) => element.menuId == item.menuId);
                           return GestureDetector(

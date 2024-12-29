@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1081014321686",
+    "project_id": "pariwisata-cireong",
+    "storage_bucket": "pariwisata-cireong.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1081014321686:android:b877e2d3cf6b9a1b386b37",
+        "android_client_info": {
+          "package_name": "com.indorep.pos"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAYmncvKVm41GP5nENKXF3IQkrdXdr6dbI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

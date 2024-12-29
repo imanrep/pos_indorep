@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:pos_indorep/screen/home_pages/main_page.dart';
+import 'package:pos_indorep/screen/management/menu_management_page.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -34,12 +35,18 @@ class _HomeScreenState extends State<HomeScreen> {
       selectedIcon: Icon(Icons.star),
       label: Text('Third'),
     ),
+    NavigationRailDestination(
+      icon: Icon(Icons.star_border),
+      selectedIcon: Icon(Icons.star),
+      label: Text('Menu'),
+    ),
   ];
 
   final List<Widget> _pages = <Widget>[
     MainPage(),
     Placeholder(),
     Placeholder(),
+    MenuManagementPage(),
   ];
 
   @override
