@@ -6,7 +6,7 @@ class ExampleData {
         available: true,
         menuId: 'MAK1',
         title: 'Bakmie Ayam Jawa Spesial Telur',
-        category: 'Makanan',
+        category: 'makanan',
         tag: ['Mie'],
         image:
             'https://www.bakmigm.com/cfind/source/thumb/images/menu/cover_w480_h480_1-bakmi-ayam.png',
@@ -24,7 +24,7 @@ class ExampleData {
         available: true,
         menuId: 'MAK2',
         title: 'Nasi Goreng Bu Indah',
-        category: 'Makanan',
+        category: 'makanan',
         tag: ['Nasi'],
         image:
             'https://www.bakmigm.com/cfind/source/thumb/images/menu/cover_w480_h480_1-bakmi-ayam.png',
@@ -42,7 +42,7 @@ class ExampleData {
         available: true,
         menuId: 'MAK3',
         title: 'Ayam Geprek',
-        category: 'Makanan',
+        category: 'makanan',
         tag: ['Ayam'],
         image:
             'https://www.bakmigm.com/cfind/source/thumb/images/menu/cover_w480_h480_1-bakmi-ayam.png',
@@ -60,7 +60,7 @@ class ExampleData {
       available: true,
       menuId: 'MAK4',
       title: 'Pempek Palembang Khas Banyuwangi',
-      category: 'Makanan',
+      category: 'makanan',
       tag: ['Cemilan'],
       image:
           'https://www.bakmigm.com/cfind/source/thumb/images/menu/cover_w480_h480_1-bakmi-ayam.png',

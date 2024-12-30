@@ -28,7 +28,7 @@ class _MenuManagementPageState extends State<MenuManagementPage> {
         Expanded(
           flex: 4,
           child: DefaultTabController(
-            length: 2, // Number of tabs
+            length: tabs.length,
             child: Scaffold(
               appBar: AppBar(
                 title: Text('Menu Management'),
@@ -48,21 +48,23 @@ class _MenuManagementPageState extends State<MenuManagementPage> {
                         ],
                       ),
                     ),
-                    SingleChildScrollView(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          MenuListView(
-                            menus: provider.filteredMenus,
-                            onItemTap: (menu) {
-                              provider.selectMenu(menu);
-                              debugPrint(
-                                  'Selected menu: ${provider.selectedMenu!.title}');
-                            },
-                          ),
-                        ],
-                      ),
-                    ),
+                    ...provider.allCategories.map((category) {
+                      return SingleChildScrollView(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            MenuListView(
+                              menus: provider.filteredMenus
+                                  .where((menu) => menu.category == category)
+                                  .toList(),
+                              onItemTap: (menu) {
+                                provider.selectMenu(menu);
+                              },
+                            ),
+                          ],
+                        ),
+                      );
+                    }).toList(),
                   ],
                 );
               }),

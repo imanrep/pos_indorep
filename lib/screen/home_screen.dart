@@ -24,30 +24,18 @@ class _HomeScreenState extends State<HomeScreen> {
       const <NavigationRailDestination>[
     NavigationRailDestination(
       icon: Icon(Icons.home_outlined),
-      selectedIcon: Icon(Icons.home_filled),
+      selectedIcon: Icon(Icons.home_outlined),
       label: Text('Main'),
     ),
     NavigationRailDestination(
-      icon: Icon(Icons.bookmark_border),
-      selectedIcon: Icon(Icons.book),
-      label: Text('Second'),
-    ),
-    NavigationRailDestination(
-      icon: Icon(Icons.star_border),
-      selectedIcon: Icon(Icons.star),
-      label: Text('Third'),
-    ),
-    NavigationRailDestination(
-      icon: Icon(Icons.star_border),
-      selectedIcon: Icon(Icons.star),
+      icon: Icon(Icons.book_outlined),
+      selectedIcon: Icon(Icons.book_outlined),
       label: Text('Menu'),
     ),
   ];
 
   final List<Widget> _pages = <Widget>[
     MainPage(),
-    Placeholder(),
-    Placeholder(),
     MenuManagementPage(),
   ];
 
