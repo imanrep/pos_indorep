@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:pos_indorep/helper/helper.dart';
 import 'package:pos_indorep/model/example_data.dart';
-import 'package:pos_indorep/provider/main_provider.dart';
+import 'package:pos_indorep/provider/cart_provider.dart';
 import 'package:provider/provider.dart';
 
 class MainPage extends StatefulWidget {
@@ -17,7 +17,7 @@ class _MainPageState extends State<MainPage> {
     var example = ExampleData();
     var exampleMenu = example.exampleMenu;
 
-    return Consumer<MainProvider>(builder: (context, provider, child) {
+    return Consumer<CartProvider>(builder: (context, provider, child) {
       return Scaffold(
         backgroundColor: Colors.black.withOpacity(0.05),
         body: Row(

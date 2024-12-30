@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:pos_indorep/model/model.dart';
 import 'package:uuid/uuid.dart';
 
-class MainProvider with ChangeNotifier {
+class CartProvider with ChangeNotifier {
   List<Cart> _currentCart = [];
   double _totalCurrentCart = 0;
 
@@ -22,6 +22,7 @@ class MainProvider with ChangeNotifier {
 
     _currentCart.add(Cart(
       cartId: uuid.v4(),
+      available: item.available,
       menuId: item.menuId,
       title: item.title,
       category: item.category,

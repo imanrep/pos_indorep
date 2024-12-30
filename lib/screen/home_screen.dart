@@ -2,8 +2,10 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:pos_indorep/provider/menu_provider.dart';
 import 'package:pos_indorep/screen/home_pages/main_page.dart';
 import 'package:pos_indorep/screen/management/menu_management_page.dart';
+import 'package:provider/provider.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -51,12 +53,22 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final provider = Provider.of<MenuProvider>(context);
     return Scaffold(
       appBar: AppBar(
         elevation: 1,
         shadowColor: Colors.grey,
         title: Row(
-          children: [Text('INDOREP POS'), const Spacer(), ClockWidget()],
+          children: [
+            Text('INDOREP POS'),
+            const Spacer(),
+            TextButton(
+                onPressed: () {
+                  provider.pushExampleMenus();
+                },
+                child: Icon(Icons.download_rounded)),
+            ClockWidget()
+          ],
         ),
       ),
       body: Row(

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:pos_indorep/provider/main_provider.dart';
+import 'package:pos_indorep/provider/cart_provider.dart';
 import 'package:pos_indorep/provider/menu_provider.dart';
 import 'package:pos_indorep/screen/home_screen.dart';
 import 'package:provider/provider.dart';
@@ -14,7 +14,7 @@ void main() async {
   runApp(
     MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (_) => MainProvider()),
+        ChangeNotifierProvider(create: (_) => CartProvider()),
         ChangeNotifierProvider(create: (_) => MenuProvider()),
       ],
       child: MyApp(),
@@ -27,9 +27,6 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      Provider.of<MenuProvider>(context, listen: false).fetchAllMenus();
-    });
     return MaterialApp(
       title: 'POS INDOREP',
       theme: ThemeData(

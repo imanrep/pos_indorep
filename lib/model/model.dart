@@ -1,4 +1,5 @@
 class Menu {
+  final bool available;
   final String menuId;
   final String title;
   final String category;
@@ -9,6 +10,7 @@ class Menu {
   List<Option>? option;
 
   Menu({
+    required this.available,
     required this.menuId,
     required this.title,
     required this.category,
@@ -21,6 +23,7 @@ class Menu {
 
   factory Menu.fromMap(Map<String, dynamic> data) {
     return Menu(
+      available: data['available'],
       menuId: data['menuId'],
       title: data['title'],
       category: data['category'],
@@ -37,6 +40,7 @@ class Menu {
 
   Map<String, dynamic> toMap() {
     return {
+      'available': available,
       'menuId': menuId,
       'title': title,
       'category': category,
@@ -102,6 +106,7 @@ class Cart extends Menu {
 
   Cart({
     required this.cartId,
+    required bool available,
     required String menuId,
     required String title,
     required String category,
@@ -115,6 +120,7 @@ class Cart extends Menu {
     this.selectedOption,
   })  : subTotal = price * qty,
         super(
+          available: available,
           menuId: menuId,
           title: title,
           category: category,
