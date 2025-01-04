@@ -70,7 +70,9 @@ class MenuProvider with ChangeNotifier {
     if (category == 'All') {
       return _allMenus.length;
     } else {
-      return _allMenus.where((menu) => menu.category == category).length;
+      return _allMenus
+          .where((menu) => menu.category.categoryId == category)
+          .length;
     }
   }
 
@@ -90,6 +92,17 @@ class MenuProvider with ChangeNotifier {
   Future<void> addMenu(Menu menu) async {
     try {
       await _firebaseService.addMenu(menu);
+      fetchAllCategories();
+      fetchAllMenus();
+    } catch (e) {
+      // Handle error
+      print(e);
+    }
+  }
+
+  Future<void> deleteMenu(Menu menu) async {
+    try {
+      await _firebaseService.deleteMenu(menu);
       fetchAllCategories();
       fetchAllMenus();
     } catch (e) {

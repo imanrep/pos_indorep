@@ -12,12 +12,38 @@ class MenuManagementPage extends StatefulWidget {
   State<MenuManagementPage> createState() => _MenuManagementPageState();
 }
 
-class _MenuManagementPageState extends State<MenuManagementPage> {
+class _MenuManagementPageState extends State<MenuManagementPage>
+    with TickerProviderStateMixin {
+  late TabController _tabController;
+
   @override
   void initState() {
     super.initState();
+    WidgetsFlutterBinding.ensureInitialized();
     final provider = Provider.of<MenuProvider>(context, listen: false);
     provider.fetchAllMenus();
+    _initializeTabController(provider);
+  }
+
+  void _initializeTabController(MenuProvider provider) {
+    _tabController = TabController(
+      length: provider.allCategories.length + 1, // +1 for "Dashboard"
+      vsync: this,
+    );
+    _tabController.addListener(() {});
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final provider = Provider.of<MenuProvider>(context);
+    _initializeTabController(provider); // Reinitialize on dependency changes
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
   }
 
   @override
@@ -35,89 +61,105 @@ class _MenuManagementPageState extends State<MenuManagementPage> {
       children: [
         Expanded(
           flex: 4,
-          child: DefaultTabController(
-            length: tabs.length,
-            child: Scaffold(
-              appBar: AppBar(
-                title: Text('Menu Management'),
-                bottom: TabBar(tabs: tabs),
+          child: Scaffold(
+            appBar: AppBar(
+              title: Text('Menu Management'),
+              bottom: TabBar(
+                tabs: tabs,
+                controller: _tabController,
               ),
-              body: Consumer<MenuProvider>(builder: (context, provider, child) {
-                return TabBarView(
-                  children: [
-                    SingleChildScrollView(
-                      child: Padding(
-                        padding: const EdgeInsets.all(14.0),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text('Kategori',
-                                style: TextStyle(
-                                    fontSize: 24.0,
-                                    fontWeight: FontWeight.w600)),
-                            const SizedBox(height: 16.0),
-                            InfoCardListView(
-                              menus: provider.allmenus,
-                              onAddCategory: () {
-                                _showAddCategoryDialog(context, provider);
-                              },
-                            ),
-                          ],
-                        ),
+            ),
+            body: Consumer<MenuProvider>(builder: (context, provider, child) {
+              return TabBarView(
+                controller: _tabController,
+                children: [
+                  SingleChildScrollView(
+                    child: Padding(
+                      padding: const EdgeInsets.all(14.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('Kategori',
+                              style: TextStyle(
+                                  fontSize: 24.0, fontWeight: FontWeight.w600)),
+                          const SizedBox(height: 16.0),
+                          InfoCardListView(
+                            menus: provider.allmenus,
+                            onAddCategory: () {
+                              _showAddCategoryDialog(context, provider);
+                            },
+                          ),
+                        ],
                       ),
                     ),
-                    ...provider.allCategories.map((category) {
-                      return SingleChildScrollView(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceAround,
-                              children: [
-                                IconButton(
-                                  icon: Icon(Icons.add),
-                                  onPressed: () {
-                                    Menu newMenu = Menu(
-                                      menuId: '',
-                                      createdAt:
-                                          DateTime.now().millisecondsSinceEpoch,
-                                      title: 'New Menu',
-                                      category: Category(
-                                          categoryId: category.categoryId,
-                                          createdAt: category.createdAt),
-                                      price: 0,
-                                      image: '',
-                                      desc: '',
-                                      tag: [],
-                                      available: true,
-                                    );
-                                    provider.selectMenu(newMenu);
-                                  },
+                  ),
+                  ...provider.allCategories.map((category) {
+                    return SingleChildScrollView(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceAround,
+                            children: [
+                              IconButton(
+                                icon: Row(
+                                  children: [
+                                    Icon(Icons.add),
+                                    Text('Tambah Menu'),
+                                  ],
                                 ),
-                                IconButton(
-                                    onPressed: () {
-                                      provider
-                                          .deleteCategory(category.categoryId);
-                                    },
-                                    icon: Icon(Icons.delete_forever))
-                              ],
-                            ),
-                            MenuListView(
-                              menus: provider.filteredMenus
-                                  .where((menu) => menu.category == category)
-                                  .toList(),
-                              onItemTap: (menu) {
-                                provider.selectMenu(menu);
-                              },
-                            ),
-                          ],
-                        ),
-                      );
-                    }),
-                  ],
-                );
-              }),
-            ),
+                                onPressed: () {
+                                  Menu newMenu = Menu(
+                                    menuId: '',
+                                    createdAt:
+                                        DateTime.now().millisecondsSinceEpoch,
+                                    title: 'New Menu',
+                                    category: Category(
+                                        categoryId: category.categoryId,
+                                        createdAt: category.createdAt),
+                                    price: 0,
+                                    image: '',
+                                    desc: '',
+                                    tag: [],
+                                    available: true,
+                                  );
+                                  provider.selectMenu(newMenu);
+                                },
+                              ),
+                              IconButton(
+                                  onPressed: () async {
+                                    await provider
+                                        .deleteCategory(category.categoryId);
+                                    _tabController
+                                        .dispose(); // Dispose old controller
+                                    _initializeTabController(
+                                        provider); // Reinitialize with new tabs
+                                  },
+                                  icon: Row(
+                                    children: [
+                                      Icon(Icons.delete_forever),
+                                      Text('Hapus Kategori'),
+                                    ],
+                                  ))
+                            ],
+                          ),
+                          MenuListView(
+                            menus: provider.allmenus
+                                .where((menu) =>
+                                    menu.category.categoryId ==
+                                    category.categoryId)
+                                .toList(),
+                            onItemTap: (menu) {
+                              provider.selectMenu(menu);
+                            },
+                          ),
+                        ],
+                      ),
+                    );
+                  }),
+                ],
+              );
+            }),
           ),
         ),
         VerticalDivider(),
@@ -134,38 +176,41 @@ class _MenuManagementPageState extends State<MenuManagementPage> {
       ],
     );
   }
-}
 
-void _showAddCategoryDialog(BuildContext context, MenuProvider provider) {
-  final TextEditingController categoryController = TextEditingController();
+  void _showAddCategoryDialog(BuildContext context, MenuProvider provider) {
+    final TextEditingController categoryController = TextEditingController();
 
-  showDialog(
-    context: context,
-    builder: (BuildContext context) {
-      return AlertDialog(
-        title: Text('Tambah Kategori'),
-        content: TextField(
-          controller: categoryController,
-          decoration: InputDecoration(hintText: '...'),
-        ),
-        actions: <Widget>[
-          TextButton(
-            child: Text('Cancel'),
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Tambah Kategori'),
+          content: TextField(
+            controller: categoryController,
+            decoration: InputDecoration(hintText: '...'),
           ),
-          TextButton(
-            child: Text('Add'),
-            onPressed: () {
-              provider.addCategory(categoryController.text.toLowerCase());
-              Navigator.of(context).pop();
-            },
-          ),
-        ],
-      );
-    },
-  );
+          actions: <Widget>[
+            TextButton(
+              child: Text('Cancel'),
+              onPressed: () {
+                Navigator.of(context).pop();
+                _tabController.dispose();
+                _initializeTabController(provider);
+              },
+            ),
+            TextButton(
+              child: Text('Add'),
+              onPressed: () {
+                provider.addCategory(categoryController.text.toLowerCase());
+
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
 }
 
 class InfoCardListView extends StatelessWidget {
@@ -222,7 +267,7 @@ class InfoCardListView extends StatelessWidget {
             );
           } else {
             final title = categories[index].categoryId;
-            final qty = menus.where((menu) => menu.category == title).length;
+            final qty = provider.getCategoryCount(title);
             return Padding(
               padding: const EdgeInsets.symmetric(horizontal: 8.0),
               child: InfoCategoryCard(

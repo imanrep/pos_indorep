@@ -46,11 +46,8 @@ class FirebaseService {
 
   Future<Menu> addMenu(Menu menu) async {
     try {
-      DocumentReference docRef = _firestore
-          .collection('menus')
-          .doc(menu.category.categoryId)
-          .collection(menu.menuId)
-          .doc();
+      DocumentReference docRef =
+          _firestore.collection('menus').doc(menu.menuId);
       await docRef.set(menu.toMap());
       DocumentSnapshot docSnap = await docRef.get();
       return Menu.fromMap(docSnap.data() as Map<String, dynamic>);
@@ -86,11 +83,8 @@ class FirebaseService {
 
   Future<void> deleteMenu(Menu menu) async {
     try {
-      DocumentReference docRef = _firestore
-          .collection('menus')
-          .doc(menu.category.categoryId)
-          .collection(menu.menuId)
-          .doc(menu.menuId);
+      DocumentReference docRef =
+          _firestore.collection('menus').doc(menu.menuId);
       await docRef.delete();
     } catch (e) {
       rethrow;
