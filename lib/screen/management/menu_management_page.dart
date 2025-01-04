@@ -14,13 +14,21 @@ class MenuManagementPage extends StatefulWidget {
 
 class _MenuManagementPageState extends State<MenuManagementPage> {
   @override
+  void initState() {
+    super.initState();
+    final provider = Provider.of<MenuProvider>(context, listen: false);
+    provider.fetchAllMenus();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final provider = Provider.of<MenuProvider>(context);
+
     List<Tab> tabs = [
       Tab(text: 'Dashboard'),
-      ...provider.allCategories.map((category) {
-        return Tab(text: category);
-      }),
+      ...provider.allCategories.map((category) => Tab(
+          text: category.categoryId[0].toUpperCase() +
+              category.categoryId.substring(1))),
     ];
 
     return Row(
@@ -38,14 +46,24 @@ class _MenuManagementPageState extends State<MenuManagementPage> {
                 return TabBarView(
                   children: [
                     SingleChildScrollView(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          InfoCardListView(
-                            menus: provider.allmenus,
-                            onAddCategory: () {},
-                          ),
-                        ],
+                      child: Padding(
+                        padding: const EdgeInsets.all(14.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text('Kategori',
+                                style: TextStyle(
+                                    fontSize: 24.0,
+                                    fontWeight: FontWeight.w600)),
+                            const SizedBox(height: 16.0),
+                            InfoCardListView(
+                              menus: provider.allmenus,
+                              onAddCategory: () {
+                                _showAddCategoryDialog(context, provider);
+                              },
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                     ...provider.allCategories.map((category) {
@@ -53,6 +71,37 @@ class _MenuManagementPageState extends State<MenuManagementPage> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceAround,
+                              children: [
+                                IconButton(
+                                  icon: Icon(Icons.add),
+                                  onPressed: () {
+                                    Menu newMenu = Menu(
+                                      menuId: '',
+                                      createdAt:
+                                          DateTime.now().millisecondsSinceEpoch,
+                                      title: 'New Menu',
+                                      category: Category(
+                                          categoryId: category.categoryId,
+                                          createdAt: category.createdAt),
+                                      price: 0,
+                                      image: '',
+                                      desc: '',
+                                      tag: [],
+                                      available: true,
+                                    );
+                                    provider.selectMenu(newMenu);
+                                  },
+                                ),
+                                IconButton(
+                                    onPressed: () {
+                                      provider
+                                          .deleteCategory(category.categoryId);
+                                    },
+                                    icon: Icon(Icons.delete_forever))
+                              ],
+                            ),
                             MenuListView(
                               menus: provider.filteredMenus
                                   .where((menu) => menu.category == category)
@@ -64,13 +113,14 @@ class _MenuManagementPageState extends State<MenuManagementPage> {
                           ],
                         ),
                       );
-                    }).toList(),
+                    }),
                   ],
                 );
               }),
             ),
           ),
         ),
+        VerticalDivider(),
         Expanded(
           flex: 2,
           child: Consumer<MenuProvider>(builder: (context, provider, child) {
@@ -86,6 +136,38 @@ class _MenuManagementPageState extends State<MenuManagementPage> {
   }
 }
 
+void _showAddCategoryDialog(BuildContext context, MenuProvider provider) {
+  final TextEditingController categoryController = TextEditingController();
+
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: Text('Tambah Kategori'),
+        content: TextField(
+          controller: categoryController,
+          decoration: InputDecoration(hintText: '...'),
+        ),
+        actions: <Widget>[
+          TextButton(
+            child: Text('Cancel'),
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+          ),
+          TextButton(
+            child: Text('Add'),
+            onPressed: () {
+              provider.addCategory(categoryController.text.toLowerCase());
+              Navigator.of(context).pop();
+            },
+          ),
+        ],
+      );
+    },
+  );
+}
+
 class InfoCardListView extends StatelessWidget {
   final List<Menu> menus;
   final Function() onAddCategory;
@@ -98,13 +180,16 @@ class InfoCardListView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    List<String> categories = menus.map((e) => e.category).toSet().toList();
+    final provider = Provider.of<MenuProvider>(context);
+    final categories = provider.allCategories;
+    final menus = provider.allmenus;
+    debugPrint(categories.length.toString());
+
     return SizedBox(
       height: 100.0,
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
-        itemCount: categories.length +
-            1, // Add one more item for the "Add New Category" card
+        itemCount: categories.length + 1,
         itemBuilder: (context, index) {
           if (index == categories.length) {
             return Padding(
@@ -123,7 +208,7 @@ class InfoCardListView extends StatelessWidget {
                         Icon(Icons.add, size: 24.0),
                         SizedBox(height: 8.0),
                         Text(
-                          'Tambah',
+                          'Tambah Kategori',
                           style: TextStyle(
                             fontSize: 14.0,
                             fontWeight: FontWeight.w600,
@@ -136,11 +221,14 @@ class InfoCardListView extends StatelessWidget {
               ),
             );
           } else {
-            final title = categories[index];
+            final title = categories[index].categoryId;
             final qty = menus.where((menu) => menu.category == title).length;
             return Padding(
               padding: const EdgeInsets.symmetric(horizontal: 8.0),
-              child: InfoCard(title: title, qty: qty),
+              child: InfoCategoryCard(
+                title: title[0].toUpperCase() + title.substring(1),
+                qty: qty,
+              ),
             );
           }
         },
@@ -149,15 +237,15 @@ class InfoCardListView extends StatelessWidget {
   }
 }
 
-class InfoCard extends StatelessWidget {
+class InfoCategoryCard extends StatelessWidget {
   final String title;
   final int qty;
 
-  const InfoCard({
-    Key? key,
+  const InfoCategoryCard({
+    super.key,
     required this.title,
     required this.qty,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

@@ -40,7 +40,9 @@ class _EditMenuViewState extends State<EditMenuView> {
 
   void _initializeFields() {
     titleController = TextEditingController(text: widget.menu.title);
-    categoryController = TextEditingController(text: widget.menu.category);
+    categoryController = TextEditingController(
+        text: widget.menu.category.categoryId.toUpperCase() +
+            widget.menu.category.categoryId.substring(1));
     tagController = TextEditingController(text: widget.menu.tag.join(', '));
     imageController = TextEditingController(text: widget.menu.image);
     descController = TextEditingController(text: widget.menu.desc);

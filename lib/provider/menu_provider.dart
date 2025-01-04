@@ -6,17 +6,18 @@ import 'package:pos_indorep/services/firebase_service.dart';
 class MenuProvider with ChangeNotifier {
   List<Menu> _allMenus = [];
   List<Menu> _filteredMenus = [];
-  List<String> _allCategories = [];
+  List<Category> _allCategories = [];
   Menu? _selectedMenu;
 
   List<Menu> get allmenus => _allMenus;
   List<Menu> get filteredMenus => _filteredMenus;
-  List<String> get allCategories => _allCategories;
+  List<Category> get allCategories => _allCategories;
   Menu? get selectedMenu => _selectedMenu;
 
   final FirebaseService _firebaseService = FirebaseService();
 
   MenuProvider() {
+    fetchAllCategories();
     fetchAllMenus();
   }
 
@@ -35,6 +36,11 @@ class MenuProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  void clearSelectedMenu() {
+    _selectedMenu = null;
+    notifyListeners();
+  }
+
   Future<void> fetchAllMenus() async {
     try {
       List<Menu> fetchedMenus = await _firebaseService.getAllMenus();
@@ -50,15 +56,10 @@ class MenuProvider with ChangeNotifier {
 
   Future<void> fetchAllCategories() async {
     try {
-      List<String> fetchedCategories = [];
-      for (var menu in _allMenus) {
-        if (!fetchedCategories.contains(menu.category)) {
-          fetchedCategories.add(menu.category);
-        }
-      }
+      List<Category> fetchedCategories =
+          await _firebaseService.getAllCategories();
       _allCategories = fetchedCategories;
       notifyListeners();
-      debugPrint('All Categories: $_allCategories');
     } catch (e) {
       // Handle error
       print(e);
@@ -75,7 +76,54 @@ class MenuProvider with ChangeNotifier {
 
   Future<void> pushExampleMenus() async {
     try {
+      await _firebaseService.addCategory('makanan');
+      await _firebaseService.addCategory('makanan');
       await _firebaseService.pushExampleData(ExampleData().exampleMenu);
+      fetchAllCategories();
+      fetchAllMenus();
+    } catch (e) {
+      // Handle error
+      print(e);
+    }
+  }
+
+  Future<void> addMenu(Menu menu) async {
+    try {
+      await _firebaseService.addMenu(menu);
+      fetchAllCategories();
+      fetchAllMenus();
+    } catch (e) {
+      // Handle error
+      print(e);
+    }
+  }
+
+  Future<void> updateMenu(Menu menu) async {
+    try {
+      await _firebaseService.updateMenu(menu);
+      fetchAllCategories();
+      fetchAllMenus();
+    } catch (e) {
+      // Handle error
+      print(e);
+    }
+  }
+
+  Future<void> addCategory(String category) async {
+    try {
+      await _firebaseService.addCategory(category);
+      fetchAllCategories();
+      fetchAllMenus();
+    } catch (e) {
+      // Handle error
+      print(e);
+    }
+  }
+
+  Future<void> deleteCategory(String category) async {
+    try {
+      await _firebaseService.deleteCategory(category);
+      fetchAllCategories();
       fetchAllMenus();
     } catch (e) {
       // Handle error

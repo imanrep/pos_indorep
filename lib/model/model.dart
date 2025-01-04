@@ -1,12 +1,37 @@
+class Category {
+  final String categoryId;
+  final int createdAt;
+
+  Category({
+    required this.categoryId,
+    required this.createdAt,
+  });
+
+  factory Category.fromMap(Map<String, dynamic> data) {
+    return Category(
+      categoryId: data['categoryId'],
+      createdAt: data['createdAt'],
+    );
+  }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'categoryId': categoryId,
+      'createdAt': createdAt,
+    };
+  }
+}
+
 class Menu {
   final bool available;
   final String menuId;
   final String title;
-  final String category;
+  final Category category;
   final List<String> tag;
   final String image;
   final String desc;
   final double price;
+  final int createdAt;
   List<Option>? option;
 
   Menu({
@@ -18,6 +43,7 @@ class Menu {
     required this.image,
     required this.desc,
     required this.price,
+    required this.createdAt,
     this.option,
   });
 
@@ -26,11 +52,12 @@ class Menu {
       available: data['available'],
       menuId: data['menuId'],
       title: data['title'],
-      category: data['category'],
+      category: Category.fromMap(data['category']),
       tag: List<String>.from(data['tag']),
       image: data['image'],
       desc: data['desc'],
       price: data['price'].toDouble(),
+      createdAt: data['createdAt'],
       option: data['option'] != null
           ? List<Option>.from(
               data['option'].map((x) => Option.fromMap(x)).toList())
@@ -43,11 +70,12 @@ class Menu {
       'available': available,
       'menuId': menuId,
       'title': title,
-      'category': category,
+      'category': category.toMap(),
       'tag': tag,
       'image': image,
       'desc': desc,
       'price': price,
+      'createdAt': createdAt,
       'option': option?.map((opt) => opt.toMap()).toList(),
     };
   }
@@ -99,6 +127,7 @@ class SelectedOption {
 
 class Cart extends Menu {
   final String cartId;
+  final int createdAt;
   int qty;
   String notes;
   SelectedOption? selectedOption;
@@ -106,10 +135,11 @@ class Cart extends Menu {
 
   Cart({
     required this.cartId,
+    required this.createdAt,
     required bool available,
     required String menuId,
     required String title,
-    required String category,
+    required Category category,
     required List<String> tag,
     required String image,
     required String desc,
@@ -121,6 +151,7 @@ class Cart extends Menu {
   })  : subTotal = price * qty,
         super(
           available: available,
+          createdAt: createdAt,
           menuId: menuId,
           title: title,
           category: category,

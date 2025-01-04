@@ -22,6 +22,7 @@ class CartProvider with ChangeNotifier {
 
     _currentCart.add(Cart(
       cartId: uuid.v4(),
+      createdAt: DateTime.now().millisecondsSinceEpoch,
       available: item.available,
       menuId: item.menuId,
       title: item.title,

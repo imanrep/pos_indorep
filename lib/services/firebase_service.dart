@@ -16,6 +16,19 @@ class FirebaseService {
     }
   }
 
+  Future<List<Category>> getAllCategories() async {
+    try {
+      QuerySnapshot querySnapshot =
+          await _firestore.collection('categories').get();
+      List<Category> categories = querySnapshot.docs
+          .map((e) => Category.fromMap(e.data() as Map<String, dynamic>))
+          .toList();
+      return categories;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
   // Future<Menu> getMenuByCategories(String category) async {
   //   try {
   //     QuerySnapshot querySnapshot = await _firestore
@@ -31,11 +44,11 @@ class FirebaseService {
   //   }
   // }
 
-  Future<Menu> pushMenu(Menu menu) async {
+  Future<Menu> addMenu(Menu menu) async {
     try {
       DocumentReference docRef = _firestore
           .collection('menus')
-          .doc(menu.category)
+          .doc(menu.category.categoryId)
           .collection(menu.menuId)
           .doc();
       await docRef.set(menu.toMap());
@@ -53,6 +66,55 @@ class FirebaseService {
             _firestore.collection('menus').doc(menu.menuId);
         await docRef.set(menu.toMap());
       }
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<void> updateMenu(Menu menu) async {
+    try {
+      DocumentReference docRef = _firestore
+          .collection('menus')
+          .doc(menu.category.categoryId)
+          .collection(menu.menuId)
+          .doc(menu.menuId);
+      await docRef.update(menu.toMap());
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<void> deleteMenu(Menu menu) async {
+    try {
+      DocumentReference docRef = _firestore
+          .collection('menus')
+          .doc(menu.category.categoryId)
+          .collection(menu.menuId)
+          .doc(menu.menuId);
+      await docRef.delete();
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<void> addCategory(String category) async {
+    try {
+      DocumentReference docRef =
+          _firestore.collection('categories').doc(category);
+      await docRef.set({
+        'categoryId': category,
+        'createdAt': DateTime.now().millisecondsSinceEpoch
+      });
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<void> deleteCategory(String category) async {
+    try {
+      DocumentReference docRef =
+          _firestore.collection('categories').doc(category);
+      await docRef.delete();
     } catch (e) {
       rethrow;
     }

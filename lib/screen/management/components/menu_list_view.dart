@@ -28,6 +28,11 @@ class MenuListView extends StatelessWidget {
           leading: ClipRRect(
               borderRadius: BorderRadius.circular(8.0),
               child: Image.network(item.image)),
+          trailing: Icon(
+            Icons.arrow_forward_ios,
+            size: 18,
+            color: Colors.grey,
+          ),
         );
       },
     );
