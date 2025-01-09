@@ -4,6 +4,7 @@ import 'package:pos_indorep/model/model.dart';
 class FirebaseService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
+  // Menu Firebase
   Future<List<Menu>> getAllMenus() async {
     try {
       QuerySnapshot querySnapshot = await _firestore.collection('menus').get();
@@ -15,34 +16,6 @@ class FirebaseService {
       rethrow;
     }
   }
-
-  Future<List<Category>> getAllCategories() async {
-    try {
-      QuerySnapshot querySnapshot =
-          await _firestore.collection('categories').get();
-      List<Category> categories = querySnapshot.docs
-          .map((e) => Category.fromMap(e.data() as Map<String, dynamic>))
-          .toList();
-      return categories;
-    } catch (e) {
-      rethrow;
-    }
-  }
-
-  // Future<Menu> getMenuByCategories(String category) async {
-  //   try {
-  //     QuerySnapshot querySnapshot = await _firestore
-  //         .collection('menus')
-  //         .where('category', isEqualTo: category)
-  //         .get();
-  //     List<Menu> menus = querySnapshot.docs
-  //         .map((e) => Menu.fromMap(e.data() as Map<String, dynamic>))
-  //         .toList();
-  //     return menus[0];
-  //   } catch (e) {
-  //     rethrow;
-  //   }
-  // }
 
   Future<Menu> addMenu(Menu menu) async {
     try {
@@ -91,6 +64,20 @@ class FirebaseService {
     }
   }
 
+  // Category Firebase
+  Future<List<Category>> getAllCategories() async {
+    try {
+      QuerySnapshot querySnapshot =
+          await _firestore.collection('categories').get();
+      List<Category> categories = querySnapshot.docs
+          .map((e) => Category.fromMap(e.data() as Map<String, dynamic>))
+          .toList();
+      return categories;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
   Future<void> addCategory(String category) async {
     try {
       DocumentReference docRef =
@@ -109,6 +96,31 @@ class FirebaseService {
       DocumentReference docRef =
           _firestore.collection('categories').doc(category);
       await docRef.delete();
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  // Transaction Firebase
+  Future<void> addTransaction(TransactionModel transaction) {
+    try {
+      DocumentReference docRef =
+          _firestore.collection('transactions').doc(transaction.transactionId);
+      return docRef.set(transaction.toMap());
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<List<TransactionModel>> getAllTransaction() async {
+    try {
+      QuerySnapshot querySnapshot =
+          await _firestore.collection('transactions').get();
+      List<TransactionModel> transactions = querySnapshot.docs
+          .map(
+              (e) => TransactionModel.fromMap(e.data() as Map<String, dynamic>))
+          .toList();
+      return transactions;
     } catch (e) {
       rethrow;
     }

@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:pos_indorep/provider/menu_provider.dart';
 import 'package:pos_indorep/screen/home_pages/main_page.dart';
 import 'package:pos_indorep/screen/management/menu_management_page.dart';
+import 'package:pos_indorep/screen/transaction/transaction_page.dart';
 import 'package:provider/provider.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -28,6 +29,11 @@ class _HomeScreenState extends State<HomeScreen> {
       label: Text('Main'),
     ),
     NavigationRailDestination(
+      icon: Icon(Icons.receipt_long_rounded),
+      selectedIcon: Icon(Icons.receipt_long_rounded),
+      label: Text('Transaksi'),
+    ),
+    NavigationRailDestination(
       icon: Icon(Icons.book_outlined),
       selectedIcon: Icon(Icons.book_outlined),
       label: Text('Menu'),
@@ -36,6 +42,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   final List<Widget> _pages = <Widget>[
     MainPage(),
+    TransactionPage(),
     MenuManagementPage(),
   ];
 

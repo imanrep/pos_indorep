@@ -125,7 +125,7 @@ class SelectedOption {
   });
 }
 
-class Cart extends Menu {
+class CartItem extends Menu {
   final String cartId;
   final int createdAt;
   int qty;
@@ -133,7 +133,7 @@ class Cart extends Menu {
   SelectedOption? selectedOption;
   double subTotal;
 
-  Cart({
+  CartItem({
     required this.cartId,
     required this.createdAt,
     required bool available,
@@ -165,5 +165,93 @@ class Cart extends Menu {
   void updateQty(int newQty) {
     qty = newQty;
     subTotal = price * qty;
+  }
+
+  factory CartItem.fromMap(Map<String, dynamic> data) {
+    return CartItem(
+      cartId: data['cartId'],
+      createdAt: data['createdAt'],
+      available: data['available'],
+      menuId: data['menuId'],
+      title: data['title'],
+      category: Category.fromMap(data['category']),
+      tag: List<String>.from(data['tag']),
+      image: data['image'],
+      desc: data['desc'],
+      price: data['price'].toDouble(),
+      qty: data['qty'],
+      notes: data['notes'],
+      selectedOption: data['selectedOption'] != null
+          ? SelectedOption(
+              selectedOptionId: data['selectedOption']['selectedOptionId'],
+              title: data['selectedOption']['title'],
+              selected: data['selectedOption']['selected'],
+            )
+          : null,
+    );
+  }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'cartId': cartId,
+      'createdAt': createdAt,
+      'available': available,
+      'menuId': menuId,
+      'title': title,
+      'category': category.toMap(),
+      'tag': tag,
+      'image': image,
+      'desc': desc,
+      'price': price,
+      'qty': qty,
+      'notes': notes,
+      'selectedOption': selectedOption != null
+          ? {
+              'selectedOptionId': selectedOption!.selectedOptionId,
+              'title': selectedOption!.title,
+              'selected': selectedOption!.selected,
+            }
+          : null,
+    };
+  }
+}
+
+class TransactionModel {
+  final String nama;
+  final String transactionId;
+  final int transactionDate;
+  final List<CartItem> cart;
+  final double total;
+  final String paymentMethod;
+  TransactionModel({
+    required this.nama,
+    required this.transactionId,
+    required this.transactionDate,
+    required this.cart,
+    required this.total,
+    required this.paymentMethod,
+  });
+
+  factory TransactionModel.fromMap(Map<String, dynamic> data) {
+    return TransactionModel(
+      nama: data['nama'],
+      transactionId: data['transactionId'],
+      transactionDate: data['transactionDate'],
+      cart: List<CartItem>.from(
+          data['cart'].map((x) => CartItem.fromMap(x)).toList()),
+      total: data['total'].toDouble(),
+      paymentMethod: data['paymentMethod'],
+    );
+  }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'nama': nama,
+      'transactionId': transactionId,
+      'transactionDate': transactionDate,
+      'cart': cart.map((x) => x.toMap()).toList(),
+      'total': total,
+      'paymentMethod': paymentMethod,
+    };
   }
 }

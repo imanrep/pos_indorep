@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:pos_indorep/helper/helper.dart';
+import 'package:pos_indorep/model/model.dart';
 import 'package:pos_indorep/provider/cart_provider.dart';
 import 'package:pos_indorep/provider/menu_provider.dart';
+import 'package:pos_indorep/provider/transaction_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:uuid/uuid.dart';
 
 class MainPage extends StatefulWidget {
   const MainPage({super.key});
@@ -475,60 +478,101 @@ class _MainPageState extends State<MainPage> {
                               ),
                             ),
                           ),
-                          Container(
-                            height: 100,
-                            decoration: BoxDecoration(
-                              color: Colors.black.withOpacity(0.05),
-                            ),
-                            child: Column(
-                              children: [
-                                Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 12.0, vertical: 8.0),
+                          Column(
+                            children: [
+                              const SizedBox(height: 12.0),
+                              SizedBox(
+                                height: 60,
+                                child: Column(
+                                  children: [
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 12.0),
+                                      child: TextField(
+                                        style: const TextStyle(
+                                          fontSize: 14.0,
+                                          fontStyle: FontStyle.italic,
+                                          fontWeight: FontWeight.w400,
+                                        ),
+                                        decoration: InputDecoration(
+                                          hintText: 'atas nama...',
+                                          border: OutlineInputBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(12.0),
+                                            borderSide: BorderSide.none,
+                                          ),
+                                          filled: true,
+                                          fillColor: Colors.white,
+                                          contentPadding: EdgeInsets.symmetric(
+                                              horizontal: 16.0, vertical: 8.0),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 12.0, vertical: 8.0),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text('Total',
+                                        style: const TextStyle(
+                                            fontSize: 16.0,
+                                            fontWeight: FontWeight.w600)),
+                                    Text(
+                                        Helper.rupiahFormatter(
+                                            provider.totalCurrentCart),
+                                        style: const TextStyle(
+                                            fontSize: 16.0,
+                                            fontWeight: FontWeight.w600)),
+                                  ],
+                                ),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 12.0),
+                                child: ElevatedButton(
+                                  onPressed: () {
+                                    TransactionModel transaction =
+                                        TransactionModel(
+                                      nama: 'Ujang',
+                                      transactionDate:
+                                          DateTime.now().millisecondsSinceEpoch,
+                                      transactionId: Uuid().v4(),
+                                      paymentMethod: 'Cash ',
+                                      total: provider.totalCurrentCart,
+                                      cart: provider.currentCart,
+                                    );
+                                    final TransactionProvider
+                                        transactionProvider =
+                                        Provider.of<TransactionProvider>(
+                                            context,
+                                            listen: false);
+                                    transactionProvider
+                                        .addTransaction(transaction);
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(12.0),
+                                    ),
+                                  ),
                                   child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
+                                    mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
-                                      Text('Total',
-                                          style: const TextStyle(
-                                              fontSize: 16.0,
-                                              fontWeight: FontWeight.w600)),
-                                      Text(
-                                          Helper.rupiahFormatter(
-                                              provider.totalCurrentCart),
-                                          style: const TextStyle(
-                                              fontSize: 16.0,
-                                              fontWeight: FontWeight.w600)),
+                                      const Text(
+                                        'Bayar',
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
                                     ],
                                   ),
                                 ),
-                                Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 12.0),
-                                  child: ElevatedButton(
-                                    onPressed: () {},
-                                    style: ElevatedButton.styleFrom(
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(12.0),
-                                      ),
-                                    ),
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        const Text(
-                                          'Bayar',
-                                          style: TextStyle(
-                                            fontWeight: FontWeight.w600,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
+                              ),
+                            ],
                           ),
                         ],
                       ),

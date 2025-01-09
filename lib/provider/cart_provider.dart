@@ -3,10 +3,10 @@ import 'package:pos_indorep/model/model.dart';
 import 'package:uuid/uuid.dart';
 
 class CartProvider with ChangeNotifier {
-  List<Cart> _currentCart = [];
+  List<CartItem> _currentCart = [];
   double _totalCurrentCart = 0;
 
-  List<Cart> get currentCart => _currentCart;
+  List<CartItem> get currentCart => _currentCart;
   double get totalCurrentCart => _totalCurrentCart;
 
   void calculateTotalCart() {
@@ -20,7 +20,7 @@ class CartProvider with ChangeNotifier {
   void addItem(Menu item, int qty, String notes) {
     var uuid = Uuid();
 
-    _currentCart.add(Cart(
+    _currentCart.add(CartItem(
       cartId: uuid.v4(),
       createdAt: DateTime.now().millisecondsSinceEpoch,
       available: item.available,

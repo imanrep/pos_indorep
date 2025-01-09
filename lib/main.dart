@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:pos_indorep/provider/cart_provider.dart';
 import 'package:pos_indorep/provider/menu_provider.dart';
+import 'package:pos_indorep/provider/transaction_provider.dart';
 import 'package:pos_indorep/screen/home_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -15,6 +16,7 @@ void main() async {
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => CartProvider()),
+        ChangeNotifierProvider(create: (_) => TransactionProvider()),
         ChangeNotifierProvider(create: (_) => MenuProvider()),
       ],
       child: MyApp(),
