@@ -227,7 +227,6 @@ class InfoCardListView extends StatelessWidget {
   Widget build(BuildContext context) {
     final provider = Provider.of<MenuProvider>(context);
     final categories = provider.allCategories;
-    final menus = provider.allmenus;
     debugPrint(categories.length.toString());
 
     return SizedBox(

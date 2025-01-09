@@ -25,9 +25,10 @@ class TransactionListView extends StatelessWidget {
           onTap: () => onTransactionTap(transaction.transactionId),
           title: Text(Helper.rupiahFormatter(transaction.total)),
           subtitle: Text(transaction.transactionDate.toString()),
-          leading: ClipRRect(
-              borderRadius: BorderRadius.circular(8.0),
-              child: Image.network(transaction.cart.first.image)),
+          leading: CircleAvatar(
+            backgroundColor: Colors.blueGrey,
+            child: Text(transaction.cart.length.toString() + 'x'),
+          ),
           trailing: Icon(
             Icons.arrow_forward_ios,
             size: 18,
