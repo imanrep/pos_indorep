@@ -9,4 +9,9 @@ class Helper {
     );
     return formatter.format(price);
   }
+
+  static String dateFormatter(int date) {
+    final formatter = DateFormat('dd MMMM yyyy');
+    return formatter.format(DateTime.fromMillisecondsSinceEpoch(date));
+  }
 }

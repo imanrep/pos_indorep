@@ -4,8 +4,10 @@ import 'package:pos_indorep/services/firebase_service.dart';
 
 class TransactionProvider extends ChangeNotifier {
   List<TransactionModel> _transactions = [];
+  TransactionModel? _selectedTransaction;
 
   List<TransactionModel> get transactions => _transactions;
+  TransactionModel? get selectedTransaction => _selectedTransaction;
 
   final FirebaseService _firebaseService = FirebaseService();
 
@@ -31,5 +33,15 @@ class TransactionProvider extends ChangeNotifier {
     } catch (e) {
       rethrow;
     }
+  }
+
+  void selectTransaction(TransactionModel transaction) {
+    _selectedTransaction = transaction;
+    notifyListeners();
+  }
+
+  void clearSelectedTransaction() {
+    _selectedTransaction = null;
+    notifyListeners();
   }
 }

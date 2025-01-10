@@ -55,7 +55,7 @@ class _HomeScreenState extends State<HomeScreen> {
         shadowColor: Colors.grey,
         title: Row(
           children: [
-            Text('INDOREP POS'),
+            Text('POS'),
             const Spacer(),
             TextButton(
                 onPressed: () {
