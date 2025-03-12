@@ -6,8 +6,8 @@ import 'package:provider/provider.dart';
 
 class MenuGridView extends StatelessWidget {
   final int crossAxisCount;
-  final List<Menu> menus;
-  final Function(Menu) onItemTap;
+  final List<MenuIrep> menus;
+  final Function(MenuIrep) onItemTap;
   const MenuGridView(
       {super.key,
       required this.crossAxisCount,
@@ -48,7 +48,7 @@ class MenuGridView extends StatelessWidget {
                           topRight: Radius.circular(8.0),
                         ),
                         child: Image.network(
-                          item.image,
+                          item.menuImage,
                           height: 120,
                           width: double.infinity,
                           fit: BoxFit.cover,
@@ -66,7 +66,7 @@ class MenuGridView extends StatelessWidget {
                             textAlign: TextAlign.center,
                             overflow: TextOverflow.ellipsis,
                             maxLines: 2,
-                            item.title,
+                            item.menuName,
                             style: const TextStyle(
                               fontSize: 16.0,
                               fontWeight: FontWeight.w600,
@@ -86,7 +86,7 @@ class MenuGridView extends StatelessWidget {
                             textAlign: TextAlign.center,
                             overflow: TextOverflow.ellipsis,
                             maxLines: 1,
-                            Helper.rupiahFormatter(item.price),
+                            Helper.rupiahFormatter(item.menuPrice.toDouble()),
                             style: const TextStyle(
                               fontSize: 14.0,
                               color: Colors.grey,

@@ -22,149 +22,193 @@ class Category {
   }
 }
 
-class Menu {
+class OptionValue {
+  final String optionValueName;
+  final int optionValueId;
+  final int optionValuePrice;
+  bool isSelected;
+
+  OptionValue({
+    required this.optionValueName,
+    required this.optionValueId,
+    required this.optionValuePrice,
+    this.isSelected = false,
+  });
+
+  factory OptionValue.fromMap(Map<String, dynamic> data) {
+    return OptionValue(
+      optionValueName: data['option_value_name'],
+      optionValueId: data['option_value_name_id'],
+      optionValuePrice: data['option_value_price'],
+      isSelected: false,
+    );
+  }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'option_value_name': optionValueName,
+      'option_value_name_id': optionValueId,
+      'option_value_price': optionValuePrice,
+    };
+  }
+}
+
+class OptionMenuIrep {
+  final String optionName;
+  final List<OptionValue> optionValue;
+  final int optionId;
+  final String optionType;
   final bool available;
-  final String menuId;
-  final String title;
-  final Category category;
-  final List<String> tag;
-  final String image;
-  final String desc;
-  final double price;
-  final int createdAt;
-  List<Option>? option;
+  bool isSelected = false;
 
-  Menu({
-    required this.available,
-    required this.menuId,
-    required this.title,
-    required this.category,
-    required this.tag,
-    required this.image,
-    required this.desc,
-    required this.price,
-    required this.createdAt,
-    this.option,
-  });
+  // New properties for tracking selections
+  OptionValue? selectedValue; // For radio-type options
+  List<OptionValue> selectedValues = []; // For checkbox-type options
 
-  factory Menu.fromMap(Map<String, dynamic> data) {
-    return Menu(
-      available: data['available'],
-      menuId: data['menuId'],
-      title: data['title'],
-      category: Category.fromMap(data['category']),
-      tag: List<String>.from(data['tag']),
-      image: data['image'],
-      desc: data['desc'],
-      price: data['price'].toDouble(),
-      createdAt: data['createdAt'],
-      option: data['option'] != null
-          ? List<Option>.from(
-              data['option'].map((x) => Option.fromMap(x)).toList())
-          : null,
-    );
-  }
-
-  Map<String, dynamic> toMap() {
-    return {
-      'available': available,
-      'menuId': menuId,
-      'title': title,
-      'category': category.toMap(),
-      'tag': tag,
-      'image': image,
-      'desc': desc,
-      'price': price,
-      'createdAt': createdAt,
-      'option': option?.map((opt) => opt.toMap()).toList(),
-    };
-  }
-}
-
-class Option {
-  final String optionId;
-  final String title;
-  final String type;
-  final List<String> options;
-
-  Option({
+  OptionMenuIrep({
+    required this.optionName,
+    required this.optionValue,
     required this.optionId,
-    required this.title,
-    required this.type,
-    required this.options,
-  });
+    required this.optionType,
+    required this.available,
+    this.selectedValue,
+    List<OptionValue>? selectedValues,
+  }) : selectedValues = selectedValues ?? [];
 
-  factory Option.fromMap(Map<String, dynamic> data) {
-    return Option(
-      optionId: data['optionId'],
-      title: data['title'],
-      type: data['type'],
-      options: List<String>.from(data['options']),
+  factory OptionMenuIrep.fromMap(Map<String, dynamic> data) {
+    return OptionMenuIrep(
+      optionName: data['option_name'],
+      optionValue: List<OptionValue>.from(
+          data['option_value'].map((x) => OptionValue.fromMap(x))),
+      optionId: data['option_id'],
+      optionType: data['option_type'],
+      available: data['available'],
     );
   }
 
   Map<String, dynamic> toMap() {
     return {
-      'optionId': optionId,
-      'title': title,
-      'type': type,
-      'options': options,
+      'option_name': optionName,
+      'option_value': optionValue.map((x) => x.toMap()).toList(),
+      'option_id': optionId,
+      'option_type': optionType,
+      'available': available,
+      'selected_value': selectedValue?.toMap(),
+      'selected_values': selectedValues.map((x) => x.toMap()).toList(),
     };
   }
 }
 
-class SelectedOption {
-  final String selectedOptionId;
-  final String title;
-  final String selected;
+class MenuIrep {
+  final String menuType;
+  final String menuName;
+  final String menuImage;
+  final int menuPrice;
+  final int menuId;
+  final String menuNote;
+  final bool available;
+  final List<OptionMenuIrep>? option;
 
-  SelectedOption({
-    required this.selectedOptionId,
-    required this.title,
-    required this.selected,
+  MenuIrep({
+    required this.menuType,
+    required this.menuName,
+    required this.menuImage,
+    required this.menuPrice,
+    required this.menuId,
+    required this.menuNote,
+    required this.available,
+    required this.option,
   });
+
+  factory MenuIrep.fromMap(Map<String, dynamic> data) {
+    const String baseUrl = 'http://192.168.5.254:8085/pic/';
+    return MenuIrep(
+      menuType: data['menu_type'],
+      menuName: data['menu_name'],
+      menuImage: '${baseUrl + data['menu_image']}.png',
+      menuPrice: data['menu_price'],
+      menuId: data['menu_id'],
+      menuNote: data['menu_note'],
+      available: data['available'],
+      option: List<OptionMenuIrep>.from(
+          data['option'].map((x) => OptionMenuIrep.fromMap(x))),
+    );
+  }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'menu_type': menuType,
+      'menu_name': menuName,
+      'menu_image': menuImage,
+      'menu_price': menuPrice,
+      'menu_id': menuId,
+      'menu_note': menuNote,
+      'available': available,
+      'option': option?.map((x) => x.toMap()).toList(),
+    };
+  }
 }
 
-class CartItem extends Menu {
+class CartItem extends MenuIrep {
   final String cartId;
   final int createdAt;
   int qty;
   String notes;
-  SelectedOption? selectedOption;
   double subTotal;
+  double addOnPrice = 0; // Store additional price from selected options
+
+  // Store selected options
+  List<OptionMenuIrep> selectedOptions;
 
   CartItem({
     required this.cartId,
     required this.createdAt,
     required bool available,
-    required String menuId,
+    required int menuId,
     required String title,
-    required Category category,
-    required List<String> tag,
+    required String category,
     required String image,
     required String desc,
     required double price,
-    List<Option>? option,
+    List<OptionMenuIrep>? option,
+    List<OptionMenuIrep>? selectedOptions,
     this.qty = 1,
     this.notes = '',
-    this.selectedOption,
   })  : subTotal = price * qty,
+        selectedOptions = selectedOptions ?? [],
         super(
-          available: available,
-          createdAt: createdAt,
+          menuType: category,
+          menuName: title,
+          menuImage: image,
+          menuPrice: price.toInt(),
           menuId: menuId,
-          title: title,
-          category: category,
-          tag: tag,
-          image: image,
-          desc: desc,
-          price: price,
-          option: option,
-        );
+          menuNote: desc,
+          available: available,
+          option: option ?? [],
+        ) {
+    _calculateSubTotal(); // Calculate subtotal including add-ons
+  }
 
+  /// **Recalculate subtotal including selected add-ons**
+  void _calculateSubTotal() {
+    addOnPrice = selectedOptions
+        .expand((option) => option.optionValue)
+        .where((optVal) => optVal.isSelected)
+        .fold(0, (sum, optVal) => sum + optVal.optionValuePrice);
+
+    subTotal = (menuPrice.toDouble() + addOnPrice) * qty;
+  }
+
+  /// **Update quantity and recalculate subtotal**
   void updateQty(int newQty) {
     qty = newQty;
-    subTotal = price * qty;
+    _calculateSubTotal();
+  }
+
+  /// **Update selected options and recalculate subtotal**
+  void updateSelectedOptions(List<OptionMenuIrep> newOptions) {
+    selectedOptions = newOptions;
+    _calculateSubTotal();
   }
 
   factory CartItem.fromMap(Map<String, dynamic> data) {
@@ -174,44 +218,35 @@ class CartItem extends Menu {
       available: data['available'],
       menuId: data['menuId'],
       title: data['title'],
-      category: Category.fromMap(data['category']),
-      tag: List<String>.from(data['tag']),
+      category: data['category'],
       image: data['image'],
       desc: data['desc'],
       price: data['price'].toDouble(),
       qty: data['qty'],
       notes: data['notes'],
-      selectedOption: data['selectedOption'] != null
-          ? SelectedOption(
-              selectedOptionId: data['selectedOption']['selectedOptionId'],
-              title: data['selectedOption']['title'],
-              selected: data['selectedOption']['selected'],
-            )
-          : null,
+      selectedOptions: List<OptionMenuIrep>.from(
+        (data['selectedOptions'] ?? []).map((x) => OptionMenuIrep.fromMap(x)),
+      ),
     );
   }
 
+  @override
   Map<String, dynamic> toMap() {
     return {
       'cartId': cartId,
       'createdAt': createdAt,
       'available': available,
       'menuId': menuId,
-      'title': title,
-      'category': category.toMap(),
-      'tag': tag,
-      'image': image,
-      'desc': desc,
-      'price': price,
+      'title': menuName,
+      'category': menuType,
+      'image': menuImage,
+      'desc': menuNote,
+      'price': menuPrice,
       'qty': qty,
       'notes': notes,
-      'selectedOption': selectedOption != null
-          ? {
-              'selectedOptionId': selectedOption!.selectedOptionId,
-              'title': selectedOption!.title,
-              'selected': selectedOption!.selected,
-            }
-          : null,
+      'selectedOptions': selectedOptions.map((x) => x.toMap()).toList(),
+      'subTotal': subTotal,
+      'addOnPrice': addOnPrice, // Store add-on price separately
     };
   }
 }

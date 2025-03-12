@@ -28,9 +28,9 @@ class _TransactionDetailViewState extends State<TransactionDetailView> {
             itemBuilder: (context, index) {
               final cart = widget.transaction.cart[index];
               return ListTile(
-                title: Text(cart.title),
-                subtitle:
-                    Text('${cart.qty} x ${Helper.rupiahFormatter(cart.price)}'),
+                title: Text(cart.menuName),
+                subtitle: Text(
+                    '${cart.qty} x ${Helper.rupiahFormatter(cart.menuPrice.toDouble())}'),
               );
             },
           ),

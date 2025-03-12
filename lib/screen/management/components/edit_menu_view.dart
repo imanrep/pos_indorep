@@ -1,15 +1,16 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:intl/intl.dart';
+import 'package:pos_indorep/helper/helper.dart';
 import 'package:pos_indorep/model/model.dart';
 import 'package:provider/provider.dart';
 import 'package:pos_indorep/provider/menu_provider.dart';
 import 'package:uuid/uuid.dart';
 
 class EditMenuView extends StatefulWidget {
-  final Menu menu;
+  final MenuIrep menu;
 
   const EditMenuView({
     super.key,
@@ -46,14 +47,15 @@ class _EditMenuViewState extends State<EditMenuView> {
   }
 
   void _initializeFields() {
-    titleController = TextEditingController(text: widget.menu.title);
-    categoryController =
-        TextEditingController(text: widget.menu.category.categoryId);
-    tagController = TextEditingController(text: widget.menu.tag.join(', '));
-    descController = TextEditingController(text: widget.menu.desc);
-    priceController = TextEditingController(text: widget.menu.price.toString());
-    availableNotifier = ValueNotifier(widget.menu.available);
-    imageUrl = widget.menu.image;
+    final NumberFormat formatter =
+        NumberFormat.currency(locale: 'id', symbol: 'Rp', decimalDigits: 0);
+    titleController = TextEditingController(text: widget.menu.menuName);
+    categoryController = TextEditingController(text: widget.menu.menuType);
+    descController = TextEditingController(text: widget.menu.menuNote);
+    priceController =
+        TextEditingController(text: formatter.format(widget.menu.menuPrice));
+    // availableNotifier = ValueNotifier(widget.menu.available);
+    imageUrl = widget.menu.menuImage;
   }
 
   @override
@@ -66,24 +68,24 @@ class _EditMenuViewState extends State<EditMenuView> {
     super.dispose();
   }
 
-  Future<void> _pickImage() async {
-    final picker = ImagePicker();
-    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+  // Future<void> _pickImage() async {
+  //   final picker = ImagePicker();
+  //   final pickedFile = await picker.pickImage(source: ImageSource.gallery);
 
-    if (pickedFile != null) {
-      final file = File(pickedFile.path);
-      final fileName = pickedFile.name;
-      final storageRef =
-          FirebaseStorage.instance.ref().child('menu_images/$fileName');
-      final uploadTask = storageRef.putFile(file);
-      final snapshot = await uploadTask.whenComplete(() => {});
-      final downloadUrl = await snapshot.ref.getDownloadURL();
-      debugPrint(downloadUrl);
-      setState(() {
-        imageUrl = downloadUrl;
-      });
-    }
-  }
+  //   if (pickedFile != null) {
+  //     final file = File(pickedFile.path);
+  //     final fileName = pickedFile.name;
+  //     final storageRef =
+  //         FirebaseStorage.instance.ref().child('menu_images/$fileName');
+  //     final uploadTask = storageRef.putFile(file);
+  //     final snapshot = await uploadTask.whenComplete(() => {});
+  //     final downloadUrl = await snapshot.ref.getDownloadURL();
+  //     debugPrint(downloadUrl);
+  //     setState(() {
+  //       imageUrl = downloadUrl;
+  //     });
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -117,7 +119,7 @@ class _EditMenuViewState extends State<EditMenuView> {
                               children: [
                                 IconButton(
                                   icon: Icon(Icons.upload_file_rounded),
-                                  onPressed: _pickImage,
+                                  onPressed: () {},
                                   iconSize: 34,
                                 ),
                                 Text('Tambah Gambar'),
@@ -140,13 +142,13 @@ class _EditMenuViewState extends State<EditMenuView> {
                 ),
                 TextFormField(
                   controller: titleController,
-                  decoration: InputDecoration(labelText: 'Title'),
+                  decoration: InputDecoration(labelText: 'Nama'),
                   onSaved: (value) {
                     titleController.text = value!;
                   },
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Please enter a title';
+                      return 'Masukkan nama menu';
                     }
                     return null;
                   },
@@ -155,12 +157,12 @@ class _EditMenuViewState extends State<EditMenuView> {
                   value: categoryController.text.isNotEmpty
                       ? categoryController.text
                       : null,
-                  decoration: InputDecoration(labelText: 'Category'),
+                  decoration: InputDecoration(labelText: 'Kategori'),
                   items: provider.allCategories.map((category) {
                     return DropdownMenuItem<String>(
-                      value: category.categoryId,
-                      child: Text(category.categoryId[0].toUpperCase() +
-                          category.categoryId.substring(1)),
+                      value: category,
+                      child: Text(
+                          category[0].toUpperCase() + category.substring(1)),
                     );
                   }).toList(),
                   onChanged: (value) {
@@ -170,7 +172,7 @@ class _EditMenuViewState extends State<EditMenuView> {
                   },
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Please select a category';
+                      return 'Pilih kategori';
                     }
                     return null;
                   },
@@ -178,86 +180,92 @@ class _EditMenuViewState extends State<EditMenuView> {
                     categoryController.text = value!;
                   },
                 ),
-                TextFormField(
-                  controller: tagController,
-                  decoration:
-                      InputDecoration(labelText: 'Tags (comma separated)'),
-                  onSaved: (value) {
-                    tagController.text = value!;
-                  },
-                ),
+                // TextFormField(
+                //   controller: tagController,
+                //   decoration:
+                //       InputDecoration(labelText: 'Tags (comma separated)'),
+                //   onSaved: (value) {
+                //     tagController.text = value!;
+                //   },
+                // ),
                 TextFormField(
                   controller: descController,
-                  decoration: InputDecoration(labelText: 'Description'),
+                  decoration: InputDecoration(labelText: 'Deskripsi'),
                   onSaved: (value) {
                     descController.text = value!;
                   },
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Please enter a description';
+                      return 'Masukkan deskripsi';
                     }
                     return null;
                   },
                 ),
                 TextFormField(
                   controller: priceController,
-                  decoration: InputDecoration(labelText: 'Price'),
+                  decoration: InputDecoration(labelText: 'Harga'),
                   keyboardType: TextInputType.number,
+                  inputFormatters: [RupiahFormatter()],
                   onSaved: (value) {
-                    priceController.text = value!;
+                    double rawValue = double.tryParse(
+                            value!.replaceAll(RegExp(r'[^0-9]'), '')) ??
+                        0.0;
+                    priceController.text = rawValue.toString();
                   },
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Please enter a price';
+                      return 'Masukkan harga';
                     }
-                    if (double.tryParse(value) == null) {
-                      return 'Please enter a valid number';
+                    if (double.tryParse(
+                            value.replaceAll(RegExp(r'[^0-9]'), '')) ==
+                        null) {
+                      return 'Masukkan harga yang valid';
                     }
                     return null;
                   },
                 ),
                 SizedBox(height: 16.0),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    ElevatedButton(
-                      onPressed: () {
-                        if (_formKey.currentState!.validate()) {
-                          String menuId = Uuid().v4();
-                          _formKey.currentState!.save();
-                          debugPrint(widget.menu.menuId);
-                          debugPrint(widget.menu.category.categoryId);
-                          Menu currentMenu = Menu(
-                            available: availableNotifier.value,
-                            createdAt: DateTime.now().millisecondsSinceEpoch,
-                            menuId: menuId,
-                            title: titleController.text,
-                            category: Category(
-                              categoryId: categoryController.text,
-                              createdAt: widget.menu.category.createdAt,
-                            ),
-                            tag: tagController.text
-                                .split(',')
-                                .map((e) => e.trim())
-                                .toList(),
-                            image: imageUrl ?? '',
-                            desc: descController.text,
-                            price: double.parse(priceController.text),
-                            option: widget.menu.option,
-                          );
-                          provider.addMenu(currentMenu);
-                        }
-                      },
-                      child: Text('Simpan'),
-                    ),
-                    ElevatedButton(
-                        onPressed: () async {
-                          await provider.deleteMenu(widget.menu);
-                          provider.clearSelectedMenu();
-                        },
-                        child: Text('Hapus')),
-                  ],
-                ),
+                // Row(
+                //   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                //   children: [
+                //     ElevatedButton(
+                //       onPressed: () {
+                //         if (_formKey.currentState!.validate()) {
+                //           int menuId = widget.menu.menuId;
+                //           _formKey.currentState!.save();
+                //           // debugPrint(widget.menu.menuId);
+                //           // debugPrint(widget.menu.category.categoryId);
+                //           Menu currentMenu = Menu(
+                //             available: availableNotifier.value,
+                //             createdAt: DateTime.now().millisecondsSinceEpoch,
+                //             menuId: menuId,
+                //             title: titleController.text,
+                //             category: Category(
+                //               categoryId: categoryController.text,
+                //               createdAt: widget.menu.category.createdAt,
+                //             ),
+                //             tag: tagController.text
+                //                 .split(',')
+                //                 .map((e) => e.trim())
+                //                 .toList(),
+                //             image: imageUrl ?? '',
+                //             desc: descController.text,
+                //             price: double.parse(priceController.text),
+                //             option: widget.menu.option,
+                //           );
+                //           provider.addMenu(currentMenu);
+                //         }
+                //       },
+                //       child: Text('Simpan'),
+                //     ),
+                //     ElevatedButton(
+                //         onPressed: () async {
+                //           await provider.deleteMenu(widget.menu);
+                //           provider.clearSelectedMenu();
+                //         },
+                //         child: Text('Hapus')),
+                //   ],
+                // ),
               ],
             ),
           ),

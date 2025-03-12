@@ -12,29 +12,15 @@ class CartProvider with ChangeNotifier {
   void calculateTotalCart() {
     _totalCurrentCart = 0;
     for (var item in _currentCart) {
-      _totalCurrentCart += item.price * item.qty;
+      _totalCurrentCart += item.subTotal;
     }
     notifyListeners();
   }
 
-  void addItem(Menu item, int qty, String notes) {
+  void addItem(CartItem item) {
     var uuid = Uuid();
 
-    _currentCart.add(CartItem(
-      cartId: uuid.v4(),
-      createdAt: DateTime.now().millisecondsSinceEpoch,
-      available: item.available,
-      menuId: item.menuId,
-      title: item.title,
-      category: item.category,
-      tag: item.tag,
-      image: item.image,
-      desc: item.desc,
-      price: item.price,
-      option: item.option,
-      qty: qty,
-      notes: notes,
-    ));
+    _currentCart.add(item);
     calculateTotalCart();
     notifyListeners();
   }
@@ -55,24 +41,42 @@ class CartProvider with ChangeNotifier {
     }
   }
 
-  void setSelectedOptionFromCart(
-      String cartId, String optionId, String option) {
-    final cartIndex = _currentCart.indexWhere((item) => item.cartId == cartId);
-    if (cartIndex != -1) {
-      final cartItem = _currentCart[cartIndex];
-      final optionIndex = cartItem.option
-          ?.indexWhere((element) => element.optionId == optionId);
-      if (optionIndex != null && optionIndex != -1) {
-        cartItem.selectedOption = SelectedOption(
-          selectedOptionId: optionId,
-          title: cartItem.option![optionIndex].title,
-          selected: option,
-        );
-        debugPrint('Selected Option for ${cartItem.cartId} : $option');
-        notifyListeners();
-      }
-    }
-  }
+  // void toggleSelectedOptionFromCart(
+  //     String cartId, int optionId, String option, bool isSelected) {
+  //   final cartIndex = _currentCart.indexWhere((item) => item.cartId == cartId);
+  //   if (cartIndex != -1) {
+  //     final cartItem = _currentCart[cartIndex];
+
+  //     cartItem.selectedOption ??= SelectedOption(
+  //         selectedOptionId: optionId,
+  //         title: cartItem.option
+  //                 .firstWhere(
+  //                   (element) => element.optionId == optionId,
+  //                 )
+  //                 .optionName,
+  //         selected: option,
+  //       );
+
+  //     List<String> selectedOptions =
+  //         List<String>.from(cartItem.selectedOption!.selected ?? []);
+
+  //     if (isSelected) {
+  //       // Add if not already present
+  //       if (!selectedOptions.contains(option)) {
+  //         selectedOptions.add(option);
+  //       }
+  //     } else {
+  //       // Remove if present
+  //       selectedOptions.remove(option);
+  //     }
+
+  //     cartItem.selectedOption!.selected = selectedOptions;
+
+  //     debugPrint('Updated Cart (${cartItem.cartId}): $selectedOptions');
+
+  //     notifyListeners();
+  //   }
+  // }
 
   void addItemNotes(String cartId, String notes) {
     final index =
@@ -88,7 +92,7 @@ class CartProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  void removeItem(Menu item) {
+  void removeItem(MenuIrep item) {
     _currentCart.remove(item);
     notifyListeners();
   }

@@ -3,8 +3,9 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:pos_indorep/provider/menu_provider.dart';
-import 'package:pos_indorep/screen/home_pages/main_page.dart';
+import 'package:pos_indorep/screen/pesanan_page/pesanan_page.dart';
 import 'package:pos_indorep/screen/management/menu_management_page.dart';
+import 'package:pos_indorep/screen/meja/meja_page.dart';
 import 'package:pos_indorep/screen/transaction/transaction_page.dart';
 import 'package:provider/provider.dart';
 
@@ -24,9 +25,9 @@ class _HomeScreenState extends State<HomeScreen> {
   final List<NavigationRailDestination> _destinations =
       const <NavigationRailDestination>[
     NavigationRailDestination(
-      icon: Icon(Icons.home_outlined),
-      selectedIcon: Icon(Icons.home_outlined),
-      label: Text('Main'),
+      icon: Icon(Icons.book_outlined),
+      selectedIcon: Icon(Icons.book_outlined),
+      label: Text('Pesanan'),
     ),
     NavigationRailDestination(
       icon: Icon(Icons.receipt_long_rounded),
@@ -34,21 +35,27 @@ class _HomeScreenState extends State<HomeScreen> {
       label: Text('Transaksi'),
     ),
     NavigationRailDestination(
-      icon: Icon(Icons.book_outlined),
-      selectedIcon: Icon(Icons.book_outlined),
+      icon: Icon(Icons.lunch_dining_outlined),
+      selectedIcon: Icon(Icons.lunch_dining_outlined),
       label: Text('Menu'),
+    ),
+    NavigationRailDestination(
+      icon: Icon(Icons.table_bar_outlined),
+      selectedIcon: Icon(Icons.table_bar_outlined),
+      label: Text('Meja'),
     ),
   ];
 
   final List<Widget> _pages = <Widget>[
-    MainPage(),
+    PesananPage(),
     TransactionPage(),
     MenuManagementPage(),
+    MejaPage(),
   ];
 
   @override
   Widget build(BuildContext context) {
-    final provider = Provider.of<MenuProvider>(context);
+    // final provider = Provider.of<MenuProvider>(context);
     return Scaffold(
       appBar: AppBar(
         elevation: 1,
@@ -59,7 +66,7 @@ class _HomeScreenState extends State<HomeScreen> {
             const Spacer(),
             TextButton(
                 onPressed: () {
-                  provider.pushExampleMenus();
+                  // provider.pushExampleMenus();
                 },
                 child: Icon(Icons.download_rounded)),
             ClockWidget()

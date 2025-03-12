@@ -4,14 +4,9 @@ import 'package:pos_indorep/provider/menu_provider.dart';
 import 'package:pos_indorep/provider/transaction_provider.dart';
 import 'package:pos_indorep/screen/home_screen.dart';
 import 'package:provider/provider.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'firebase_options.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
   runApp(
     MultiProvider(
       providers: [

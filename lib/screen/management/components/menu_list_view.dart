@@ -3,8 +3,8 @@ import 'package:pos_indorep/helper/helper.dart';
 import 'package:pos_indorep/model/model.dart';
 
 class MenuListView extends StatelessWidget {
-  final List<Menu> menus;
-  final Function(Menu) onItemTap;
+  final List<MenuIrep> menus;
+  final Function(MenuIrep) onItemTap;
 
   const MenuListView({
     super.key,
@@ -23,11 +23,11 @@ class MenuListView extends StatelessWidget {
         final item = menus[index];
         return ListTile(
           onTap: () => onItemTap(item),
-          title: Text(item.title),
-          subtitle: Text(Helper.rupiahFormatter(item.price)),
+          title: Text(item.menuName),
+          subtitle: Text(Helper.rupiahFormatter(item.menuPrice.toDouble())),
           leading: ClipRRect(
               borderRadius: BorderRadius.circular(8.0),
-              child: Image.network(item.image)),
+              child: Image.network(item.menuImage)),
           trailing: Icon(
             Icons.arrow_forward_ios,
             size: 18,

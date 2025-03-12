@@ -1,0 +1,507 @@
+[
+    {
+        "menu_type": "makanan",
+        "menu_name": "Burger",
+        "menu_image": "food1",
+        "menu_price": 20000,
+        "menu_id": 1,
+        "menu_note": "Normal Ass Burger",
+        "available": true,
+        "option": [
+            {
+                "option_name": "Saus",
+                "option_value": [
+                    {
+                        "option_value_name": "Saus Tomat & Saus Pedas",
+                        "option_value_name_id": 1,
+                        "option_value_price": 0
+                    },
+                    {
+                        "option_value_name": "Saus Tomat",
+                        "option_value_name_id": 2,
+                        "option_value_price": 0
+                    },
+                    {
+                        "option_value_name": "Saus Pedas",
+                        "option_value_name_id": 3,
+                        "option_value_price": 0
+                    },
+                    {
+                        "option_value_name": "Tanpa Saus",
+                        "option_value_name_id": 4,
+                        "option_value_price": 0
+                    }
+                ],
+                "option_id": 1,
+                "option_type": "Radio",
+                "available": true
+            },
+            {
+                "option_name": "Opsi",
+                "option_value": [
+                    {
+                        "option_value_name": "Tanpa Bawang",
+                        "option_value_name_id": 5,
+                        "option_value_price": 0
+                    }
+                ],
+                "option_id": 2,
+                "option_type": "Checkbox",
+                "available": true
+            },
+            {
+                "option_name": "Add on",
+                "option_value": [
+                    {
+                        "option_value_name": "Daging Double",
+                        "option_value_name_id": 6,
+                        "option_value_price": 5000
+                    }
+                ],
+                "option_id": 3,
+                "option_type": "Checkbox",
+                "available": true
+            }
+        ]
+    },
+    {
+        "menu_type": "makanan",
+        "menu_name": "Rice Bowl Chicken",
+        "menu_image": "food2",
+        "menu_price": 20000,
+        "menu_id": 2,
+        "menu_note": "Normal portion of Rice Bowl with Chicken",
+        "available": false,
+        "option": []
+    },
+    {
+        "menu_type": "makanan",
+        "menu_name": "Rice Bowl Beef",
+        "menu_image": "food3",
+        "menu_price": 20000,
+        "menu_id": 3,
+        "menu_note": "Normal portion of Rice Bowl with Beef",
+        "available": true,
+        "option": []
+    },
+    {
+        "menu_type": "makanan",
+        "menu_name": "Rice Bowl Egg",
+        "menu_image": "food4",
+        "menu_price": 20000,
+        "menu_id": 4,
+        "menu_note": "Normal portion of Rice Bowl with Egg",
+        "available": true,
+        "option": []
+    },
+    {
+        "menu_type": "makanan",
+        "menu_name": "Sandwich",
+        "menu_image": "food5",
+        "menu_price": 20000,
+        "menu_id": 5,
+        "menu_note": "Sandwich with egg",
+        "available": true,
+        "option": []
+    },
+    {
+        "menu_type": "makanan",
+        "menu_name": "Gorengan Jejepangan",
+        "menu_image": "food6",
+        "menu_price": 20000,
+        "menu_id": 6,
+        "menu_note": "Japanese style fried food",
+        "available": true,
+        "option": []
+    },
+    {
+        "menu_type": "makanan",
+        "menu_name": "Mie Samyang",
+        "menu_image": "food7",
+        "menu_price": 20000,
+        "menu_id": 7,
+        "menu_note": "Spicy Samyang noodle",
+        "available": true,
+        "option": []
+    },
+    {
+        "menu_type": "makanan",
+        "menu_name": "Roti Bakar",
+        "menu_image": "food1",
+        "menu_price": 20000,
+        "menu_id": 8,
+        "menu_note": "Roti Bakar with Butter",
+        "available": true,
+        "option": []
+    },
+    {
+        "menu_type": "makanan",
+        "menu_name": "Platter Gorengan",
+        "menu_image": "food2",
+        "menu_price": 20000,
+        "menu_id": 9,
+        "menu_note": "ADD DESCRIPTON",
+        "available": true,
+        "option": []
+    },
+    {
+        "menu_type": "makanan",
+        "menu_name": "Nasi Ayam",
+        "menu_image": "food3",
+        "menu_price": 20000,
+        "menu_id": 10,
+        "menu_note": "Normal",
+        "available": true,
+        "option": []
+    },
+    {
+        "menu_type": "makanan",
+        "menu_name": "Indomie Goreng",
+        "menu_image": "food4",
+        "menu_price": 20000,
+        "menu_id": 11,
+        "menu_note": "ADD DESCRIPTON",
+        "available": true,
+        "option": []
+    },
+    {
+        "menu_type": "makanan",
+        "menu_name": "Indomie Kuah",
+        "menu_image": "food5",
+        "menu_price": 20000,
+        "menu_id": 12,
+        "menu_note": "ADD DESCRIPTON",
+        "available": true,
+        "option": []
+    },
+    {
+        "menu_type": "tiam",
+        "menu_name": "Kopi Susu",
+        "menu_image": "",
+        "menu_price": 20000,
+        "menu_id": 13,
+        "menu_note": "ADD DESCRIPTON",
+        "available": true,
+        "option": []
+    },
+    {
+        "menu_type": "tiam",
+        "menu_name": "Kopi Krim",
+        "menu_image": "",
+        "menu_price": 20000,
+        "menu_id": 14,
+        "menu_note": "ADD DESCRIPTON",
+        "available": true,
+        "option": []
+    },
+    {
+        "menu_type": "tiam",
+        "menu_name": "Kopi Milo Cream",
+        "menu_image": "",
+        "menu_price": 20000,
+        "menu_id": 15,
+        "menu_note": "ADD DESCRIPTON",
+        "available": true,
+        "option": []
+    },
+    {
+        "menu_type": "tiam",
+        "menu_name": "Kopi Gula Aren",
+        "menu_image": "",
+        "menu_price": 20000,
+        "menu_id": 16,
+        "menu_note": "ADD DESCRIPTON",
+        "available": true,
+        "option": []
+    },
+    {
+        "menu_type": "tiam",
+        "menu_name": "Kopi Pandan",
+        "menu_image": "",
+        "menu_price": 20000,
+        "menu_id": 17,
+        "menu_note": "ADD DESCRIPTON",
+        "available": true,
+        "option": []
+    },
+    {
+        "menu_type": "tiam",
+        "menu_name": "Kopi Coklat",
+        "menu_image": "",
+        "menu_price": 20000,
+        "menu_id": 18,
+        "menu_note": "ADD DESCRIPTON",
+        "available": true,
+        "option": []
+    },
+    {
+        "menu_type": "tiam",
+        "menu_name": "Kopi Hitam",
+        "menu_image": "",
+        "menu_price": 20000,
+        "menu_id": 19,
+        "menu_note": "ADD DESCRIPTON",
+        "available": true,
+        "option": []
+    },
+    {
+        "menu_type": "tiam",
+        "menu_name": "Kopi Karamel",
+        "menu_image": "",
+        "menu_price": 20000,
+        "menu_id": 20,
+        "menu_note": "ADD DESCRIPTON",
+        "available": true,
+        "option": []
+    },
+    {
+        "menu_type": "espresso",
+        "menu_name": "Espresso (1 Shot)",
+        "menu_image": "",
+        "menu_price": 20000,
+        "menu_id": 21,
+        "menu_note": "ADD DESCRIPTON",
+        "available": true,
+        "option": []
+    },
+    {
+        "menu_type": "espresso",
+        "menu_name": "Kopi Susu",
+        "menu_image": "",
+        "menu_price": 20000,
+        "menu_id": 22,
+        "menu_note": "ADD DESCRIPTON",
+        "available": true,
+        "option": []
+    },
+    {
+        "menu_type": "espresso",
+        "menu_name": "Kopi Krim",
+        "menu_image": "",
+        "menu_price": 20000,
+        "menu_id": 23,
+        "menu_note": "ADD DESCRIPTON",
+        "available": true,
+        "option": []
+    },
+    {
+        "menu_type": "espresso",
+        "menu_name": "Kopi Milo",
+        "menu_image": "",
+        "menu_price": 20000,
+        "menu_id": 24,
+        "menu_note": "ADD DESCRIPTON",
+        "available": true,
+        "option": []
+    },
+    {
+        "menu_type": "espresso",
+        "menu_name": "Kopi Gula Aren",
+        "menu_image": "",
+        "menu_price": 20000,
+        "menu_id": 25,
+        "menu_note": "ADD DESCRIPTON",
+        "available": true,
+        "option": []
+    },
+    {
+        "menu_type": "espresso",
+        "menu_name": "Caffé Latte",
+        "menu_image": "",
+        "menu_price": 20000,
+        "menu_id": 26,
+        "menu_note": "ADD DESCRIPTON",
+        "available": true,
+        "option": []
+    },
+    {
+        "menu_type": "espresso",
+        "menu_name": "Cappuccino",
+        "menu_image": "",
+        "menu_price": 20000,
+        "menu_id": 27,
+        "menu_note": "ADD DESCRIPTON",
+        "available": true,
+        "option": []
+    },
+    {
+        "menu_type": "espresso",
+        "menu_name": "Mocaccino",
+        "menu_image": "",
+        "menu_price": 20000,
+        "menu_id": 28,
+        "menu_note": "ADD DESCRIPTON",
+        "available": true,
+        "option": []
+    },
+    {
+        "menu_type": "espresso",
+        "menu_name": "Americano",
+        "menu_image": "",
+        "menu_price": 20000,
+        "menu_id": 29,
+        "menu_note": "ADD DESCRIPTON",
+        "available": true,
+        "option": []
+    },
+    {
+        "menu_type": "espresso",
+        "menu_name": "Caramel Macchiato",
+        "menu_image": "",
+        "menu_price": 20000,
+        "menu_id": 30,
+        "menu_note": "ADD DESCRIPTON",
+        "available": true,
+        "option": []
+    },
+    {
+        "menu_type": "manual",
+        "menu_name": "V60",
+        "menu_image": "",
+        "menu_price": 20000,
+        "menu_id": 31,
+        "menu_note": "ADD DESCRIPTON",
+        "available": true,
+        "option": []
+    },
+    {
+        "menu_type": "manual",
+        "menu_name": "Vitenam Drip",
+        "menu_image": "",
+        "menu_price": 20000,
+        "menu_id": 32,
+        "menu_note": "ADD DESCRIPTON",
+        "available": true,
+        "option": []
+    },
+    {
+        "menu_type": "manual",
+        "menu_name": "Mokapot (1 Shot)",
+        "menu_image": "",
+        "menu_price": 20000,
+        "menu_id": 33,
+        "menu_note": "ADD DESCRIPTON",
+        "available": true,
+        "option": []
+    },
+    {
+        "menu_type": "nonKopi",
+        "menu_name": "Thai Tea",
+        "menu_image": "chocolate",
+        "menu_price": 20000,
+        "menu_id": 34,
+        "menu_note": "ADD DESCRIPTON",
+        "available": true,
+        "option": []
+    },
+    {
+        "menu_type": "nonKopi",
+        "menu_name": "Green Tea",
+        "menu_image": "milo_cream",
+        "menu_price": 20000,
+        "menu_id": 35,
+        "menu_note": "ADD DESCRIPTON",
+        "available": true,
+        "option": []
+    },
+    {
+        "menu_type": "nonKopi",
+        "menu_name": "Teh Tarik",
+        "menu_image": "tarik",
+        "menu_price": 20000,
+        "menu_id": 36,
+        "menu_note": "ADD DESCRIPTON",
+        "available": true,
+        "option": []
+    },
+    {
+        "menu_type": "nonKopi",
+        "menu_name": "Iced Tea",
+        "menu_image": "milo_cream",
+        "menu_price": 20000,
+        "menu_id": 37,
+        "menu_note": "ADD DESCRIPTON",
+        "available": true,
+        "option": []
+    },
+    {
+        "menu_type": "nonKopi",
+        "menu_name": "Lemon Tea",
+        "menu_image": "chocolate",
+        "menu_price": 20000,
+        "menu_id": 38,
+        "menu_note": "ADD DESCRIPTON",
+        "available": true,
+        "option": []
+    },
+    {
+        "menu_type": "nonKopi",
+        "menu_name": "Oreo Regal Blend",
+        "menu_image": "blue_ocean",
+        "menu_price": 20000,
+        "menu_id": 39,
+        "menu_note": "ADD DESCRIPTON",
+        "available": true,
+        "option": []
+    },
+    {
+        "menu_type": "nonKopi",
+        "menu_name": "Milo Cream",
+        "menu_image": "milo_cream",
+        "menu_price": 20000,
+        "menu_id": 40,
+        "menu_note": "ADD DESCRIPTON",
+        "available": true,
+        "option": []
+    },
+    {
+        "menu_type": "nonKopi",
+        "menu_name": "Chocolate shake",
+        "menu_image": "chocolate",
+        "menu_price": 20000,
+        "menu_id": 41,
+        "menu_note": "ADD DESCRIPTON",
+        "available": true,
+        "option": []
+    },
+    {
+        "menu_type": "nonKopi",
+        "menu_name": "Vanilla Milk",
+        "menu_image": "chocolate",
+        "menu_price": 20000,
+        "menu_id": 42,
+        "menu_note": "ADD DESCRIPTON",
+        "available": true,
+        "option": []
+    },
+    {
+        "menu_type": "nonKopi",
+        "menu_name": "Strawberry Milk",
+        "menu_image": "tarik",
+        "menu_price": 20000,
+        "menu_id": 43,
+        "menu_note": "ADD DESCRIPTON",
+        "available": true,
+        "option": []
+    },
+    {
+        "menu_type": "nonKopi",
+        "menu_name": "Blue Ocean",
+        "menu_image": "blue_ocean",
+        "menu_price": 20000,
+        "menu_id": 44,
+        "menu_note": "ADD DESCRIPTON",
+        "available": true,
+        "option": []
+    },
+    {
+        "menu_type": "nonKopi",
+        "menu_name": "Summer Punch",
+        "menu_image": "tarik",
+        "menu_price": 20000,
+        "menu_id": 45,
+        "menu_note": "ADD DESCRIPTON",
+        "available": true,
+        "option": []
+    }
+]

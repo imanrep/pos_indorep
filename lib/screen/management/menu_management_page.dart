@@ -25,19 +25,51 @@ class _MenuManagementPageState extends State<MenuManagementPage>
     _initializeTabController(provider);
   }
 
+  void _updateTabController() {
+    final provider = Provider.of<MenuProvider>(context, listen: false);
+
+    if (mounted) {
+      int previousIndex = _tabController.index; // Save current index
+      int maxIndex = provider.allCategories.length; // Max possible index
+
+      _tabController.dispose(); // Dispose old controller
+
+      _tabController = TabController(
+        length: maxIndex + 1, // +1 for "Dashboard"
+        vsync: this,
+      );
+
+      // Restore the previous index, but ensure it's within bounds
+      _tabController.index =
+          (previousIndex > maxIndex) ? maxIndex : previousIndex;
+
+      _tabController.addListener(() {
+        if (!_tabController.indexIsChanging) {
+          provider.clearSelectedMenu();
+        }
+      });
+
+      setState(() {}); // Trigger UI rebuild
+    }
+  }
+
   void _initializeTabController(MenuProvider provider) {
     _tabController = TabController(
       length: provider.allCategories.length + 1, // +1 for "Dashboard"
       vsync: this,
     );
-    _tabController.addListener(() {});
+
+    _tabController.addListener(() {
+      if (!_tabController.indexIsChanging) {
+        provider.clearSelectedMenu();
+      }
+    });
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    final provider = Provider.of<MenuProvider>(context);
-    _initializeTabController(provider); // Reinitialize on dependency changes
+    _updateTabController();
   }
 
   @override
@@ -52,9 +84,8 @@ class _MenuManagementPageState extends State<MenuManagementPage>
 
     List<Tab> tabs = [
       Tab(text: 'Dashboard'),
-      ...provider.allCategories.map((category) => Tab(
-          text: category.categoryId[0].toUpperCase() +
-              category.categoryId.substring(1))),
+      ...provider.allCategories.map((category) =>
+          Tab(text: category[0].toUpperCase() + category.substring(1))),
     ];
 
     return Row(
@@ -109,45 +140,42 @@ class _MenuManagementPageState extends State<MenuManagementPage>
                                   ],
                                 ),
                                 onPressed: () {
-                                  Menu newMenu = Menu(
-                                    menuId: '',
-                                    createdAt:
-                                        DateTime.now().millisecondsSinceEpoch,
-                                    title: 'New Menu',
-                                    category: Category(
-                                        categoryId: category.categoryId,
-                                        createdAt: category.createdAt),
-                                    price: 0,
-                                    image: '',
-                                    desc: '',
-                                    tag: [],
-                                    available: true,
-                                  );
-                                  provider.selectMenu(newMenu);
+                                  // Menu newMenu = Menu(
+                                  //   menuId: '',
+                                  //   createdAt:
+                                  //       DateTime.now().millisecondsSinceEpoch,
+                                  //   title: 'New Menu',
+                                  //   category: Category(
+                                  //       categoryId: category.categoryId,
+                                  //       createdAt: category.createdAt),
+                                  //   price: 0,
+                                  //   image: '',
+                                  //   desc: '',
+                                  //   tag: [],
+                                  //   available: true,
+                                  // );
+                                  // provider.selectMenu(newMenu);
                                 },
                               ),
-                              IconButton(
-                                  onPressed: () async {
-                                    await provider
-                                        .deleteCategory(category.categoryId);
-                                    _tabController
-                                        .dispose(); // Dispose old controller
-                                    _initializeTabController(
-                                        provider); // Reinitialize with new tabs
-                                  },
-                                  icon: Row(
-                                    children: [
-                                      Icon(Icons.delete_forever),
-                                      Text('Hapus Kategori'),
-                                    ],
-                                  ))
+                              // IconButton(
+                              //     onPressed: () async {
+                              //       await provider
+                              //           .deleteCategory(category.categoryId);
+                              //       _updateTabController();
+                              //       Future.microtask(
+                              //           () => _updateTabController());
+                              //     },
+                              //     icon: Row(
+                              //       children: [
+                              //         Icon(Icons.delete_forever),
+                              //         Text('Hapus Kategori'),
+                              //       ],
+                              //     ))
                             ],
                           ),
                           MenuListView(
                             menus: provider.allmenus
-                                .where((menu) =>
-                                    menu.category.categoryId ==
-                                    category.categoryId)
+                                .where((menu) => menu.menuType == category)
                                 .toList(),
                             onItemTap: (menu) {
                               provider.selectMenu(menu);
@@ -194,18 +222,16 @@ class _MenuManagementPageState extends State<MenuManagementPage>
               child: Text('Cancel'),
               onPressed: () {
                 Navigator.of(context).pop();
-                _tabController.dispose();
-                _initializeTabController(provider);
               },
             ),
-            TextButton(
-              child: Text('Add'),
-              onPressed: () {
-                provider.addCategory(categoryController.text.toLowerCase());
-
-                Navigator.of(context).pop();
-              },
-            ),
+            // TextButton(
+            //   child: Text('Add'),
+            //   onPressed: () {
+            //     // provider.addCategory(categoryController.text.toLowerCase());
+            //     Navigator.of(context).pop();
+            //     Future.microtask(() => _updateTabController());
+            //   },
+            // ),
           ],
         );
       },
@@ -214,7 +240,7 @@ class _MenuManagementPageState extends State<MenuManagementPage>
 }
 
 class InfoCardListView extends StatelessWidget {
-  final List<Menu> menus;
+  final List<MenuIrep> menus;
   final Function() onAddCategory;
 
   const InfoCardListView({
@@ -265,7 +291,7 @@ class InfoCardListView extends StatelessWidget {
               ),
             );
           } else {
-            final title = categories[index].categoryId;
+            final title = categories[index];
             final qty = provider.getCategoryCount(title);
             return Padding(
               padding: const EdgeInsets.symmetric(horizontal: 8.0),
@@ -298,11 +324,11 @@ class InfoCategoryCard extends StatelessWidget {
         padding: const EdgeInsets.all(8.0),
         child: Column(
           children: [
-            Text('Total Menu'),
+            Text(title),
             const Spacer(),
             Text(qty.toString()),
             const Spacer(),
-            Text(title),
+            Text('Menu'),
           ],
         ),
       ),

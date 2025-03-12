@@ -30,6 +30,7 @@ class _TransactionListViewState extends State<TransactionListView> {
           final transaction = widget.transactions[index];
           String total = Helper.rupiahFormatter(transaction.total);
           String date = Helper.dateFormatter(transaction.transactionDate);
+          String time = Helper.timeFormatter(transaction.transactionDate);
           String totalCart = transaction.cart.length.toString();
           return Container(
             decoration: BoxDecoration(
@@ -40,7 +41,7 @@ class _TransactionListViewState extends State<TransactionListView> {
             ),
             child: ListTile(
               onTap: () => widget.onTransactionTap(transaction),
-              title: Text('${transaction.nama} - $date'),
+              title: Text('${transaction.nama} | $date - $time'),
               subtitle: Text(
                   '$totalCart Menu, $total (${transaction.paymentMethod})'),
               leading: CircleAvatar(

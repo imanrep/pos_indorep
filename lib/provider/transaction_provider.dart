@@ -1,39 +1,50 @@
 import 'package:flutter/material.dart';
 import 'package:pos_indorep/model/model.dart';
-import 'package:pos_indorep/services/firebase_service.dart';
 
 class TransactionProvider extends ChangeNotifier {
-  List<TransactionModel> _transactions = [];
+  List<TransactionModel> _allTransactions = [];
+  List<TransactionModel> _filteredTransactions = [];
   TransactionModel? _selectedTransaction;
 
-  List<TransactionModel> get transactions => _transactions;
+  List<TransactionModel> get transactions => _allTransactions;
+  List<TransactionModel> get filteredTransactions => _filteredTransactions;
   TransactionModel? get selectedTransaction => _selectedTransaction;
 
-  final FirebaseService _firebaseService = FirebaseService();
-
   TransactionProvider() {
-    getAllTransactions();
+    // getAllTransactions();
   }
 
-  Future<void> getAllTransactions() async {
-    try {
-      List<TransactionModel> fetchedTransactions =
-          await _firebaseService.getAllTransaction();
-      _transactions = fetchedTransactions;
-      notifyListeners();
-    } catch (e) {
-      // Handle error
-      print(e);
-    }
+  // Future<void> getAllTransactions() async {
+  //   try {
+  //     List<TransactionModel> fetchedTransactions =
+  //         await _firebaseService.getAllTransaction();
+  //     // Sort the fetched transactions by transactionDate in descending order (latest first)
+  //     fetchedTransactions
+  //         .sort((a, b) => b.transactionDate.compareTo(a.transactionDate));
+  //     _allTransactions = fetchedTransactions;
+  //     notifyListeners();
+  //   } catch (e) {
+  //     // Handle error
+  //     print(e);
+  //   }
+  // }
+
+  void filterTransactionsByTimeframe(DateTime start, DateTime end) {
+    _filteredTransactions = _allTransactions
+        .where((transaction) =>
+            transaction.transactionDate >= start.millisecondsSinceEpoch &&
+            transaction.transactionDate <= end.millisecondsSinceEpoch)
+        .toList();
+    notifyListeners();
   }
 
-  Future<void> addTransaction(TransactionModel transaction) {
-    try {
-      return _firebaseService.addTransaction(transaction);
-    } catch (e) {
-      rethrow;
-    }
-  }
+  // Future<void> addTransaction(TransactionModel transaction) {
+  //   try {
+  //     return _firebaseService.addTransaction(transaction);
+  //   } catch (e) {
+  //     rethrow;
+  //   }
+  // }
 
   void selectTransaction(TransactionModel transaction) {
     _selectedTransaction = transaction;
