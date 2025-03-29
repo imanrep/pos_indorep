@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:pos_indorep/helper/helper.dart';
 import 'package:pos_indorep/model/model.dart';
 import 'package:pos_indorep/provider/cart_provider.dart';
+import 'package:pos_indorep/provider/main_provider.dart';
 import 'package:pos_indorep/provider/menu_provider.dart';
 import 'package:pos_indorep/screen/pesanan_page/components/add_item_dialog.dart';
+import 'package:pos_indorep/screen/pesanan_page/components/category_button.dart';
 import 'package:pos_indorep/screen/pesanan_page/components/payment_dialog.dart';
+import 'package:pos_indorep/services/irepbe_services.dart';
 import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
 
@@ -16,6 +20,17 @@ class PesananPage extends StatefulWidget {
 }
 
 class _PesananPageState extends State<PesananPage> {
+  @override
+  void initState() {
+    super.initState();
+    _fetchMenu();
+  }
+
+  Future<void> _fetchMenu() async {
+    final provider = Provider.of<MenuProvider>(context, listen: false);
+    provider.fetchAllMenus();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Consumer<CartProvider>(builder: (context, provider, child) {
@@ -32,75 +47,28 @@ class _PesananPageState extends State<PesananPage> {
                   return SingleChildScrollView(
                     child: Column(
                       children: [
-                        AppBar(
-                          title: Text('Menu Management'),
-                          backgroundColor: Colors.black.withOpacity(0.002),
-                        ),
                         Padding(
-                          padding: const EdgeInsets.all(12.0),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 24.0, vertical: 12.0),
                           child: Row(
                             children: [
-                              Padding(
-                                padding: const EdgeInsets.all(12.0),
-                                child: SingleChildScrollView(
-                                  scrollDirection: Axis.horizontal,
-                                  child: Row(
-                                    children: [
-                                      Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                            horizontal: 8.0),
-                                        child: ElevatedButton(
-                                          onPressed: () {
-                                            // Handle "All" button press
-                                            menuProvider
-                                                .filterMenusByCategory("All");
-                                          },
-                                          style: ElevatedButton.styleFrom(
-                                            shape: RoundedRectangleBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(30.0),
-                                            ),
-                                          ),
-                                          child: Text('All'),
-                                        ),
-                                      ),
-                                      ...menuProvider.allCategories
-                                          .map((category) {
-                                        return Padding(
-                                          padding: const EdgeInsets.symmetric(
-                                              horizontal: 8.0),
-                                          child: ElevatedButton(
-                                            onPressed: () {
-                                              menuProvider
-                                                  .filterMenusByCategory(
-                                                      category);
-                                              // debugPrint(category.categoryId);
-                                              // debugPrint(menuProvider
-                                              //     .filteredMenus.length
-                                              //     .toString());
-                                              // debugPrint(menuProvider
-                                              //     .filteredMenus[0].title);
-                                            },
-                                            style: ElevatedButton.styleFrom(
-                                              shape: RoundedRectangleBorder(
-                                                borderRadius:
-                                                    BorderRadius.circular(30.0),
-                                              ),
-                                            ),
-                                            child: Text(
-                                              category[0].toUpperCase() +
-                                                  category.substring(1),
-                                            ),
-                                          ),
-                                        );
-                                      }),
-                                    ],
-                                  ),
-                                ),
-                              ),
+                              Text('Pesanan',
+                                  style: GoogleFonts.inter(
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 28.0)),
+                              const Spacer(),
+                              IconButton(
+                                onPressed: () {
+                                  menuProvider.fetchAllCategories();
+                                  menuProvider.fetchAllMenus();
+                                },
+                                icon: const Icon(Icons.refresh_rounded),
+                              )
                             ],
                           ),
                         ),
+                        Align(
+                            alignment: Alignment.topLeft, child: CategoryRow()),
                         GridView.builder(
                           shrinkWrap: true,
                           physics: const NeverScrollableScrollPhysics(),
@@ -108,11 +76,11 @@ class _PesananPageState extends State<PesananPage> {
                               SliverGridDelegateWithFixedCrossAxisCount(
                             crossAxisCount:
                                 crossAxisCount, // number of items in each row
-                            mainAxisSpacing: 24.0, // spacing between rows
-                            crossAxisSpacing: 24.0, // spacing between columns
+                            mainAxisSpacing: 16.0, // spacing between rows
+                            crossAxisSpacing: 16.0, // spacing between columns
                           ),
                           padding:
-                              EdgeInsets.all(8.0), // padding around the grid
+                              EdgeInsets.all(32.0), // padding around the grid
                           itemCount: menuProvider
                               .filteredMenus.length, // total number of items
                           itemBuilder: (context, index) {
@@ -136,91 +104,75 @@ class _PesananPageState extends State<PesananPage> {
                                   borderRadius: BorderRadius.circular(8.0),
                                 ),
                                 child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
                                   children: [
-                                    Stack(
-                                      children: [
-                                        ClipRRect(
-                                          borderRadius: BorderRadius.only(
-                                            topLeft: Radius.circular(8.0),
-                                            topRight: Radius.circular(8.0),
-                                          ),
-                                          child: Image.network(
-                                            item.menuImage,
-                                            height: 120,
-                                            width: double.infinity,
-                                            fit: BoxFit.cover,
-                                          ),
-                                        ),
-                                        isItemSelected
-                                            ? Container(
-                                                height: 5,
-                                                decoration: BoxDecoration(
-                                                  boxShadow: [
-                                                    BoxShadow(
-                                                      color: Colors.black
-                                                          .withOpacity(0.2),
-                                                      spreadRadius: 0.5,
-                                                      blurRadius: 1,
-                                                      offset:
-                                                          const Offset(0, 1),
-                                                    ),
-                                                  ],
-                                                  color: Colors
-                                                      .deepPurple.shade300,
-                                                  borderRadius:
-                                                      BorderRadius.only(
-                                                    topLeft:
-                                                        Radius.circular(8.0),
-                                                    topRight:
-                                                        Radius.circular(8.0),
-                                                  ),
+                                    isItemSelected
+                                        ? Container(
+                                            height: 5,
+                                            decoration: BoxDecoration(
+                                              boxShadow: [
+                                                BoxShadow(
+                                                  color: Colors.black
+                                                      .withOpacity(0.2),
+                                                  spreadRadius: 0.5,
+                                                  blurRadius: 1,
+                                                  offset: const Offset(0, 1),
                                                 ),
-                                              )
-                                            : const SizedBox(),
-                                      ],
-                                    ),
-                                    const Spacer(),
-                                    Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 12.0),
-                                      child: Column(
-                                        children: [
-                                          Center(
-                                            child: Text(
-                                              textAlign: TextAlign.center,
-                                              overflow: TextOverflow.ellipsis,
-                                              maxLines: 2,
-                                              item.menuName,
-                                              style: const TextStyle(
-                                                fontSize: 16.0,
-                                                fontWeight: FontWeight.w600,
+                                              ],
+                                              color: IndorepColor.primary,
+                                              borderRadius: BorderRadius.only(
+                                                topLeft: Radius.circular(8.0),
+                                                topRight: Radius.circular(8.0),
                                               ),
                                             ),
-                                          ),
-                                        ],
+                                          )
+                                        : const SizedBox(),
+                                    const Spacer(),
+                                    ClipRRect(
+                                      borderRadius: const BorderRadius.only(
+                                        topLeft: Radius.circular(8.0),
+                                        topRight: Radius.circular(8.0),
+                                      ),
+                                      child: Image.network(
+                                        item.menuImage,
+                                        height: 100,
+                                        width: double.infinity,
+                                        fit: BoxFit.fitHeight,
+                                        errorBuilder:
+                                            (context, error, stackTrace) {
+                                          return Image.asset(
+                                            'assets/images/default-menu.png', // Your default image path
+                                            height: 100,
+                                            width: double.infinity,
+                                            fit: BoxFit.fitHeight,
+                                          );
+                                        },
                                       ),
                                     ),
-                                    Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 12.0),
-                                      child: Column(
-                                        children: [
-                                          const SizedBox(height: 8.0),
-                                          Center(
-                                            child: Text(
-                                              textAlign: TextAlign.center,
-                                              overflow: TextOverflow.ellipsis,
-                                              maxLines: 1,
-                                              Helper.rupiahFormatter(
-                                                  item.menuPrice.toDouble()),
-                                              style: const TextStyle(
-                                                fontSize: 14.0,
-                                                color: Colors.grey,
-                                              ),
-                                            ),
-                                          ),
-                                        ],
+                                    const Spacer(),
+                                    Center(
+                                      child: Text(
+                                        textAlign: TextAlign.center,
+                                        overflow: TextOverflow.ellipsis,
+                                        maxLines: 2,
+                                        item.menuName,
+                                        style: GoogleFonts.inter(
+                                          fontSize: 14.0,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                    ),
+                                    Center(
+                                      child: Text(
+                                        textAlign: TextAlign.center,
+                                        overflow: TextOverflow.ellipsis,
+                                        maxLines: 1,
+                                        Helper.rupiahFormatter(
+                                            item.menuPrice.toDouble()),
+                                        style: GoogleFonts.inter(
+                                          fontSize: 13.0,
+                                          color: Colors.grey,
+                                        ),
                                       ),
                                     ),
                                     const Spacer(),
@@ -254,94 +206,152 @@ class _PesananPageState extends State<PesananPage> {
                                   return Padding(
                                     padding: const EdgeInsets.only(
                                         left: 12.0, right: 12.0, bottom: 12),
-                                    child: Container(
+                                    child: Theme(
+                                      data: ThemeData().copyWith(
+                                        dividerColor: Colors.transparent,
+                                      ),
+                                      child: Container(
+                                        margin: const EdgeInsets.symmetric(
+                                            vertical: 4, horizontal: 8),
                                         decoration: BoxDecoration(
-                                          color: Colors.black.withOpacity(0.05),
-                                          borderRadius:
-                                              BorderRadius.circular(8),
+                                          color: Colors.grey.withOpacity(
+                                              0.1), // Dark gray background (adjust as needed)
+                                          borderRadius: BorderRadius.circular(
+                                              12), // Rounded corners
                                         ),
-                                        child: Theme(
-                                          data: ThemeData().copyWith(
-                                              dividerColor: Colors.transparent),
-                                          child: ExpansionTile(
-                                            initiallyExpanded: true,
-                                            showTrailingIcon: true,
-                                            title: Text(
-                                              item.menuName,
-                                              maxLines: 1,
-                                              overflow: TextOverflow.ellipsis,
-                                              style: const TextStyle(
+                                        child: ExpansionTile(
+                                          backgroundColor: Colors.transparent,
+                                          initiallyExpanded: true,
+                                          showTrailingIcon: true,
+                                          title: Text(
+                                            item.menuName,
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
+                                            style: const TextStyle(
                                                 fontWeight: FontWeight.w400,
                                                 fontSize: 16.0,
-                                              ),
-                                            ),
-                                            subtitle: Row(
-                                              children: [
-                                                Container(
-                                                  decoration: BoxDecoration(
-                                                    color:
-                                                        Colors.deepPurple[100],
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            4),
-                                                  ),
-                                                  child: Padding(
-                                                    padding: const EdgeInsets
-                                                        .symmetric(
-                                                        horizontal: 8.0),
-                                                    child: Text(
-                                                      'Qty: ${item.qty}',
-                                                      textAlign:
-                                                          TextAlign.center,
-                                                      maxLines: 1,
-                                                      style: const TextStyle(
-                                                        fontSize: 12.0,
-                                                        fontWeight:
-                                                            FontWeight.w600,
-                                                        color:
-                                                            Colors.deepPurple,
-                                                      ),
+                                                color: Colors.white),
+                                          ),
+                                          subtitle: Row(
+                                            children: [
+                                              Container(
+                                                decoration: BoxDecoration(
+                                                  color: Colors.deepPurple[100],
+                                                  borderRadius:
+                                                      BorderRadius.circular(4),
+                                                ),
+                                                child: Padding(
+                                                  padding: const EdgeInsets
+                                                      .symmetric(
+                                                      horizontal: 8.0),
+                                                  child: Text(
+                                                    'Qty: ${item.qty}',
+                                                    textAlign: TextAlign.center,
+                                                    maxLines: 1,
+                                                    style: const TextStyle(
+                                                      fontSize: 12.0,
+                                                      fontWeight:
+                                                          FontWeight.w600,
+                                                      color: Colors.deepPurple,
                                                     ),
                                                   ),
                                                 ),
-                                                const SizedBox(width: 8.0),
-                                                Text(
-                                                  Helper.rupiahFormatter(
-                                                      item.subTotal),
-                                                  style: const TextStyle(
+                                              ),
+                                              const SizedBox(width: 8.0),
+                                              Text(
+                                                Helper.rupiahFormatter(
+                                                    item.subTotal),
+                                                style: const TextStyle(
                                                     fontSize: 12.0,
                                                     fontWeight: FontWeight.w600,
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                            leading: CircleAvatar(
-                                              backgroundColor: Colors.white,
-                                              backgroundImage:
-                                                  NetworkImage(item.menuImage),
-                                              onBackgroundImageError:
-                                                  (_, __) {},
-                                              child: Image.asset(
-                                                'assets/images/default-menu.png',
+                                                    color: Colors.white),
                                               ),
+                                            ],
+                                          ),
+                                          leading: CircleAvatar(
+                                            backgroundColor: Colors.transparent,
+                                            child: Image.network(
+                                              item.menuImage,
+                                              height: 100,
+                                              width: double.infinity,
+                                              fit: BoxFit.fitHeight,
+                                              errorBuilder:
+                                                  (context, error, stackTrace) {
+                                                return Image.asset(
+                                                  'assets/images/default-menu.png',
+                                                  height: 100,
+                                                  width: double.infinity,
+                                                  fit: BoxFit.fitHeight,
+                                                );
+                                              },
                                             ),
-                                            children: [
-                                              // Display selected options
-                                              if (item
-                                                  .selectedOptions.isNotEmpty)
-                                                Padding(
-                                                  padding:
-                                                      const EdgeInsets.only(
-                                                          left: 16.0,
-                                                          right: 16.0,
-                                                          bottom: 8.0),
+                                          ),
+                                          children: [
+                                            // Display selected options
+                                            if (item.selectedOptions.isNotEmpty)
+                                              Padding(
+                                                padding: const EdgeInsets.only(
+                                                    left: 16.0,
+                                                    right: 16.0,
+                                                    bottom: 8.0),
+                                                child: Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    const Text(
+                                                      "Selected Add-ons:",
+                                                      style: TextStyle(
+                                                        fontSize: 14.0,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                      ),
+                                                    ),
+                                                    const SizedBox(height: 4.0),
+                                                    ...item.selectedOptions
+                                                        .map((option) => Align(
+                                                              alignment:
+                                                                  Alignment
+                                                                      .topLeft,
+                                                              child: Column(
+                                                                children: option
+                                                                    .optionValue
+                                                                    .where((optVal) =>
+                                                                        optVal
+                                                                            .isSelected) // Filter selected options
+                                                                    .map((optVal) =>
+                                                                        Padding(
+                                                                          padding: const EdgeInsets
+                                                                              .only(
+                                                                              left: 8.0,
+                                                                              bottom: 2.0),
+                                                                          child:
+                                                                              Text(
+                                                                            "- ${optVal.optionValueName} (+${Helper.rupiahFormatter(optVal.optionValuePrice.toDouble())})",
+                                                                            style:
+                                                                                const TextStyle(
+                                                                              fontSize: 13.0,
+                                                                            ),
+                                                                          ),
+                                                                        ))
+                                                                    .toList(),
+                                                              ),
+                                                            )),
+                                                  ],
+                                                ),
+                                              ),
+                                            // Display notes if available
+                                            if (item.notes.isNotEmpty)
+                                              Padding(
+                                                padding: const EdgeInsets.only(
+                                                    left: 16.0,
+                                                    right: 16.0,
+                                                    bottom: 8.0),
+                                                child: Align(
+                                                  alignment: Alignment.topLeft,
                                                   child: Column(
-                                                    crossAxisAlignment:
-                                                        CrossAxisAlignment
-                                                            .start,
                                                     children: [
                                                       const Text(
-                                                        "Selected Add-ons:",
+                                                        "Notes:",
                                                         style: TextStyle(
                                                           fontSize: 14.0,
                                                           fontWeight:
@@ -350,73 +360,44 @@ class _PesananPageState extends State<PesananPage> {
                                                       ),
                                                       const SizedBox(
                                                           height: 4.0),
-                                                      ...item.selectedOptions
-                                                          .map(
-                                                              (option) => Align(
-                                                                    alignment:
-                                                                        Alignment
-                                                                            .topLeft,
-                                                                    child:
-                                                                        Column(
-                                                                      children: option
-                                                                          .optionValue
-                                                                          .where((optVal) => optVal
-                                                                              .isSelected) // Filter selected options
-                                                                          .map((optVal) =>
-                                                                              Padding(
-                                                                                padding: const EdgeInsets.only(left: 8.0, bottom: 2.0),
-                                                                                child: Text(
-                                                                                  "- ${optVal.optionValueName} (+${Helper.rupiahFormatter(optVal.optionValuePrice.toDouble())})",
-                                                                                  style: const TextStyle(
-                                                                                    fontSize: 13.0,
-                                                                                  ),
-                                                                                ),
-                                                                              ))
-                                                                          .toList(),
-                                                                    ),
-                                                                  )),
+                                                      Text(
+                                                        item.notes,
+                                                        style: const TextStyle(
+                                                          fontSize: 13.0,
+                                                          fontStyle:
+                                                              FontStyle.italic,
+                                                        ),
+                                                      ),
                                                     ],
                                                   ),
                                                 ),
-                                              // Display notes if available
-                                              if (item.notes.isNotEmpty)
-                                                Padding(
-                                                  padding:
-                                                      const EdgeInsets.only(
-                                                          left: 16.0,
-                                                          right: 16.0,
-                                                          bottom: 8.0),
-                                                  child: Align(
-                                                    alignment:
-                                                        Alignment.topLeft,
-                                                    child: Column(
-                                                      children: [
-                                                        const Text(
-                                                          "Notes:",
-                                                          style: TextStyle(
-                                                            fontSize: 14.0,
-                                                            fontWeight:
-                                                                FontWeight.bold,
-                                                          ),
-                                                        ),
-                                                        const SizedBox(
-                                                            height: 4.0),
-                                                        Text(
-                                                          item.notes,
-                                                          style:
-                                                              const TextStyle(
-                                                            fontSize: 13.0,
-                                                            fontStyle: FontStyle
-                                                                .italic,
-                                                          ),
-                                                        ),
-                                                      ],
-                                                    ),
+                                              ),
+                                            Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.spaceAround,
+                                              children: [
+                                                IconButton(
+                                                  onPressed: () {
+                                                    provider.updateQty(
+                                                        item.cartId,
+                                                        item.qty - 1);
+                                                  },
+                                                  icon: const Icon(
+                                                    Icons.remove_rounded,
+                                                    color: Colors.white,
                                                   ),
                                                 ),
-                                              Align(
-                                                alignment: Alignment.topRight,
-                                                child: IconButton(
+                                                IconButton(
+                                                  onPressed: () {
+                                                    provider.updateQty(
+                                                        item.cartId,
+                                                        item.qty + 1);
+                                                  },
+                                                  icon: const Icon(
+                                                      Icons.add_rounded,
+                                                      color: Colors.white),
+                                                ),
+                                                IconButton(
                                                   onPressed: () {
                                                     provider.removeItem(item);
                                                   },
@@ -425,10 +406,12 @@ class _PesananPageState extends State<PesananPage> {
                                                     color: Colors.red,
                                                   ),
                                                 ),
-                                              ),
-                                            ],
-                                          ),
-                                        )),
+                                              ],
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
                                   );
                                 },
                               ),
@@ -491,7 +474,11 @@ class _PesananPageState extends State<PesananPage> {
                                 padding: const EdgeInsets.symmetric(
                                     horizontal: 12.0),
                                 child: ElevatedButton(
-                                  onPressed: () {
+                                  onPressed: () async {
+                                    var mainProvider =
+                                        Provider.of<MainProvider>(context,
+                                            listen: false);
+                                    var irepBE = IrepBE();
                                     TransactionModel transaction =
                                         TransactionModel(
                                       nama: 'Ujang',
@@ -502,14 +489,27 @@ class _PesananPageState extends State<PesananPage> {
                                       total: provider.totalCurrentCart,
                                       cart: provider.currentCart,
                                     );
-                                    showDialog(
-                                      context: context,
-                                      builder: (BuildContext context) {
-                                        return PaymentDialog(
-                                          transaction: transaction,
-                                        );
-                                      },
-                                    );
+                                    var request = QrisOrderRequest(
+                                        orders: provider.currentOrder,
+                                        payment: 'qris',
+                                        source: 'cafe');
+                                    QrisOrderResponse response =
+                                        await irepBE.createOrder(request);
+                                    showModalBottomSheet(
+                                        context: context,
+                                        builder: (context) {
+                                          return PaymentDialogBottomSheet(
+                                              transaction: transaction,
+                                              qrisOrderResponse: response);
+                                        });
+                                    // showDialog(
+                                    //   context: context,
+                                    //   builder: (BuildContext context) {
+                                    //     return PaymentDialog(
+                                    //       transaction: transaction,
+                                    //     );
+                                    //   },
+                                    // );
                                   },
                                   style: ElevatedButton.styleFrom(
                                     shape: RoundedRectangleBorder(

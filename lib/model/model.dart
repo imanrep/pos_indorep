@@ -1,3 +1,5 @@
+import 'package:pos_indorep/services/irepbe_services.dart';
+
 class Category {
   final String categoryId;
   final int createdAt;
@@ -34,6 +36,15 @@ class OptionValue {
     required this.optionValuePrice,
     this.isSelected = false,
   });
+
+  OptionValue copyWith({String? optionValueName, int? optionValuePrice}) {
+    return OptionValue(
+      optionValueName: optionValueName ?? this.optionValueName,
+      optionValueId: optionValueId,
+      optionValuePrice: optionValuePrice ?? this.optionValuePrice,
+      isSelected: isSelected,
+    );
+  }
 
   factory OptionValue.fromMap(Map<String, dynamic> data) {
     return OptionValue(
@@ -74,6 +85,22 @@ class OptionMenuIrep {
     this.selectedValue,
     List<OptionValue>? selectedValues,
   }) : selectedValues = selectedValues ?? [];
+
+  OptionMenuIrep copyWith({
+    bool? available,
+    int? optionId,
+    String? optionName,
+    String? optionType,
+    List<OptionValue>? optionValue,
+  }) {
+    return OptionMenuIrep(
+      available: available ?? this.available,
+      optionId: optionId ?? this.optionId,
+      optionName: optionName ?? this.optionName,
+      optionType: optionType ?? this.optionType,
+      optionValue: optionValue ?? this.optionValue,
+    );
+  }
 
   factory OptionMenuIrep.fromMap(Map<String, dynamic> data) {
     return OptionMenuIrep(
@@ -120,18 +147,20 @@ class MenuIrep {
     required this.option,
   });
 
-  factory MenuIrep.fromMap(Map<String, dynamic> data) {
-    const String baseUrl = 'http://192.168.5.254:8085/pic/';
+  factory MenuIrep.fromMap(Map<String, dynamic> data, String baseUrl) {
     return MenuIrep(
       menuType: data['menu_type'],
       menuName: data['menu_name'],
-      menuImage: '${baseUrl + data['menu_image']}.png',
+      menuImage: '$baseUrl/pic/${data['menu_image']}.png',
       menuPrice: data['menu_price'],
       menuId: data['menu_id'],
       menuNote: data['menu_note'],
       available: data['available'],
-      option: List<OptionMenuIrep>.from(
-          data['option'].map((x) => OptionMenuIrep.fromMap(x))),
+      option: data['option'] != null
+          ? List<OptionMenuIrep>.from(
+              data['option'].map((x) => OptionMenuIrep.fromMap(x)),
+            )
+          : null,
     );
   }
 
@@ -155,7 +184,8 @@ class CartItem extends MenuIrep {
   int qty;
   String notes;
   double subTotal;
-  double addOnPrice = 0; // Store additional price from selected options
+  double addOnPrice = 0;
+  List<OrderItem> orderItem = [];
 
   // Store selected options
   List<OptionMenuIrep> selectedOptions;
@@ -186,7 +216,8 @@ class CartItem extends MenuIrep {
           available: available,
           option: option ?? [],
         ) {
-    _calculateSubTotal(); // Calculate subtotal including add-ons
+    _addOrderItem();
+    _calculateSubTotal();
   }
 
   /// **Recalculate subtotal including selected add-ons**
@@ -197,6 +228,18 @@ class CartItem extends MenuIrep {
         .fold(0, (sum, optVal) => sum + optVal.optionValuePrice);
 
     subTotal = (menuPrice.toDouble() + addOnPrice) * qty;
+  }
+
+  void _addOrderItem() {
+    orderItem = selectedOptions
+        .expand((option) => option.optionValue)
+        .where((optVal) => optVal.isSelected)
+        .map((optVal) => OrderItem(
+              id: optVal.optionValueId,
+              qty: qty,
+              note: notes,
+            ))
+        .toList();
   }
 
   /// **Update quantity and recalculate subtotal**
@@ -287,6 +330,391 @@ class TransactionModel {
       'cart': cart.map((x) => x.toMap()).toList(),
       'total': total,
       'paymentMethod': paymentMethod,
+    };
+  }
+}
+
+class QrisOrderResponse {
+  final String message;
+  final int orderID;
+  final String qris;
+  final bool success;
+  final int total;
+
+  QrisOrderResponse({
+    required this.message,
+    required this.orderID,
+    required this.qris,
+    required this.success,
+    required this.total,
+  });
+
+  factory QrisOrderResponse.fromJson(Map<String, dynamic> json) {
+    return QrisOrderResponse(
+      message: json['message'],
+      orderID: json['orderID'],
+      qris: json['qris'],
+      success: json['success'],
+      total: json['total'],
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'message': message,
+      'orderID': orderID,
+      'qris': qris,
+      'success': success,
+      'total': total,
+    };
+  }
+}
+
+class OrderItem {
+  final int id;
+  final int qty;
+  final String note;
+
+  OrderItem({
+    required this.id,
+    required this.qty,
+    required this.note,
+  });
+
+  factory OrderItem.fromJson(Map<String, dynamic> json) {
+    return OrderItem(
+      id: json['id'],
+      qty: json['qty'],
+      note: json['note'],
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'qty': qty,
+      'note': note,
+    };
+  }
+}
+
+class QrisOrderRequest {
+  final List<OrderItem> orders;
+  final String payment;
+  final String source;
+
+  QrisOrderRequest({
+    required this.orders,
+    required this.payment,
+    required this.source,
+  });
+
+  factory QrisOrderRequest.fromJson(Map<String, dynamic> json) {
+    return QrisOrderRequest(
+      orders: (json['orders'] as List<dynamic>)
+          .map((item) => OrderItem.fromJson(item))
+          .toList(),
+      payment: json['payment'],
+      source: json['source'],
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'orders': orders.map((order) => order.toJson()).toList(),
+      'payment': payment,
+      'source': source,
+    };
+  }
+}
+
+class AddMenuRequest {
+  int? menuId;
+  final String menuType;
+  final String menuName;
+  final String menuImage;
+  final int menuPrice;
+  final String menuNote;
+  final bool menuAvailable;
+
+  AddMenuRequest({
+    this.menuId = 0,
+    required this.menuType,
+    required this.menuName,
+    required this.menuImage,
+    required this.menuPrice,
+    required this.menuNote,
+    required this.menuAvailable,
+  });
+
+  factory AddMenuRequest.fromJson(Map<String, dynamic> json) {
+    return AddMenuRequest(
+      menuId: json['menu_id'],
+      menuType: json['menu_type'],
+      menuName: json['menu_name'],
+      menuImage: json['menu_image'],
+      menuPrice: json['menu_price'],
+      menuNote: json['menu_note'],
+      menuAvailable: json['menu_available'],
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'menu_id': menuId,
+      'menu_type': menuType,
+      'menu_name': menuName,
+      'menu_image': menuImage,
+      'menu_price': menuPrice,
+      'menu_note': menuNote,
+      'menu_available': menuAvailable,
+    };
+  }
+}
+
+class AddMenuResponse {
+  final int menuId;
+  final String message;
+  final bool success;
+
+  AddMenuResponse({
+    required this.menuId,
+    required this.message,
+    required this.success,
+  });
+
+  factory AddMenuResponse.fromJson(Map<String, dynamic> json) {
+    return AddMenuResponse(
+      menuId: json['menu_id'],
+      message: json['message'],
+      success: json['success'],
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'menu_id': menuId,
+      'message': message,
+      'success': success,
+    };
+  }
+}
+
+class EditMenuResponse {
+  final String message;
+  final bool success;
+
+  EditMenuResponse({
+    required this.message,
+    required this.success,
+  });
+
+  factory EditMenuResponse.fromJson(Map<String, dynamic> json) {
+    return EditMenuResponse(
+      message: json['message'],
+      success: json['success'],
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'message': message,
+      'success': success,
+    };
+  }
+}
+
+class AddOptionRequest {
+  int? menuId;
+  final String optionName;
+  final String optionType;
+  final bool optionAvailable;
+
+  AddOptionRequest({
+    this.menuId = 0,
+    required this.optionName,
+    required this.optionType,
+    required this.optionAvailable,
+  });
+
+  factory AddOptionRequest.fromJson(Map<String, dynamic> json) {
+    return AddOptionRequest(
+      menuId: json['menu_id'],
+      optionName: json['option_name'],
+      optionType: json['option_type'],
+      optionAvailable: json['option_available'],
+    );
+  }
+  Map<String, dynamic> toJson() {
+    return {
+      'menu_id': menuId,
+      'option_name': optionName,
+      'option_type': optionType,
+      'option_available': optionAvailable,
+    };
+  }
+}
+
+class AddOptionResponse {
+  final String message;
+  final int optionId;
+  final bool success;
+
+  AddOptionResponse({
+    required this.message,
+    required this.optionId,
+    required this.success,
+  });
+
+  factory AddOptionResponse.fromJson(Map<String, dynamic> json) {
+    return AddOptionResponse(
+      message: json['message'],
+      optionId: json['option_id'],
+      success: json['success'],
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'message': message,
+      'option_id': optionId,
+      'success': success,
+    };
+  }
+}
+
+class AddOptionValueRequest {
+  final int menuOptionId;
+  final String optionValueName;
+  final int amount;
+
+  AddOptionValueRequest({
+    required this.menuOptionId,
+    required this.optionValueName,
+    required this.amount,
+  });
+
+  factory AddOptionValueRequest.fromJson(Map<String, dynamic> json) {
+    return AddOptionValueRequest(
+      menuOptionId: json['menu_option_id'],
+      optionValueName: json['option_value_name'],
+      amount: json['amount'],
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'menu_option_id': menuOptionId,
+      'option_value_name': optionValueName,
+      'amount': amount,
+    };
+  }
+}
+
+class EditOptionRequest {
+  final int id;
+  final String optionName;
+  final String optionType;
+  final bool optionAvailable;
+
+  EditOptionRequest({
+    required this.id,
+    required this.optionName,
+    required this.optionType,
+    required this.optionAvailable,
+  });
+
+  factory EditOptionRequest.fromJson(Map<String, dynamic> json) {
+    return EditOptionRequest(
+      id: json['id'],
+      optionName: json['option_name'],
+      optionType: json['option_type'],
+      optionAvailable: json['option_available'],
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'option_name': optionName,
+      'option_type': optionType,
+      'option_available': optionAvailable,
+    };
+  }
+}
+
+class EditOptionValueRequest {
+  final int id;
+  final String optionValueName;
+  final int amount;
+
+  EditOptionValueRequest({
+    required this.id,
+    required this.optionValueName,
+    required this.amount,
+  });
+
+  factory EditOptionValueRequest.fromJson(Map<String, dynamic> json) {
+    return EditOptionValueRequest(
+      id: json['id'],
+      optionValueName: json['option_value_name'],
+      amount: json['amount'],
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'option_value_name': optionValueName,
+      'amount': amount,
+    };
+  }
+}
+
+class AddOptionValueResponse {
+  final String message;
+  final bool success;
+
+  AddOptionValueResponse({
+    required this.message,
+    required this.success,
+  });
+
+  factory AddOptionValueResponse.fromJson(Map<String, dynamic> json) {
+    return AddOptionValueResponse(
+      message: json['message'],
+      success: json['success'],
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'message': message,
+      'success': success,
+    };
+  }
+}
+
+class DefaultResponse {
+  final String message;
+  final bool success;
+
+  DefaultResponse({
+    required this.message,
+    required this.success,
+  });
+
+  factory DefaultResponse.fromJson(Map<String, dynamic> json) {
+    return DefaultResponse(
+      message: json['message'],
+      success: json['success'],
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'message': message,
+      'success': success,
     };
   }
 }

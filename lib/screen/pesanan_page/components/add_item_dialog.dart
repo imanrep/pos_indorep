@@ -72,7 +72,8 @@ class _AddItemDialogState extends State<AddItemDialog> {
   Widget build(BuildContext context) {
     final cartProvider = Provider.of<CartProvider>(context);
     return AlertDialog(
-      title: Text('Tambah Item'),
+      title: Text('Tambah Item',
+          style: GoogleFonts.inter(fontWeight: FontWeight.w600)),
       content: SingleChildScrollView(
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -80,18 +81,30 @@ class _AddItemDialogState extends State<AddItemDialog> {
             Row(
               children: [
                 CircleAvatar(
-                  backgroundColor: Colors.white,
-                  backgroundImage: NetworkImage(widget.selectedMenu.menuImage),
-                  onBackgroundImageError: (_, __) {},
-                  radius: 70,
-                  child: Image.asset('assets/images/default-menu.png'),
+                  backgroundColor: Colors.transparent,
+                  radius: 60,
+                  child: Image.network(
+                    widget.selectedMenu.menuImage,
+                    width: double.infinity,
+                    fit: BoxFit.fitHeight,
+                    errorBuilder: (context, error, stackTrace) {
+                      return Image.asset(
+                        'assets/images/default-menu.png', // Your default image path
+
+                        width: double.infinity,
+                        fit: BoxFit.fitHeight,
+                      );
+                    },
+                  ),
                 ),
                 const SizedBox(width: 16),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(widget.selectedMenu.menuName),
-                    Text(widget.selectedMenu.menuNote),
+                    Text(widget.selectedMenu.menuName,
+                        style: GoogleFonts.inter(fontWeight: FontWeight.w400)),
+                    Text(widget.selectedMenu.menuNote,
+                        style: GoogleFonts.inter(fontWeight: FontWeight.w400)),
                     const SizedBox(height: 8),
                     QuantitySelectorWidget(onQtyChanged: (newQty) {
                       setState(() {
@@ -114,7 +127,9 @@ class _AddItemDialogState extends State<AddItemDialog> {
             TextField(
               decoration: InputDecoration(
                 labelText: 'Catatan',
-                border: OutlineInputBorder(),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
               ),
               onChanged: (value) {
                 setState(() {
@@ -137,12 +152,14 @@ class _AddItemDialogState extends State<AddItemDialog> {
                 fontWeight: FontWeight.w600,
               ),
             ),
+            const SizedBox(width: 32),
             const Spacer(),
             TextButton(
               onPressed: () {
                 Navigator.pop(context);
               },
-              child: Text('Batal'),
+              child: Text('Batal',
+                  style: GoogleFonts.inter(fontWeight: FontWeight.w600)),
             ),
             ElevatedButton(
               onPressed: () {
@@ -160,14 +177,14 @@ class _AddItemDialogState extends State<AddItemDialog> {
                   price: widget.selectedMenu.menuPrice.toDouble(),
                   qty: qty,
                   notes: notes,
-                  selectedOptions:
-                      widget.selectedMenu.option!, // Pass selected options
+                  selectedOptions: localOptions, // Pass selected options
                 );
 
                 cartProvider.addItem(cartItem);
                 Navigator.pop(context);
               },
-              child: Text('Tambah'),
+              child: Text('Tambah',
+                  style: GoogleFonts.inter(fontWeight: FontWeight.w600)),
             )
           ],
         )

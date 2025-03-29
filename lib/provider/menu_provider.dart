@@ -1,20 +1,41 @@
 import 'package:flutter/material.dart';
 import 'package:pos_indorep/model/model.dart';
+import 'package:pos_indorep/provider/main_provider.dart';
 import 'package:pos_indorep/services/irepbe_services.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class MenuProvider with ChangeNotifier {
   List<MenuIrep> _allMenus = [];
   List<MenuIrep> _filteredMenus = [];
   List<String> _allCategories = [];
   MenuIrep? _selectedMenu;
+  String _selectedCategory = "All";
+  String _apiUrl = '';
+
+  String get apiUrl => _apiUrl;
 
   List<MenuIrep> get allmenus => _allMenus;
   List<MenuIrep> get filteredMenus => _filteredMenus;
   List<String> get allCategories => _allCategories;
   MenuIrep? get selectedMenu => _selectedMenu;
+  String get selectedCategory => _selectedCategory;
 
   MenuProvider() {
-    fetchAllMenus();
+    _initialize();
+  }
+
+  Future<void> _initialize() async {
+    await _loadApiUrl();
+  }
+
+  Future<void> _loadApiUrl() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    if (!prefs.containsKey('apiUrl')) {
+      await prefs.setString('apiUrl', 'http://112.78.128.73:8085');
+    } else {
+      _apiUrl = prefs.getString('apiUrl') ?? 'http://112.78.128.73:8085';
+    }
+    notifyListeners();
   }
 
   void selectMenu(MenuIrep menu) {
@@ -65,12 +86,136 @@ class MenuProvider with ChangeNotifier {
   }
 
   void filterMenusByCategory(String category) {
-    if (category == 'All') {
-      _filteredMenus = _allMenus;
-    } else {
-      _filteredMenus =
-          _allMenus.where((menu) => menu.menuType == category).toList();
+    _filteredMenus = category == 'All'
+        ? List.from(_allMenus)
+        : _allMenus.where((menu) => menu.menuType == category).toList();
+
+    if (_selectedCategory != category) {
+      _selectedCategory = category;
+      notifyListeners(); // Notify UI of the change
     }
-    notifyListeners();
+  }
+
+  Future<AddMenuResponse> addMenu(AddMenuRequest request) async {
+    IrepBE irepBE = IrepBE();
+    try {
+      AddMenuResponse res = await irepBE.addMenu(request);
+      if (res.success) {
+        await fetchAllMenus();
+        notifyListeners();
+      }
+      return res;
+    } catch (e) {
+      await fetchAllMenus();
+      notifyListeners();
+      rethrow;
+    }
+  }
+
+  Future<EditMenuResponse> editMenu(AddMenuRequest request) async {
+    IrepBE irepBE = IrepBE();
+    try {
+      EditMenuResponse res = await irepBE.editMenu(request);
+      if (res.success) {
+        await fetchAllMenus();
+        notifyListeners();
+      }
+      return res;
+    } catch (e) {
+      await fetchAllMenus();
+      rethrow;
+    }
+  }
+
+  Future<DefaultResponse> deleteMenu(int menuId) async {
+    IrepBE irepBE = IrepBE();
+    try {
+      DefaultResponse res = await irepBE.deleteMenu(menuId);
+      if (res.success) {
+        await fetchAllMenus();
+        notifyListeners();
+      }
+      return res;
+    } catch (e) {
+      await fetchAllMenus();
+      rethrow;
+    }
+  }
+
+  Future<AddOptionResponse> addOption(AddOptionRequest request) async {
+    IrepBE irepBE = IrepBE();
+    try {
+      AddOptionResponse res = await irepBE.addOption(request);
+      if (res.success) {
+        fetchAllMenus();
+        notifyListeners();
+      }
+      return res;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<void> editOption(EditOptionRequest request) async {
+    IrepBE irepBE = IrepBE();
+    try {
+      await irepBE.editOption(request);
+      fetchAllMenus();
+    } catch (e) {
+      fetchAllMenus();
+      print(e);
+    }
+  }
+
+  Future<void> addOptionValue(AddOptionValueRequest request) async {
+    IrepBE irepBE = IrepBE();
+    try {
+      await irepBE.addOptionValue(request);
+      fetchAllMenus();
+    } catch (e) {
+      fetchAllMenus();
+      print(e);
+    }
+  }
+
+  Future<void> editOptionValue(AddOptionValueRequest request) async {
+    IrepBE irepBE = IrepBE();
+    try {
+      await irepBE.addOptionValue(request);
+      fetchAllMenus();
+    } catch (e) {
+      fetchAllMenus();
+      print(e);
+    }
+  }
+
+  Future<DefaultResponse> deleteOption(int optionId) async {
+    IrepBE irepBE = IrepBE();
+    try {
+      DefaultResponse res = await irepBE.deleteOption(optionId);
+      if (res.success) {
+        await fetchAllMenus();
+        notifyListeners();
+      }
+      return res;
+    } catch (e) {
+      await fetchAllMenus();
+      rethrow;
+    }
+  }
+
+  Future<DefaultResponse> deleteOptionValue(int optionValueId) async {
+    IrepBE irepBE = IrepBE();
+    try {
+      DefaultResponse res = await irepBE.deleteOption(optionValueId);
+      if (res.success) {
+        await fetchAllMenus();
+        notifyListeners();
+      }
+      return res;
+    } catch (e) {
+      await fetchAllMenus();
+      rethrow;
+    }
   }
 }

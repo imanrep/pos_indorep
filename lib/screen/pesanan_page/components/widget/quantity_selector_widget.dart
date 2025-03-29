@@ -56,20 +56,18 @@ class _QuantitySelectorWidgetState extends State<QuantitySelectorWidget> {
     return Container(
       decoration: BoxDecoration(
         border: Border.all(color: Colors.grey),
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(16),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          // Minus button
           IconButton(
-            icon: Icon(Icons.remove, color: Colors.red),
+            icon: Icon(Icons.remove, color: Colors.redAccent),
             onPressed: () => _updateQty(qty - 1),
           ),
 
-          // Text field for manual input
           SizedBox(
-            width: 30,
+            width: 20,
             child: TextField(
               controller: _controller,
               keyboardType: TextInputType.number,

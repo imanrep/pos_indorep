@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:pos_indorep/model/model.dart';
+import 'package:pos_indorep/provider/main_provider.dart';
 import 'package:pos_indorep/provider/menu_provider.dart';
 import 'package:pos_indorep/screen/management/components/edit_menu_view.dart';
 import 'package:pos_indorep/screen/management/components/menu_list_view.dart';
@@ -21,8 +23,13 @@ class _MenuManagementPageState extends State<MenuManagementPage>
     super.initState();
     WidgetsFlutterBinding.ensureInitialized();
     final provider = Provider.of<MenuProvider>(context, listen: false);
-    provider.fetchAllMenus();
     _initializeTabController(provider);
+    _fetchMenu();
+  }
+
+  Future<void> _fetchMenu() async {
+    final provider = Provider.of<MenuProvider>(context, listen: false);
+    provider.fetchAllMenus();
   }
 
   void _updateTabController() {
@@ -94,7 +101,24 @@ class _MenuManagementPageState extends State<MenuManagementPage>
           flex: 4,
           child: Scaffold(
             appBar: AppBar(
-              title: Text('Menu Management'),
+              toolbarHeight: 72,
+              title: Row(
+                children: [
+                  Text('Menu Management',
+                      style: GoogleFonts.inter(
+                          fontWeight: FontWeight.w600, fontSize: 28.0)),
+                  const Spacer(),
+                  IconButton(
+                    onPressed: () {
+                      var mainProvider =
+                          Provider.of<MainProvider>(context, listen: false);
+                      provider.fetchAllCategories();
+                      provider.fetchAllMenus();
+                    },
+                    icon: const Icon(Icons.refresh_rounded),
+                  )
+                ],
+              ),
               bottom: TabBar(
                 tabs: tabs,
                 controller: _tabController,
@@ -127,7 +151,6 @@ class _MenuManagementPageState extends State<MenuManagementPage>
                   ...provider.allCategories.map((category) {
                     return SingleChildScrollView(
                       child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -136,25 +159,23 @@ class _MenuManagementPageState extends State<MenuManagementPage>
                                 icon: Row(
                                   children: [
                                     Icon(Icons.add),
-                                    Text('Tambah Menu'),
+                                    const SizedBox(width: 8.0),
+                                    Text('Tambah Menu',
+                                        style: GoogleFonts.inter()),
                                   ],
                                 ),
                                 onPressed: () {
-                                  // Menu newMenu = Menu(
-                                  //   menuId: '',
-                                  //   createdAt:
-                                  //       DateTime.now().millisecondsSinceEpoch,
-                                  //   title: 'New Menu',
-                                  //   category: Category(
-                                  //       categoryId: category.categoryId,
-                                  //       createdAt: category.createdAt),
-                                  //   price: 0,
-                                  //   image: '',
-                                  //   desc: '',
-                                  //   tag: [],
-                                  //   available: true,
-                                  // );
-                                  // provider.selectMenu(newMenu);
+                                  MenuIrep newMenu = MenuIrep(
+                                    available: false,
+                                    menuId: 0,
+                                    menuName: 'New Menu',
+                                    menuType: category,
+                                    menuPrice: 0,
+                                    menuImage: '',
+                                    menuNote: '',
+                                    option: [],
+                                  );
+                                  provider.selectMenu(newMenu);
                                 },
                               ),
                               // IconButton(
@@ -324,11 +345,16 @@ class InfoCategoryCard extends StatelessWidget {
         padding: const EdgeInsets.all(8.0),
         child: Column(
           children: [
-            Text(title),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12.0),
+              child: Text(title,
+                  style: GoogleFonts.inter(fontWeight: FontWeight.w500)),
+            ),
             const Spacer(),
-            Text(qty.toString()),
+            Text(qty.toString(),
+                style: GoogleFonts.inter(fontWeight: FontWeight.w800)),
             const Spacer(),
-            Text('Menu'),
+            Text('Menu', style: GoogleFonts.inter(fontWeight: FontWeight.w500)),
           ],
         ),
       ),

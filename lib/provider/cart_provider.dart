@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:pos_indorep/model/model.dart';
+import 'package:pos_indorep/services/irepbe_services.dart';
 import 'package:uuid/uuid.dart';
 
 class CartProvider with ChangeNotifier {
   List<CartItem> _currentCart = [];
+  List<OrderItem> _currentOrder = [];
   double _totalCurrentCart = 0;
 
   List<CartItem> get currentCart => _currentCart;
+  List<OrderItem> get currentOrder => _currentOrder;
   double get totalCurrentCart => _totalCurrentCart;
 
   void calculateTotalCart() {
@@ -21,21 +24,19 @@ class CartProvider with ChangeNotifier {
     var uuid = Uuid();
 
     _currentCart.add(item);
+    _currentOrder.add(OrderItem(
+      id: item.menuId,
+      qty: item.qty,
+      note: item.notes,
+    ));
     calculateTotalCart();
     notifyListeners();
   }
 
-  void incrementQty(String cartId) {
+  void updateQty(String cartId, int qty) {
     final cartItem = _currentCart.firstWhere((item) => item.cartId == cartId);
-    cartItem.updateQty(cartItem.qty + 1);
-    calculateTotalCart();
-    notifyListeners();
-  }
-
-  void decrementQty(String cartId) {
-    final cartItem = _currentCart.firstWhere((item) => item.cartId == cartId);
-    if (cartItem.qty > 1) {
-      cartItem.updateQty(cartItem.qty - 1);
+    if (qty > 0) {
+      cartItem.updateQty(qty);
       calculateTotalCart();
       notifyListeners();
     }
@@ -94,6 +95,8 @@ class CartProvider with ChangeNotifier {
 
   void removeItem(MenuIrep item) {
     _currentCart.remove(item);
+    _currentOrder.removeWhere((element) => element.id == item.menuId);
+    calculateTotalCart();
     notifyListeners();
   }
 }

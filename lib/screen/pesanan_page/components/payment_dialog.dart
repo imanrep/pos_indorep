@@ -1,27 +1,31 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:pos_indorep/model/model.dart';
 import 'package:pos_indorep/provider/transaction_provider.dart';
+import 'package:pretty_qr_code/pretty_qr_code.dart';
 import 'package:provider/provider.dart';
 
-class PaymentDialog extends StatefulWidget {
+class PaymentDialogBottomSheet extends StatefulWidget {
   final TransactionModel transaction;
+  final QrisOrderResponse qrisOrderResponse;
 
-  const PaymentDialog({
+  const PaymentDialogBottomSheet({
     super.key,
     required this.transaction,
+    required this.qrisOrderResponse,
   });
 
   @override
-  State<PaymentDialog> createState() => _PaymentDialogState();
+  State<PaymentDialogBottomSheet> createState() =>
+      _PaymentDialogBottomSheetState();
 }
 
-class _PaymentDialogState extends State<PaymentDialog> {
+class _PaymentDialogBottomSheetState extends State<PaymentDialogBottomSheet> {
   final TextEditingController _nameController = TextEditingController();
   final List<String> _paymentMethods = [
     'Cash',
     'QRIS',
-    'Card',
   ];
 
   String? _selectedPaymentMethod;
@@ -41,11 +45,14 @@ class _PaymentDialogState extends State<PaymentDialog> {
 
   @override
   Widget build(BuildContext context) {
-    return AlertDialog(
-      title: Text('Konfirmasi Pesanan'),
-      content: Column(
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
+          Text('Konfirmasi Pembayaran',
+              style:
+                  GoogleFonts.inter(fontSize: 18, fontWeight: FontWeight.w600)),
           TextFormField(
             controller: _nameController,
             decoration: InputDecoration(labelText: 'Atas nama'),
@@ -75,33 +82,15 @@ class _PaymentDialogState extends State<PaymentDialog> {
             validator: (value) =>
                 value == null ? 'Masukkan metode pembayaran' : null,
           ),
+          const SizedBox(height: 16),
+          Container(
+            height: 200,
+            child: PrettyQrView.data(
+              data: widget.qrisOrderResponse.qris,
+            ),
+          ),
         ],
       ),
-      actions: [
-        TextButton(
-          onPressed: () {
-            Navigator.of(context).pop();
-          },
-          child: Text('Cancel'),
-        ),
-        ElevatedButton(
-          onPressed: () {
-            if (_selectedPaymentMethod != null &&
-                _nameController.text.isNotEmpty) {
-              _handlePayment();
-              Navigator.of(context).pop();
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('Pesanan berhasil dibuat!')),
-              );
-            } else {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('Lengkapi detail pesanan!')),
-              );
-            }
-          },
-          child: Text('Bayar'),
-        ),
-      ],
     );
   }
 }
