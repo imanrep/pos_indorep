@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'package:flutter/services.dart' show rootBundle;
 import 'package:http/http.dart' as http;
 import 'package:pos_indorep/model/model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -11,7 +10,7 @@ class IrepBE {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? baseUrl = prefs.getString('apiUrl');
     if (baseUrl == null || baseUrl.isEmpty) {
-      baseUrl = 'http://112.78.128.73:8085';
+      baseUrl = 'https://warnet-api.indorep.com';
       await prefs.setString('apiUrl', baseUrl);
     }
     return baseUrl;
@@ -19,13 +18,7 @@ class IrepBE {
 
   Future<List<MenuIrep>> getAllMenus() async {
     String baseUrl = await getBaseUrl();
-    if (isOffline) {
-      // Load local JSON file
-      final String response =
-          await rootBundle.loadString('assets/example.json');
-      List<dynamic> data = json.decode(response);
-      return data.map((item) => MenuIrep.fromMap(item, baseUrl)).toList();
-    } else {
+    {
       String menuUrl = '${baseUrl}/menu';
 
       final response = await http.get(Uri.parse(menuUrl));
@@ -41,11 +34,35 @@ class IrepBE {
     }
   }
 
+  Future<GetTransacationsResponse> getTransactions(int page) async {
+    String baseUrl = await getBaseUrl();
+    final url = Uri.parse('${baseUrl}/getTransaction?page=${page}');
+    try {
+      final response = await http.get(url);
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> data = jsonDecode(response.body);
+        return GetTransacationsResponse.fromJson(data);
+      } else {
+        print('Failed to load transactions: ${response.body}');
+      }
+    } catch (e) {
+      print('Error loading transactions: $e');
+    }
+
+    // Return a default response instead of null
+    return GetTransacationsResponse(
+      data: [],
+      totalPages: 0,
+      totalTransaction: 0,
+    );
+  }
+
   Future<QrisOrderResponse> createOrder(QrisOrderRequest request) async {
     String baseUrl = await getBaseUrl();
     final url = Uri.parse('${baseUrl}/createOrder');
 
     try {
+      print(request.toJson());
       final response = await http.post(
         url,
         body: jsonEncode(request.toJson()),
@@ -67,6 +84,7 @@ class IrepBE {
       orderID: 0,
       qris: "",
       success: false,
+      time: "",
       total: 0,
     );
   }
@@ -173,7 +191,6 @@ class IrepBE {
       print('Error adding option: $e');
     }
 
-    // Return a default response instead of null
     return AddOptionResponse(
       message: "Failed",
       optionId: 0,
@@ -195,7 +212,7 @@ class IrepBE {
         final Map<String, dynamic> data = jsonDecode(response.body);
         return AddOptionResponse.fromJson(data);
       } else {
-        print('Failed to add option: ${response.body}');
+        print('Failed to edit/update option: ${response.body}');
       }
     } catch (e) {
       print('Error adding option: $e');
@@ -224,7 +241,7 @@ class IrepBE {
         final Map<String, dynamic> data = jsonDecode(response.body);
         return AddOptionValueResponse.fromJson(data);
       } else {
-        print('Failed to add option: ${response.body}');
+        print('Failed to add option value item: ${response.body}');
       }
     } catch (e) {
       print('Error adding option: $e');
@@ -237,7 +254,8 @@ class IrepBE {
     );
   }
 
-  Future<DefaultResponse> editOptionValue(AddOptionValueRequest request) async {
+  Future<DefaultResponse> editOptionValue(
+      EditOptionValueRequest request) async {
     String baseUrl = await getBaseUrl();
     final url = Uri.parse('${baseUrl}/editOptionValue');
 
@@ -251,7 +269,7 @@ class IrepBE {
         final Map<String, dynamic> data = jsonDecode(response.body);
         return DefaultResponse.fromJson(data);
       } else {
-        print('Failed to add option: ${response.body}');
+        print('Failed to edit/update option value item : ${response.body}');
       }
     } catch (e) {
       print('Error adding option: $e');

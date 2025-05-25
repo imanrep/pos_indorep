@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:pos_indorep/model/model.dart';
 
@@ -19,13 +20,24 @@ class _AddOptionDialogState extends State<AddOptionDialog> {
   void initState() {
     super.initState();
     _optionNameController = TextEditingController();
-    selectedValue = "Pilihan Opsional";
+    selectedValue = "";
+
+    // Add a listener to the text controller to rebuild the widget on text changes
+    _optionNameController.addListener(() {
+      setState(() {}); // Rebuild the widget when the text changes
+    });
   }
 
   void _handleSelection(String value) {
     setState(() {
       selectedValue = value;
     });
+  }
+
+  @override
+  void dispose() {
+    _optionNameController.dispose();
+    super.dispose();
   }
 
   @override
@@ -40,7 +52,13 @@ class _AddOptionDialogState extends State<AddOptionDialog> {
               TextField(
                 controller: _optionNameController,
                 decoration: InputDecoration(
-                    labelText: 'Nama Pilihan', labelStyle: GoogleFonts.inter()),
+                    labelText: 'Nama Pilihan',
+                    labelStyle: GoogleFonts.inter(),
+                    counterText: ""),
+                maxLength: 20,
+                inputFormatters: [
+                  FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z0-9/\s]')),
+                ],
               ),
               const SizedBox(height: 32),
               Align(
@@ -77,18 +95,22 @@ class _AddOptionDialogState extends State<AddOptionDialog> {
           child: const Text('Batal'),
         ),
         ElevatedButton(
-            onPressed: () {
-              OptionMenuIrep newOption = OptionMenuIrep(
-                optionId: 0,
-                optionName: _optionNameController.text,
-                optionType: selectedValue,
-                available: true,
-                optionValue: [],
-              );
-              widget.onOptionAdded(newOption);
-              Navigator.of(context).pop();
-            },
-            child: Text('Simpan')),
+          onPressed:
+              _optionNameController.text.isNotEmpty && selectedValue.isNotEmpty
+                  ? () {
+                      OptionMenuIrep newOption = OptionMenuIrep(
+                        optionId: 0,
+                        optionName: _optionNameController.text,
+                        optionType: selectedValue,
+                        available: true,
+                        optionValue: [],
+                      );
+                      widget.onOptionAdded(newOption);
+                      Navigator.of(context).pop();
+                    }
+                  : null, // Disable the button if validation fails
+          child: Text('Simpan'),
+        ),
       ],
     );
   }

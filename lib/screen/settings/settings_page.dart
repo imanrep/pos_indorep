@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bluetooth_printer/flutter_bluetooth_printer.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:pos_indorep/provider/main_provider.dart';
@@ -51,10 +52,24 @@ class _SettingsPageState extends State<SettingsPage> {
                     },
                   ),
                   ListTile(
+                    leading: Icon(Icons.print_rounded),
+                    title: Text('Printer Device'),
+                    subtitle: Text(
+                        '${provider.printerName} (${provider.printerAddress})'),
+                    onTap: () async {
+                      final device =
+                          await FlutterBluetoothPrinter.selectDevice(context);
+                      if (device != null) {
+                        provider.setPrinterAddress(device.address);
+                        provider.setPrinterName(device.name!);
+                      }
+                    },
+                  ),
+                  ListTile(
                     leading: Icon(Icons.info_outline_rounded),
                     title: Text('Version'),
                     subtitle: Text(provider.appVersion),
-                  )
+                  ),
                 ],
               ),
             ),

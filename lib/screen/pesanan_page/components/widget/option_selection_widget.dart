@@ -32,7 +32,6 @@ class _OptionSelectionWidgetState extends State<OptionSelectionWidget> {
       }
     });
 
-    // Notify parent widget (AddItemDialog) of the change
     widget.onOptionChanged(widget.option);
   }
 

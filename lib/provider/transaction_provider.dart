@@ -1,42 +1,50 @@
 import 'package:flutter/material.dart';
 import 'package:pos_indorep/model/model.dart';
+import 'package:pos_indorep/services/irepbe_services.dart';
 
 class TransactionProvider extends ChangeNotifier {
-  List<TransactionModel> _allTransactions = [];
-  List<TransactionModel> _filteredTransactions = [];
-  TransactionModel? _selectedTransaction;
+  List<TransactionData> _allTransactions = [];
+  List<TransactionData> _filteredTransactions = [];
+  TransactionData? _selectedTransaction;
+  int _currentPageIndex = 1;
+  int _totalPages = 0;
 
-  List<TransactionModel> get transactions => _allTransactions;
-  List<TransactionModel> get filteredTransactions => _filteredTransactions;
-  TransactionModel? get selectedTransaction => _selectedTransaction;
+  List<TransactionData> get transactions => _allTransactions;
+  List<TransactionData> get filteredTransactions => _filteredTransactions;
+  TransactionData? get selectedTransaction => _selectedTransaction;
+  int get currentPageIndex => _currentPageIndex;
+  int get totalPages => _totalPages;
 
   TransactionProvider() {
-    // getAllTransactions();
+    getAllTransactions(1);
   }
 
-  // Future<void> getAllTransactions() async {
-  //   try {
-  //     List<TransactionModel> fetchedTransactions =
-  //         await _firebaseService.getAllTransaction();
-  //     // Sort the fetched transactions by transactionDate in descending order (latest first)
-  //     fetchedTransactions
-  //         .sort((a, b) => b.transactionDate.compareTo(a.transactionDate));
-  //     _allTransactions = fetchedTransactions;
-  //     notifyListeners();
-  //   } catch (e) {
-  //     // Handle error
-  //     print(e);
-  //   }
+  Future<void> getAllTransactions(int page) async {
+    IrepBE irepBE = IrepBE();
+    try {
+      GetTransacationsResponse response = await irepBE.getTransactions(page);
+      if (response.data.isNotEmpty) {
+        _allTransactions = response.data;
+        _filteredTransactions = response.data;
+        _currentPageIndex = page;
+        _totalPages = response.totalPages;
+        notifyListeners();
+      } else {
+        print('No transactions found.');
+      }
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  // void filterTransactionsByTimeframe(DateTime start, DateTime end) {
+  //   _filteredTransactions = _allTransactions
+  //       .where((transaction) =>
+  //           transaction.transactionDate >= start.millisecondsSinceEpoch &&
+  //           transaction.transactionDate <= end.millisecondsSinceEpoch)
+  //       .toList();
+  //   notifyListeners();
   // }
-
-  void filterTransactionsByTimeframe(DateTime start, DateTime end) {
-    _filteredTransactions = _allTransactions
-        .where((transaction) =>
-            transaction.transactionDate >= start.millisecondsSinceEpoch &&
-            transaction.transactionDate <= end.millisecondsSinceEpoch)
-        .toList();
-    notifyListeners();
-  }
 
   // Future<void> addTransaction(TransactionModel transaction) {
   //   try {
@@ -46,7 +54,7 @@ class TransactionProvider extends ChangeNotifier {
   //   }
   // }
 
-  void selectTransaction(TransactionModel transaction) {
+  void selectTransaction(TransactionData transaction) {
     _selectedTransaction = transaction;
     notifyListeners();
   }

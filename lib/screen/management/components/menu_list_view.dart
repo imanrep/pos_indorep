@@ -27,19 +27,21 @@ class MenuListView extends StatelessWidget {
           subtitle: Text(Helper.rupiahFormatter(item.menuPrice.toDouble())),
           leading: CircleAvatar(
             backgroundColor: Colors.transparent,
-            child: Image.network(
-              item.menuImage,
-              height: 100,
-              width: double.infinity,
-              fit: BoxFit.fitHeight,
-              errorBuilder: (context, error, stackTrace) {
-                return Image.asset(
-                  'assets/images/default-menu.png', // Your default image path
-                  height: 100,
-                  width: double.infinity,
-                  fit: BoxFit.fitHeight,
-                );
-              },
+            child: ClipOval(
+              child: Image.network(
+                item.menuImage,
+                height: 100,
+                width: double.infinity,
+                fit: BoxFit.fitHeight,
+                errorBuilder: (context, error, stackTrace) {
+                  return Image.asset(
+                    'assets/images/default-menu.png', // Your default image path
+                    height: 100,
+                    width: double.infinity,
+                    fit: BoxFit.fitHeight,
+                  );
+                },
+              ),
             ),
           ),
           trailing: Icon(

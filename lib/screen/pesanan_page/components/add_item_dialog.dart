@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:pos_indorep/helper/helper.dart';
 import 'package:pos_indorep/model/model.dart';
@@ -26,6 +27,12 @@ class _AddItemDialogState extends State<AddItemDialog> {
   double addOnPrice = 0;
   String notes = '';
 
+  bool allRadioSelected() {
+    return localOptions.where((opt) => opt.optionType == "Radio").every(
+          (radioOption) => radioOption.optionValue.any((val) => val.isSelected),
+        );
+  }
+
   @override
   void initState() {
     super.initState();
@@ -46,6 +53,14 @@ class _AddItemDialogState extends State<AddItemDialog> {
                   .toList(),
             ))
         .toList();
+
+    // for (var option in localOptions) {
+    //   if (option.optionType == "Radio") {
+    //     for (var optVal in option.optionValue) {
+    //       optVal.isSelected = true;
+    //     }
+    //   }
+    // }
   }
 
   void _handleOptionChanged(OptionMenuIrep updatedOption) {
@@ -80,21 +95,22 @@ class _AddItemDialogState extends State<AddItemDialog> {
           children: [
             Row(
               children: [
-                CircleAvatar(
-                  backgroundColor: Colors.transparent,
-                  radius: 60,
-                  child: Image.network(
-                    widget.selectedMenu.menuImage,
-                    width: double.infinity,
-                    fit: BoxFit.fitHeight,
-                    errorBuilder: (context, error, stackTrace) {
-                      return Image.asset(
-                        'assets/images/default-menu.png', // Your default image path
-
-                        width: double.infinity,
-                        fit: BoxFit.fitHeight,
-                      );
-                    },
+                ClipOval(
+                  child: CircleAvatar(
+                    backgroundColor: Colors.transparent,
+                    radius: 60,
+                    child: Image.network(
+                      widget.selectedMenu.menuImage,
+                      width: double.infinity,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) {
+                        return Image.asset(
+                          'assets/images/default-menu.png',
+                          width: double.infinity,
+                          fit: BoxFit.cover,
+                        );
+                      },
+                    ),
                   ),
                 ),
                 const SizedBox(width: 16),
@@ -105,7 +121,7 @@ class _AddItemDialogState extends State<AddItemDialog> {
                         style: GoogleFonts.inter(fontWeight: FontWeight.w400)),
                     Text(widget.selectedMenu.menuNote,
                         style: GoogleFonts.inter(fontWeight: FontWeight.w400)),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: 14),
                     QuantitySelectorWidget(onQtyChanged: (newQty) {
                       setState(() {
                         qty = newQty;
@@ -127,10 +143,18 @@ class _AddItemDialogState extends State<AddItemDialog> {
             TextField(
               decoration: InputDecoration(
                 labelText: 'Catatan',
+                labelStyle: GoogleFonts.inter(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w400,
+                ),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(16),
                 ),
               ),
+              maxLength: 15,
+              inputFormatters: [
+                FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z0-9/&=\s]')),
+              ],
               onChanged: (value) {
                 setState(() {
                   notes = value;
@@ -162,30 +186,34 @@ class _AddItemDialogState extends State<AddItemDialog> {
                   style: GoogleFonts.inter(fontWeight: FontWeight.w600)),
             ),
             ElevatedButton(
-              onPressed: () {
-                var uuid = Uuid();
+              onPressed: allRadioSelected()
+                  ? () {
+                      var uuid = Uuid();
 
-                CartItem cartItem = CartItem(
-                  cartId: uuid.v4(),
-                  createdAt: DateTime.now().millisecondsSinceEpoch,
-                  available: widget.selectedMenu.available,
-                  menuId: widget.selectedMenu.menuId,
-                  title: widget.selectedMenu.menuName,
-                  category: widget.selectedMenu.menuType,
-                  image: widget.selectedMenu.menuImage,
-                  desc: widget.selectedMenu.menuNote,
-                  price: widget.selectedMenu.menuPrice.toDouble(),
-                  qty: qty,
-                  notes: notes,
-                  selectedOptions: localOptions, // Pass selected options
-                );
+                      CartItem cartItem = CartItem(
+                        cartId: uuid.v4(),
+                        createdAt: DateTime.now().millisecondsSinceEpoch,
+                        available: widget.selectedMenu.available,
+                        menuId: widget.selectedMenu.menuId,
+                        title: widget.selectedMenu.menuName,
+                        category: widget.selectedMenu.menuType,
+                        image: widget.selectedMenu.menuImage,
+                        desc: widget.selectedMenu.menuNote,
+                        price: widget.selectedMenu.menuPrice.toDouble(),
+                        qty: qty,
+                        notes: notes,
+                        selectedOptions: localOptions,
+                      );
 
-                cartProvider.addItem(cartItem);
-                Navigator.pop(context);
-              },
-              child: Text('Tambah',
-                  style: GoogleFonts.inter(fontWeight: FontWeight.w600)),
-            )
+                      cartProvider.addItem(cartItem);
+                      Navigator.pop(context);
+                    }
+                  : null,
+              child: Text(
+                'Tambah',
+                style: GoogleFonts.inter(fontWeight: FontWeight.w600),
+              ),
+            ),
           ],
         )
       ],

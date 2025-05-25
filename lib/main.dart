@@ -1,4 +1,5 @@
-import 'package:flutter/cupertino.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:loader_overlay/loader_overlay.dart';
 import 'package:pos_indorep/helper/helper.dart';
@@ -8,9 +9,26 @@ import 'package:pos_indorep/provider/menu_provider.dart';
 import 'package:pos_indorep/provider/transaction_provider.dart';
 import 'package:pos_indorep/screen/home_screen.dart';
 import 'package:provider/provider.dart';
+import 'package:intl/date_symbol_data_local.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await initializeDateFormatting('id_ID', null); // Initialize Indonesian locale
+  if (kIsWeb) {
+    await Firebase.initializeApp(
+      options: const FirebaseOptions(
+        apiKey: "AIzaSyAeR0FuthfHhmNg221oGLzY6f8vBBqRQmc",
+        authDomain: "pariwisata-cireong.firebaseapp.com",
+        projectId: "pariwisata-cireong",
+        storageBucket: "pariwisata-cireong.appspot.com",
+        messagingSenderId: "1081014321686",
+        appId: "1:1081014321686:web:73f179db5c144f37386b37",
+        measurementId: "G-ZGYP2QXW1K",
+      ),
+    );
+  } else {
+    await Firebase.initializeApp();
+  }
   runApp(
     MultiProvider(
       providers: [
@@ -19,13 +37,7 @@ void main() async {
         ChangeNotifierProvider(create: (_) => TransactionProvider()),
         ChangeNotifierProvider(create: (_) => MenuProvider()),
       ],
-      child: GlobalLoaderOverlay(
-          useDefaultLoading: false,
-          overlayWidgetBuilder: (_) {
-            //ignored progress for the moment
-            return Center(child: CupertinoActivityIndicator());
-          },
-          child: MyApp()),
+      child: GlobalLoaderOverlay(child: MyApp()),
     ),
   );
 }
@@ -36,7 +48,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'INDOREP CAFE',
+      title: 'POS Indorep',
       themeMode: ThemeMode.dark, // Change this to ThemeMode.system for auto
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(

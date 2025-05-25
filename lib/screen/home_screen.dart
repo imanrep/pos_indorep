@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_bluetooth_printer/flutter_bluetooth_printer.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:pos_indorep/helper/helper.dart';
@@ -135,12 +136,150 @@ class ClockWidget extends StatelessWidget {
               style: GoogleFonts.inter(fontWeight: FontWeight.w500),
             ),
             Text(
-              DateFormat('EEEE, dd MMM yyyy').format(DateTime.now()),
+              DateFormat('EEEE, d MMMM yyyy', 'id_ID').format(DateTime.now()),
               style: GoogleFonts.inter(fontSize: 14),
             ),
           ],
         );
       },
+    );
+  }
+}
+
+class _ReceiptBottomSheet extends StatefulWidget {
+  const _ReceiptBottomSheet({super.key});
+
+  @override
+  State<_ReceiptBottomSheet> createState() => _ReceiptBottomSheetState();
+}
+
+class _ReceiptBottomSheetState extends State<_ReceiptBottomSheet> {
+  ReceiptController? controller;
+  String? address;
+
+  @override
+  Widget build(BuildContext context) {
+    return DraggableScrollableSheet(
+      expand: false,
+      initialChildSize: 0.9,
+      minChildSize: 0.5,
+      maxChildSize: 0.95,
+      builder: (_, controllerScroll) => Container(
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+        ),
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          children: [
+            Row(
+              children: [
+                const Text('Receipt',
+                    style:
+                        TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                const Spacer(),
+                IconButton(
+                  onPressed: () async {
+                    final selected =
+                        await FlutterBluetoothPrinter.selectDevice(context);
+                    if (selected != null) {
+                      setState(() {
+                        address = selected.address;
+                      });
+                    }
+                  },
+                  icon: const Icon(Icons.settings),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            Expanded(
+              child: SingleChildScrollView(
+                controller: controllerScroll,
+                child: Receipt(
+                  backgroundColor: Colors.grey.shade200,
+                  builder: (context) {
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        // Image.asset(
+                        //   'assets/logo.webp',
+                        //   fit: BoxFit.fitHeight,
+                        //   height: 200,
+                        // ),
+                        const SizedBox(height: 8),
+                        const FittedBox(
+                          fit: BoxFit.contain,
+                          child: Text(
+                            'PURCHASE RECEIPT',
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                        const Divider(thickness: 2),
+                        Table(
+                          columnWidths: const {
+                            1: IntrinsicColumnWidth(),
+                          },
+                          children: const [
+                            TableRow(
+                                children: [Text('ORANGE JUICE'), Text(r'$2')]),
+                            TableRow(children: [
+                              Text('CAPPUCINO MEDIUM SIZE'),
+                              Text(r'$2.9')
+                            ]),
+                            TableRow(
+                                children: [Text('BEEF PIZZA'), Text(r'$15.9')]),
+                            TableRow(
+                                children: [Text('ORANGE JUICE'), Text(r'$2')]),
+                            TableRow(children: [
+                              Text('CAPPUCINO MEDIUM SIZE'),
+                              Text(r'$2.9')
+                            ]),
+                            TableRow(
+                                children: [Text('BEEF PIZZA'), Text(r'$15.9')]),
+                          ],
+                        ),
+                        const Divider(thickness: 2),
+                        const FittedBox(
+                          fit: BoxFit.cover,
+                          child: Row(
+                            children: [
+                              Text('TOTAL',
+                                  style:
+                                      TextStyle(fontWeight: FontWeight.w900)),
+                              SizedBox(width: 16),
+                              Text(r'$200',
+                                  style:
+                                      TextStyle(fontWeight: FontWeight.w900)),
+                            ],
+                          ),
+                        ),
+                        const Divider(thickness: 2),
+                        const Text('Thank you for your purchase!'),
+                        const SizedBox(height: 24),
+                        // Center(
+                        //   child: Image.asset(
+                        //     'assets/qrcode.png',
+                        //     width: 150,
+                        //   ),
+                        // ),
+                      ],
+                    );
+                  },
+                  onInitialized: (ctrl) => setState(() => controller = ctrl),
+                ),
+              ),
+            ),
+            const SizedBox(height: 8),
+            SafeArea(
+              top: false,
+              child: Row(
+                children: [],
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

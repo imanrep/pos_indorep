@@ -12,13 +12,31 @@ class Helper {
     return formatter.format(price);
   }
 
+  static String dateFormatterTwo(String dateTimeString) {
+    DateTime dt = DateTime.parse(dateTimeString);
+    // final dayOfWeek = DateFormat('EEEE', 'id_ID').format(dt);
+    final formattedDate = DateFormat('dd-MM-yyyy', 'id_ID').format(dt);
+    return '$formattedDate';
+  }
+
+  static String timeFormatterTwo(String dateTimeString) {
+    final formatter = DateFormat('HH:mm');
+    return formatter.format(DateTime.parse(dateTimeString));
+  }
+
   static String dateFormatter(int date) {
-    final formatter = DateFormat('dd MMMM yyyy');
+    final formatter = DateFormat('d MMMM yyyy', 'id_ID');
     return formatter.format(DateTime.fromMillisecondsSinceEpoch(date));
   }
 
   static String timeFormatter(int date) {
     final formatter = DateFormat('HH:mm');
+    return formatter.format(DateTime.fromMillisecondsSinceEpoch(date));
+  }
+
+  // New method to format date like 'Jumat, 2 Mei 2025'
+  static String formattedDateWithDay(int date) {
+    final formatter = DateFormat('EEEE, d MMMM yyyy', 'id_ID');
     return formatter.format(DateTime.fromMillisecondsSinceEpoch(date));
   }
 }

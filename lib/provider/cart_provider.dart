@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:pos_indorep/model/model.dart';
-import 'package:pos_indorep/services/irepbe_services.dart';
-import 'package:uuid/uuid.dart';
 
 class CartProvider with ChangeNotifier {
   List<CartItem> _currentCart = [];
@@ -15,20 +13,35 @@ class CartProvider with ChangeNotifier {
   void calculateTotalCart() {
     _totalCurrentCart = 0;
     for (var item in _currentCart) {
-      _totalCurrentCart += item.subTotal;
+      _totalCurrentCart += (item.subTotal);
     }
     notifyListeners();
   }
 
-  void addItem(CartItem item) {
-    var uuid = Uuid();
+  void clearCart() {
+    _currentCart.clear();
+    _currentOrder.clear();
+    _totalCurrentCart = 0;
+    notifyListeners();
+  }
 
+  void addItem(CartItem item) {
     _currentCart.add(item);
-    _currentOrder.add(OrderItem(
-      id: item.menuId,
-      qty: item.qty,
-      note: item.notes,
-    ));
+    _currentOrder.add(
+      OrderItem(
+        id: item.menuId,
+        qty: item.qty,
+        note: item.notes,
+        option: [
+          for (var opt in item.selectedOptions)
+            for (var val in opt.optionValue.where((v) => v.isSelected))
+              OptionOrderItem(
+                optionId: opt.optionId,
+                valueId: val.optionValueId,
+              ),
+        ],
+      ),
+    );
     calculateTotalCart();
     notifyListeners();
   }

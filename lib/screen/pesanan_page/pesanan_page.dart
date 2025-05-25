@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:pos_indorep/helper/helper.dart';
 import 'package:pos_indorep/model/model.dart';
@@ -81,101 +82,137 @@ class _PesananPageState extends State<PesananPage> {
                           ),
                           padding:
                               EdgeInsets.all(32.0), // padding around the grid
-                          itemCount: menuProvider
-                              .filteredMenus.length, // total number of items
+                          itemCount: menuProvider.filteredMenus.isNotEmpty
+                              ? menuProvider.filteredMenus.length
+                              : menuProvider
+                                  .allmenus.length, // total number of items
                           itemBuilder: (context, index) {
-                            final item = menuProvider.filteredMenus[index];
+                            final item = menuProvider.filteredMenus.isNotEmpty
+                                ? menuProvider.filteredMenus[index]
+                                : menuProvider.allmenus[index];
                             bool isItemSelected = provider.currentCart.any(
                                 (element) => element.menuId == item.menuId);
                             return GestureDetector(
-                              onTap: () {
-                                showDialog(
-                                  context: context,
-                                  builder: (BuildContext context) {
-                                    return AddItemDialog(
-                                      selectedMenu: item,
-                                    );
-                                  },
-                                );
-                                // provider.addItem(item, 1, '');
-                              },
+                              onTap: item.available
+                                  ? () {
+                                      showDialog(
+                                        context: context,
+                                        builder: (BuildContext context) {
+                                          return AddItemDialog(
+                                            selectedMenu: item,
+                                          );
+                                        },
+                                      );
+                                      // provider.addItem(item, 1, '');
+                                    }
+                                  : () {
+                                      Fluttertoast.showToast(
+                                        msg: 'Menu tidak tersedia',
+                                        toastLength: Toast.LENGTH_SHORT,
+                                        gravity: ToastGravity.BOTTOM,
+                                        fontSize: 16.0,
+                                      );
+                                    },
                               child: Card(
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(8.0),
                                 ),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                child: Stack(
                                   children: [
-                                    isItemSelected
-                                        ? Container(
-                                            height: 5,
-                                            decoration: BoxDecoration(
-                                              boxShadow: [
-                                                BoxShadow(
-                                                  color: Colors.black
-                                                      .withOpacity(0.2),
-                                                  spreadRadius: 0.5,
-                                                  blurRadius: 1,
-                                                  offset: const Offset(0, 1),
+                                    Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                      children: [
+                                        const Spacer(),
+                                        ClipOval(
+                                          child: Image.network(
+                                            item.menuImage,
+                                            height: 100,
+                                            width:
+                                                100, // Set width equal to height for a perfect circle
+                                            fit: BoxFit
+                                                .cover, // Use BoxFit.cover to ensure the image fills the circle
+                                            errorBuilder:
+                                                (context, error, stackTrace) {
+                                              return ClipOval(
+                                                child: Image.asset(
+                                                  'assets/images/default-menu.png', // Your default image path
+                                                  height: 100,
+                                                  width: 100,
+                                                  fit: BoxFit.cover,
                                                 ),
-                                              ],
-                                              color: IndorepColor.primary,
-                                              borderRadius: BorderRadius.only(
-                                                topLeft: Radius.circular(8.0),
-                                                topRight: Radius.circular(8.0),
-                                              ),
+                                              );
+                                            },
+                                          ),
+                                        ),
+                                        const Spacer(),
+                                        Center(
+                                          child: Text(
+                                            textAlign: TextAlign.center,
+                                            overflow: TextOverflow.ellipsis,
+                                            maxLines: 2,
+                                            item.menuName,
+                                            style: GoogleFonts.inter(
+                                              fontSize: 14.0,
+                                              fontWeight: FontWeight.w600,
+                                            ),
+                                          ),
+                                        ),
+                                        Center(
+                                          child: Text(
+                                            textAlign: TextAlign.center,
+                                            overflow: TextOverflow.ellipsis,
+                                            maxLines: 1,
+                                            Helper.rupiahFormatter(
+                                                item.menuPrice.toDouble()),
+                                            style: GoogleFonts.inter(
+                                              fontSize: 13.0,
+                                              color: Colors.grey,
+                                            ),
+                                          ),
+                                        ),
+                                        const Spacer(),
+                                      ],
+                                    ),
+                                    item.available
+                                        ? Positioned(
+                                            top: 8,
+                                            right: 8,
+                                            child: Icon(
+                                              isItemSelected
+                                                  ? Icons.check_circle_rounded
+                                                  : Icons.add_circle_rounded,
+                                              color: isItemSelected
+                                                  ? Colors.green
+                                                  : IndorepColor.primary,
+                                              size: 24,
                                             ),
                                           )
-                                        : const SizedBox(),
-                                    const Spacer(),
-                                    ClipRRect(
-                                      borderRadius: const BorderRadius.only(
-                                        topLeft: Radius.circular(8.0),
-                                        topRight: Radius.circular(8.0),
-                                      ),
-                                      child: Image.network(
-                                        item.menuImage,
-                                        height: 100,
-                                        width: double.infinity,
-                                        fit: BoxFit.fitHeight,
-                                        errorBuilder:
-                                            (context, error, stackTrace) {
-                                          return Image.asset(
-                                            'assets/images/default-menu.png', // Your default image path
-                                            height: 100,
-                                            width: double.infinity,
-                                            fit: BoxFit.fitHeight,
-                                          );
-                                        },
-                                      ),
-                                    ),
-                                    const Spacer(),
-                                    Center(
-                                      child: Text(
-                                        textAlign: TextAlign.center,
-                                        overflow: TextOverflow.ellipsis,
-                                        maxLines: 2,
-                                        item.menuName,
-                                        style: GoogleFonts.inter(
-                                          fontSize: 14.0,
-                                          fontWeight: FontWeight.w600,
-                                        ),
-                                      ),
-                                    ),
-                                    Center(
-                                      child: Text(
-                                        textAlign: TextAlign.center,
-                                        overflow: TextOverflow.ellipsis,
-                                        maxLines: 1,
-                                        Helper.rupiahFormatter(
-                                            item.menuPrice.toDouble()),
-                                        style: GoogleFonts.inter(
-                                          fontSize: 13.0,
-                                          color: Colors.grey,
-                                        ),
-                                      ),
-                                    ),
-                                    const Spacer(),
+                                        : Positioned(
+                                            top: 8,
+                                            right: 8,
+                                            child: Container(
+                                              decoration: BoxDecoration(
+                                                borderRadius:
+                                                    BorderRadius.circular(4.0),
+                                                color:
+                                                    Colors.red.withOpacity(0.5),
+                                              ),
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      vertical: 4.0,
+                                                      horizontal: 8),
+                                              child: const Text(
+                                                'Habis',
+                                                textAlign: TextAlign.center,
+                                                style: TextStyle(
+                                                  color: Colors.white,
+                                                  fontSize: 12.0,
+                                                  fontWeight: FontWeight.w600,
+                                                ),
+                                              ),
+                                            ),
+                                          ),
                                   ],
                                 ),
                               ),
@@ -195,6 +232,19 @@ class _PesananPageState extends State<PesananPage> {
                     : Column(
                         children: [
                           const SizedBox(height: 12.0),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 18.0, vertical: 8.0),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text('Keranjang',
+                                    style: GoogleFonts.inter(
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: 28.0)),
+                              ],
+                            ),
+                          ),
                           Expanded(
                             child: SingleChildScrollView(
                               child: ListView.builder(
@@ -227,8 +277,8 @@ class _PesananPageState extends State<PesananPage> {
                                             item.menuName,
                                             maxLines: 1,
                                             overflow: TextOverflow.ellipsis,
-                                            style: const TextStyle(
-                                                fontWeight: FontWeight.w400,
+                                            style: GoogleFonts.inter(
+                                                fontWeight: FontWeight.w600,
                                                 fontSize: 16.0,
                                                 color: Colors.white),
                                           ),
@@ -248,7 +298,7 @@ class _PesananPageState extends State<PesananPage> {
                                                     'Qty: ${item.qty}',
                                                     textAlign: TextAlign.center,
                                                     maxLines: 1,
-                                                    style: const TextStyle(
+                                                    style: GoogleFonts.inter(
                                                       fontSize: 12.0,
                                                       fontWeight:
                                                           FontWeight.w600,
@@ -261,29 +311,32 @@ class _PesananPageState extends State<PesananPage> {
                                               Text(
                                                 Helper.rupiahFormatter(
                                                     item.subTotal),
-                                                style: const TextStyle(
+                                                style: GoogleFonts.inter(
                                                     fontSize: 12.0,
                                                     fontWeight: FontWeight.w600,
                                                     color: Colors.white),
                                               ),
                                             ],
                                           ),
-                                          leading: CircleAvatar(
-                                            backgroundColor: Colors.transparent,
-                                            child: Image.network(
-                                              item.menuImage,
-                                              height: 100,
-                                              width: double.infinity,
-                                              fit: BoxFit.fitHeight,
-                                              errorBuilder:
-                                                  (context, error, stackTrace) {
-                                                return Image.asset(
-                                                  'assets/images/default-menu.png',
-                                                  height: 100,
-                                                  width: double.infinity,
-                                                  fit: BoxFit.fitHeight,
-                                                );
-                                              },
+                                          leading: ClipOval(
+                                            child: CircleAvatar(
+                                              backgroundColor:
+                                                  Colors.transparent,
+                                              child: Image.network(
+                                                item.menuImage,
+                                                height: 100,
+                                                width: double.infinity,
+                                                fit: BoxFit.fitHeight,
+                                                errorBuilder: (context, error,
+                                                    stackTrace) {
+                                                  return Image.asset(
+                                                    'assets/images/default-menu.png',
+                                                    height: 100,
+                                                    width: double.infinity,
+                                                    fit: BoxFit.fitHeight,
+                                                  );
+                                                },
+                                              ),
                                             ),
                                           ),
                                           children: [
@@ -298,9 +351,9 @@ class _PesananPageState extends State<PesananPage> {
                                                   crossAxisAlignment:
                                                       CrossAxisAlignment.start,
                                                   children: [
-                                                    const Text(
-                                                      "Selected Add-ons:",
-                                                      style: TextStyle(
+                                                    Text(
+                                                      "Add-ons:",
+                                                      style: GoogleFonts.inter(
                                                         fontSize: 14.0,
                                                         fontWeight:
                                                             FontWeight.bold,
@@ -313,11 +366,14 @@ class _PesananPageState extends State<PesananPage> {
                                                                   Alignment
                                                                       .topLeft,
                                                               child: Column(
+                                                                crossAxisAlignment:
+                                                                    CrossAxisAlignment
+                                                                        .start,
                                                                 children: option
                                                                     .optionValue
                                                                     .where((optVal) =>
                                                                         optVal
-                                                                            .isSelected) // Filter selected options
+                                                                            .isSelected)
                                                                     .map((optVal) =>
                                                                         Padding(
                                                                           padding: const EdgeInsets
@@ -328,9 +384,7 @@ class _PesananPageState extends State<PesananPage> {
                                                                               Text(
                                                                             "- ${optVal.optionValueName} (+${Helper.rupiahFormatter(optVal.optionValuePrice.toDouble())})",
                                                                             style:
-                                                                                const TextStyle(
-                                                                              fontSize: 13.0,
-                                                                            ),
+                                                                                GoogleFonts.inter(fontSize: 13.0, fontWeight: FontWeight.w600),
                                                                           ),
                                                                         ))
                                                                     .toList(),
@@ -350,12 +404,13 @@ class _PesananPageState extends State<PesananPage> {
                                                   alignment: Alignment.topLeft,
                                                   child: Column(
                                                     children: [
-                                                      const Text(
+                                                      Text(
                                                         "Notes:",
-                                                        style: TextStyle(
+                                                        style:
+                                                            GoogleFonts.inter(
                                                           fontSize: 14.0,
                                                           fontWeight:
-                                                              FontWeight.bold,
+                                                              FontWeight.w600,
                                                         ),
                                                       ),
                                                       const SizedBox(
@@ -419,37 +474,6 @@ class _PesananPageState extends State<PesananPage> {
                           ),
                           Column(
                             children: [
-                              // const SizedBox(height: 12.0),
-                              // SizedBox(
-                              //   height: 60,
-                              //   child: Column(
-                              //     children: [
-                              //       Padding(
-                              //         padding: const EdgeInsets.symmetric(
-                              //             horizontal: 12.0),
-                              //         child: TextField(
-                              //           style: const TextStyle(
-                              //             fontSize: 14.0,
-                              //             fontStyle: FontStyle.italic,
-                              //             fontWeight: FontWeight.w400,
-                              //           ),
-                              //           decoration: InputDecoration(
-                              //             hintText: 'atas nama...',
-                              //             border: OutlineInputBorder(
-                              //               borderRadius:
-                              //                   BorderRadius.circular(12.0),
-                              //               borderSide: BorderSide.none,
-                              //             ),
-                              //             filled: true,
-                              //             fillColor: Colors.white,
-                              //             contentPadding: EdgeInsets.symmetric(
-                              //                 horizontal: 16.0, vertical: 8.0),
-                              //           ),
-                              //         ),
-                              //       ),
-                              //     ],
-                              //   ),
-                              // ),
                               Padding(
                                 padding: const EdgeInsets.symmetric(
                                     horizontal: 12.0, vertical: 8.0),
@@ -493,14 +517,21 @@ class _PesananPageState extends State<PesananPage> {
                                         orders: provider.currentOrder,
                                         payment: 'qris',
                                         source: 'cafe');
-                                    QrisOrderResponse response =
-                                        await irepBE.createOrder(request);
+                                    // QrisOrderResponse response =
+                                    //     await irepBE.createOrder(request);
                                     showModalBottomSheet(
+                                        isScrollControlled: true,
+                                        useSafeArea: true,
                                         context: context,
+                                        shape: const RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.vertical(
+                                            top: Radius.circular(16.0),
+                                          ),
+                                        ),
                                         builder: (context) {
                                           return PaymentDialogBottomSheet(
-                                              transaction: transaction,
-                                              qrisOrderResponse: response);
+                                            transaction: transaction,
+                                          );
                                         });
                                     // showDialog(
                                     //   context: context,

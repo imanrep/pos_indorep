@@ -1,13 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
+import 'package:pos_indorep/helper/helper.dart';
 import 'package:pos_indorep/model/model.dart';
 
 class EditOptionDialog extends StatefulWidget {
   final OptionMenuIrep option;
   final Function(OptionMenuIrep) onOptionChanged;
+  final Function(int) onOptionValueDeleted;
 
   const EditOptionDialog(
-      {required this.onOptionChanged, required this.option, super.key});
+      {required this.onOptionChanged,
+      required this.option,
+      required this.onOptionValueDeleted,
+      super.key});
 
   @override
   State<EditOptionDialog> createState() => _EditOptionDialogState();
@@ -22,6 +29,8 @@ class _EditOptionDialogState extends State<EditOptionDialog> {
   @override
   void initState() {
     super.initState();
+    final NumberFormat formatter =
+        NumberFormat.currency(locale: 'id', symbol: 'Rp', decimalDigits: 0);
     // Create a local mutable copy of the option
     localOption = OptionMenuIrep(
       optionId: widget.option.optionId,
@@ -46,7 +55,7 @@ class _EditOptionDialogState extends State<EditOptionDialog> {
 
     _optionValuePriceControllers = localOption.optionValue
         .map((optionValue) => TextEditingController(
-            text: optionValue.optionValuePrice.toString()))
+            text: formatter.format(optionValue.optionValuePrice)))
         .toList();
 
     _judulController = TextEditingController(text: localOption.optionName);
@@ -72,15 +81,19 @@ class _EditOptionDialogState extends State<EditOptionDialog> {
             TextField(
               controller: _judulController,
               decoration: InputDecoration(
-                label: Text('Nama Pilihan', style: GoogleFonts.inter()),
-              ),
+                  label: Text('Nama Pilihan', style: GoogleFonts.inter()),
+                  counterText: ""),
+              maxLength: 20,
+              inputFormatters: [
+                FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z0-9/\s]')),
+              ],
               onChanged: (value) {
                 setState(() {
                   localOption = localOption.copyWith(optionName: value);
                 });
               },
             ),
-            const SizedBox(height: 28),
+            const SizedBox(height: 14),
             Align(
               alignment: Alignment.topLeft,
               child: Row(
@@ -120,8 +133,13 @@ class _EditOptionDialogState extends State<EditOptionDialog> {
                     flex: 4,
                     child: TextField(
                       controller: _optionValueNameControllers[index],
-                      decoration:
-                          InputDecoration(labelText: 'Opsi ${index + 1}'),
+                      decoration: InputDecoration(
+                          labelText: 'Opsi ${index + 1}', counterText: ""),
+                      maxLength: 10,
+                      inputFormatters: [
+                        FilteringTextInputFormatter.allow(
+                            RegExp(r'[a-zA-Z0-9/\s]')),
+                      ],
                       onChanged: (value) {
                         setState(() {
                           localOption.optionValue[index] = localOption
@@ -134,15 +152,29 @@ class _EditOptionDialogState extends State<EditOptionDialog> {
                   const SizedBox(width: 16),
                   Expanded(
                     flex: 2,
-                    child: TextField(
+                    child: TextFormField(
                       controller: _optionValuePriceControllers[index],
-                      decoration:
-                          InputDecoration(labelText: 'Harga ${index + 1}'),
+                      decoration: InputDecoration(
+                          labelText: 'Harga ${index + 1}', counterText: ""),
+                      maxLength: 8,
+                      keyboardType: TextInputType.number,
+                      inputFormatters: [RupiahFormatter()],
+                      onSaved: (value) {
+                        double rawValue = double.tryParse(
+                                value!.replaceAll(RegExp(r'[^0-9]'), '')) ??
+                            0.0;
+                        _optionValuePriceControllers[index].text =
+                            rawValue.toString();
+                      },
                       onChanged: (value) {
                         setState(() {
-                          localOption.optionValue[index] = localOption
-                              .optionValue[index]
-                              .copyWith(optionValueName: value);
+                          // Remove non-numeric characters (e.g., Rp and .) before parsing
+                          String numericValue =
+                              value.replaceAll(RegExp(r'[^0-9]'), '');
+                          localOption.optionValue[index] =
+                              localOption.optionValue[index].copyWith(
+                                  optionValuePrice:
+                                      int.tryParse(numericValue) ?? 0);
                         });
                       },
                     ),
@@ -152,6 +184,8 @@ class _EditOptionDialogState extends State<EditOptionDialog> {
                     child: IconButton(
                       icon: Icon(Icons.delete),
                       onPressed: () {
+                        widget.onOptionValueDeleted(
+                            localOption.optionValue[index].optionValueId);
                         setState(() {
                           localOption.optionValue.removeAt(index);
                           _optionValueNameControllers.removeAt(index);
@@ -175,22 +209,7 @@ class _EditOptionDialogState extends State<EditOptionDialog> {
         ),
         ElevatedButton(
           onPressed: () {
-            OptionMenuIrep newOption = OptionMenuIrep(
-              optionId: 0,
-              optionName: widget.option.optionName,
-              optionType: widget.option.optionType,
-              available: widget.option.available,
-              optionValue: [
-                for (var i = 0; i < localOption.optionValue.length; i++)
-                  OptionValue(
-                    optionValueName: _optionValueNameControllers[i].text,
-                    optionValuePrice:
-                        int.parse(_optionValuePriceControllers[i].text),
-                    optionValueId: 0,
-                    isSelected: false,
-                  ),
-              ],
-            );
+            OptionMenuIrep newOption = localOption;
             widget.onOptionChanged(newOption);
             Navigator.of(context).pop();
           },

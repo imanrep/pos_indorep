@@ -1,24 +1,26 @@
 // import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-// import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:loader_overlay/loader_overlay.dart';
 import 'package:pos_indorep/helper/helper.dart';
 import 'package:pos_indorep/model/model.dart';
 import 'package:pos_indorep/provider/main_provider.dart';
 import 'package:pos_indorep/screen/management/components/add_option_dialog.dart';
+import 'package:pos_indorep/screen/management/components/helpers/edit_menu_view_helpers.dart';
+import 'package:pos_indorep/screen/management/components/helpers/image_picker_result.dart';
 import 'package:pos_indorep/screen/management/components/widget/option_editor_widget.dart';
 import 'package:provider/provider.dart';
 import 'package:pos_indorep/provider/menu_provider.dart';
-import 'package:collection/collection.dart';
 
 class EditMenuView extends StatefulWidget {
   final MenuIrep menu;
+  final Function(bool) isMenuModified;
 
   const EditMenuView({
     super.key,
     required this.menu,
+    required this.isMenuModified,
   });
 
   @override
@@ -33,8 +35,11 @@ class _EditMenuViewState extends State<EditMenuView> {
   late TextEditingController descController;
   late TextEditingController priceController;
   late ValueNotifier<bool> availableNotifier;
-  late List<OptionMenuIrep> localOptions;
   String? imageUrl;
+
+  List<OptionMenuIrep> localOptions = [];
+  List<OptionMenuIrep> updatedOptions = [];
+  List<int> deletedOptionValueIds = [];
 
   @override
   void initState() {
@@ -47,6 +52,7 @@ class _EditMenuViewState extends State<EditMenuView> {
     super.didUpdateWidget(oldWidget);
     if (widget.menu != oldWidget.menu) {
       _initializeFields();
+      // _isMenuModified();
     }
   }
 
@@ -90,6 +96,12 @@ class _EditMenuViewState extends State<EditMenuView> {
     });
   }
 
+  void _handleOptionValueDeleted(int optionValueId) {
+    setState(() {
+      deletedOptionValueIds.add(optionValueId);
+    });
+  }
+
   @override
   void dispose() {
     titleController.dispose();
@@ -99,125 +111,17 @@ class _EditMenuViewState extends State<EditMenuView> {
     super.dispose();
   }
 
-  // Future<void> _pickImage() async {
-  //   final picker = ImagePicker();
-  //   final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+  void _isMenuModified() {
+    final isModified = widget.menu.menuName != titleController.text ||
+        widget.menu.menuType != categoryController.text ||
+        widget.menu.menuNote != descController.text ||
+        widget.menu.menuPrice !=
+            int.tryParse(
+                priceController.text.replaceAll(RegExp(r'[^0-9]'), '')) ||
+        widget.menu.available != availableNotifier.value ||
+        localOptions.length != widget.menu.option!.length;
 
-  //   if (pickedFile != null) {
-  //     final file = File(pickedFile.path);
-  //     final fileName = pickedFile.name;
-  //     final storageRef =
-  //         FirebaseStorage.instance.ref().child('menu_images/$fileName');
-  //     final uploadTask = storageRef.putFile(file);
-  //     final snapshot = await uploadTask.whenComplete(() => {});
-  //     final downloadUrl = await snapshot.ref.getDownloadURL();
-  //     debugPrint(downloadUrl);
-  //     setState(() {
-  //       imageUrl = downloadUrl;
-  //     });
-  //   }
-  // }
-
-  Future<void> _updateMenu(AddMenuRequest newMenu,
-      List<OptionMenuIrep> originalOptions, MenuProvider provider) async {
-    EditMenuResponse res = await provider.editMenu(newMenu);
-    if (res.success) {
-      _handleOptions(originalOptions, provider);
-    }
-  }
-
-  Future<void> _addNewMenu(
-      AddMenuRequest newMenu, MenuProvider provider) async {
-    AddMenuResponse res = await provider.addMenu(newMenu);
-    if (res.success) {
-      _addOptionsToMenu(res.menuId, provider);
-    }
-  }
-
-  void _handleOptions(
-      List<OptionMenuIrep> originalOptions, MenuProvider provider) {
-    List<OptionMenuIrep> newOptions = _getNewOptions(originalOptions, provider);
-    List<OptionMenuIrep> editedOptions = _getEditedOptions(originalOptions);
-    List<OptionMenuIrep> deletedOptions = _getDeletedOptions(originalOptions);
-
-    // Process deletions
-    for (var option in deletedOptions) {
-      provider.deleteOption(option.optionId);
-    }
-
-    // Process new additions
-    for (var option in newOptions) {
-      _addOptionToMenu(widget.menu.menuId, option, provider);
-    }
-
-    // Process edits
-    for (var option in editedOptions) {
-      _editOption(option, provider);
-    }
-  }
-
-  List<OptionMenuIrep> _getNewOptions(
-      List<OptionMenuIrep> originalOptions, MenuProvider provider) {
-    return localOptions
-        .where((option) =>
-            !originalOptions.any((orig) => orig.optionId == option.optionId))
-        .toList();
-  }
-
-  List<OptionMenuIrep> _getEditedOptions(List<OptionMenuIrep> originalOptions) {
-    return localOptions.where((option) {
-      OptionMenuIrep? original = originalOptions
-          .firstWhereOrNull((orig) => orig.optionId == option.optionId);
-
-      if (original == null) return false;
-
-      return original.optionName != option.optionName ||
-          original.optionType != option.optionType ||
-          original.available != option.available;
-    }).toList();
-  }
-
-  List<OptionMenuIrep> _getDeletedOptions(
-      List<OptionMenuIrep> originalOptions) {
-    return originalOptions
-        .where((original) => !localOptions
-            .any((current) => current.optionId == original.optionId))
-        .toList();
-  }
-
-  Future<void> _addOptionsToMenu(int menuId, MenuProvider provider) async {
-    for (var option in localOptions) {
-      await _addOptionToMenu(menuId, option, provider);
-    }
-  }
-
-  Future<void> _addOptionToMenu(
-      int menuId, OptionMenuIrep option, MenuProvider provider) async {
-    AddOptionResponse res = await provider.addOption(AddOptionRequest(
-      menuId: menuId,
-      optionName: option.optionName,
-      optionType: option.optionType,
-      optionAvailable: option.available,
-    ));
-
-    if (res.success) {
-      for (var optVal in option.optionValue) {
-        await provider.addOptionValue(AddOptionValueRequest(
-          menuOptionId: menuId,
-          optionValueName: optVal.optionValueName,
-          amount: optVal.optionValuePrice,
-        ));
-      }
-    }
-  }
-
-  Future<void> _editOption(OptionMenuIrep option, MenuProvider provider) async {
-    await provider.editOption(EditOptionRequest(
-      id: option.optionId,
-      optionName: option.optionName,
-      optionType: option.optionType,
-      optionAvailable: option.available,
-    ));
+    widget.isMenuModified(isModified);
   }
 
   @override
@@ -228,29 +132,30 @@ class _EditMenuViewState extends State<EditMenuView> {
           Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
-              ElevatedButton(
-                  onPressed: () async {
-                    var res = await provider.deleteMenu(widget.menu.menuId);
-                    if (res.success) {
-                      provider.clearSelectedMenu();
-                    }
-                  },
-                  child: Row(
-                    children: [
-                      Icon(Icons.delete, color: Colors.redAccent),
-                      SizedBox(width: 8.0),
-                      Text('Hapus',
-                          style: GoogleFonts.inter(
-                            fontWeight: FontWeight.w600,
-                            color: Colors.redAccent,
-                          )),
-                    ],
-                  )),
+              widget.menu.menuId != 0
+                  ? ElevatedButton(
+                      onPressed: () async {
+                        var res = await provider.deleteMenu(widget.menu.menuId);
+                        if (res.success) {
+                          provider.clearSelectedMenu();
+                        }
+                      },
+                      child: Row(
+                        children: [
+                          Icon(Icons.delete, color: Colors.redAccent),
+                          SizedBox(width: 8.0),
+                          Text('Hapus',
+                              style: GoogleFonts.inter(
+                                fontWeight: FontWeight.w600,
+                                color: Colors.redAccent,
+                              )),
+                        ],
+                      ))
+                  : SizedBox(),
               SizedBox(width: 16.0),
               ElevatedButton(
                 onPressed: () async {
                   context.loaderOverlay.show();
-                  print(widget.menu.menuId);
                   var mainProvider =
                       Provider.of<MainProvider>(context, listen: false);
 
@@ -258,8 +163,9 @@ class _EditMenuViewState extends State<EditMenuView> {
                     menuId: widget.menu.menuId,
                     menuType: categoryController.text,
                     menuName: titleController.text,
-                    menuImage:
-                        titleController.text.toLowerCase().replaceAll(' ', '-'),
+                    menuImage: imageUrl != null && imageUrl!.isNotEmpty
+                        ? imageUrl!
+                        : widget.menu.menuImage,
                     menuPrice: int.tryParse(priceController.text
                             .replaceAll(RegExp(r'[^0-9]'), '')) ??
                         0,
@@ -267,13 +173,16 @@ class _EditMenuViewState extends State<EditMenuView> {
                     menuAvailable: availableNotifier.value,
                   );
 
-                  List<OptionMenuIrep> originalOptions =
-                      widget.menu.option ?? [];
-
                   if (widget.menu.menuId != 0) {
-                    await _updateMenu(newMenu, originalOptions, provider);
+                    await EditMenuViewHelpers.updateMenu(
+                        newMenu,
+                        widget.menu.option!,
+                        localOptions,
+                        deletedOptionValueIds,
+                        provider);
                   } else {
-                    await _addNewMenu(newMenu, provider);
+                    await EditMenuViewHelpers.addNewMenu(
+                        newMenu, localOptions, provider);
                   }
 
                   provider.clearSelectedMenu();
@@ -283,7 +192,7 @@ class _EditMenuViewState extends State<EditMenuView> {
                   children: [
                     Icon(Icons.save),
                     SizedBox(width: 8.0),
-                    Text('Simpan',
+                    Text(widget.menu.menuId != 0 ? 'Simpan' : 'Tambah Menu',
                         style: GoogleFonts.inter(fontWeight: FontWeight.w600)),
                   ],
                 ),
@@ -300,42 +209,84 @@ class _EditMenuViewState extends State<EditMenuView> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   imageUrl != null && imageUrl!.isNotEmpty
-                      ? Center(
-                          child: Image.network(
-                            widget.menu.menuImage,
-                            height: 200,
-                            width: double.infinity,
-                            fit: BoxFit.fitHeight,
-                            errorBuilder: (context, error, stackTrace) {
-                              return Image.asset(
-                                'assets/images/default-menu.png',
-                                height: 200,
-                                width: double.infinity,
-                                fit: BoxFit.fitHeight,
-                              );
-                            },
-                          ),
-                        )
-                      : ClipRRect(
-                          borderRadius: BorderRadius.circular(12.0),
-                          child: Container(
-                            height: 200,
-                            color: Colors.black.withOpacity(0.4),
-                            child: Center(
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  IconButton(
-                                    icon: Icon(Icons.upload_file_rounded),
-                                    onPressed: () {},
-                                    iconSize: 34,
-                                  ),
-                                  Text('Tambah Gambar',
-                                      style: GoogleFonts.inter()),
-                                ],
+                      ? Column(
+                          children: [
+                            Center(
+                              child: ClipOval(
+                                child: Image.network(
+                                  imageUrl!,
+                                  height: 200,
+                                  width: 200,
+                                  fit: BoxFit.cover,
+                                  errorBuilder: (context, error, stackTrace) {
+                                    return Image.asset(
+                                      'assets/images/default-menu.png',
+                                      height: 200,
+                                      width: 200,
+                                      fit: BoxFit.cover,
+                                    );
+                                  },
+                                ),
                               ),
                             ),
-                          ),
+                            SizedBox(height: 8.0),
+                            Align(
+                                alignment: Alignment.center,
+                                child: ElevatedButton.icon(
+                                  onPressed: () async {
+                                    String category = categoryController.text;
+                                    String name = titleController.text;
+                                    final image = await ImagePickerUnified
+                                        .pickAndProcessImage(context);
+                                    if (image != null) {
+                                      final url = await ImagePickerUnified
+                                          .uploadImageToFirebase(
+                                              category, name, image);
+                                      print("Uploaded image URL: $url");
+                                      setState(() {
+                                        imageUrl = url;
+                                      });
+                                    }
+                                  },
+                                  label: Text('Upload Gambar',
+                                      style: GoogleFonts.inter()),
+                                  icon: Icon(Icons.upload_file_rounded),
+                                )),
+                          ],
+                        )
+                      : Column(
+                          children: [
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(12.0),
+                              child: Container(
+                                height: 200,
+                                color: Colors.black.withOpacity(0.4),
+                              ),
+                            ),
+                            SizedBox(height: 8.0),
+                            Align(
+                                alignment: Alignment.center,
+                                child: ElevatedButton.icon(
+                                  onPressed: () async {
+                                    String category = categoryController.text;
+                                    String name = titleController.text;
+                                    final image = await ImagePickerUnified
+                                        .pickAndProcessImage(context);
+                                    if (image != null) {
+                                      final url = await ImagePickerUnified
+                                          .uploadImageToFirebase(
+                                              category, name, image);
+                                      print("Uploaded image URL: $url");
+                                      setState(() {
+                                        imageUrl = url;
+                                      });
+                                    }
+                                  },
+                                  label: Text('Upload Gambar',
+                                      style: GoogleFonts.inter()),
+                                  icon: Icon(Icons.upload_file_rounded),
+                                )),
+                          ],
                         ),
                   ValueListenableBuilder<bool>(
                     valueListenable: availableNotifier,
@@ -411,7 +362,10 @@ class _EditMenuViewState extends State<EditMenuView> {
                   TextFormField(
                     controller: priceController,
                     decoration: InputDecoration(
-                        labelText: 'Harga', labelStyle: GoogleFonts.inter()),
+                        labelText: 'Harga',
+                        labelStyle: GoogleFonts.inter(),
+                        counterText: ""),
+                    maxLength: 8,
                     keyboardType: TextInputType.number,
                     inputFormatters: [RupiahFormatter()],
                     onSaved: (value) {
@@ -463,6 +417,7 @@ class _EditMenuViewState extends State<EditMenuView> {
                     ...localOptions.map((option) {
                       return OptionEditorWidget(
                         option: option,
+                        onOptionValueDeleted: _handleOptionValueDeleted,
                         onOptionChanged: _handleOptionChanged,
                         onDelete: (deletedOption) {
                           setState(() {

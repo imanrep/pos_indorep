@@ -1,4 +1,5 @@
-import 'package:pos_indorep/services/irepbe_services.dart';
+import 'package:collection/collection.dart';
+import 'package:flutter/cupertino.dart';
 
 class Category {
   final String categoryId;
@@ -72,8 +73,6 @@ class OptionMenuIrep {
   final bool available;
   bool isSelected = false;
 
-  // New properties for tracking selections
-  OptionValue? selectedValue; // For radio-type options
   List<OptionValue> selectedValues = []; // For checkbox-type options
 
   OptionMenuIrep({
@@ -82,7 +81,6 @@ class OptionMenuIrep {
     required this.optionId,
     required this.optionType,
     required this.available,
-    this.selectedValue,
     List<OptionValue>? selectedValues,
   }) : selectedValues = selectedValues ?? [];
 
@@ -120,7 +118,6 @@ class OptionMenuIrep {
       'option_id': optionId,
       'option_type': optionType,
       'available': available,
-      'selected_value': selectedValue?.toMap(),
       'selected_values': selectedValues.map((x) => x.toMap()).toList(),
     };
   }
@@ -151,7 +148,7 @@ class MenuIrep {
     return MenuIrep(
       menuType: data['menu_type'],
       menuName: data['menu_name'],
-      menuImage: '$baseUrl/pic/${data['menu_image']}.png',
+      menuImage: data['menu_image'],
       menuPrice: data['menu_price'],
       menuId: data['menu_id'],
       menuNote: data['menu_note'],
@@ -176,6 +173,31 @@ class MenuIrep {
       'option': option?.map((x) => x.toMap()).toList(),
     };
   }
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is MenuIrep &&
+          runtimeType == other.runtimeType &&
+          menuId == other.menuId &&
+          menuName == other.menuName &&
+          menuType == other.menuType &&
+          menuPrice == other.menuPrice &&
+          menuImage == other.menuImage &&
+          menuNote == other.menuNote &&
+          available == other.available &&
+          const DeepCollectionEquality().equals(option, other.option);
+
+  @override
+  int get hashCode =>
+      menuId.hashCode ^
+      menuName.hashCode ^
+      menuType.hashCode ^
+      menuPrice.hashCode ^
+      menuImage.hashCode ^
+      menuNote.hashCode ^
+      available.hashCode ^
+      const DeepCollectionEquality().hash(option);
 }
 
 class CartItem extends MenuIrep {
@@ -186,8 +208,6 @@ class CartItem extends MenuIrep {
   double subTotal;
   double addOnPrice = 0;
   List<OrderItem> orderItem = [];
-
-  // Store selected options
   List<OptionMenuIrep> selectedOptions;
 
   CartItem({
@@ -216,7 +236,6 @@ class CartItem extends MenuIrep {
           available: available,
           option: option ?? [],
         ) {
-    _addOrderItem();
     _calculateSubTotal();
   }
 
@@ -228,18 +247,6 @@ class CartItem extends MenuIrep {
         .fold(0, (sum, optVal) => sum + optVal.optionValuePrice);
 
     subTotal = (menuPrice.toDouble() + addOnPrice) * qty;
-  }
-
-  void _addOrderItem() {
-    orderItem = selectedOptions
-        .expand((option) => option.optionValue)
-        .where((optVal) => optVal.isSelected)
-        .map((optVal) => OrderItem(
-              id: optVal.optionValueId,
-              qty: qty,
-              note: notes,
-            ))
-        .toList();
   }
 
   /// **Update quantity and recalculate subtotal**
@@ -339,6 +346,7 @@ class QrisOrderResponse {
   final int orderID;
   final String qris;
   final bool success;
+  final String time;
   final int total;
 
   QrisOrderResponse({
@@ -346,6 +354,7 @@ class QrisOrderResponse {
     required this.orderID,
     required this.qris,
     required this.success,
+    required this.time,
     required this.total,
   });
 
@@ -355,6 +364,7 @@ class QrisOrderResponse {
       orderID: json['orderID'],
       qris: json['qris'],
       success: json['success'],
+      time: json['time'] ?? '2025-05-25 21:06:28',
       total: json['total'],
     );
   }
@@ -365,7 +375,31 @@ class QrisOrderResponse {
       'orderID': orderID,
       'qris': qris,
       'success': success,
+      'time': time,
       'total': total,
+    };
+  }
+}
+
+class OptionOrderItem {
+  final int optionId;
+  final int valueId;
+
+  OptionOrderItem({
+    required this.optionId,
+    required this.valueId,
+  });
+
+  factory OptionOrderItem.fromJson(Map<String, dynamic> json) {
+    return OptionOrderItem(
+      optionId: json['option_id'],
+      valueId: json['value_id'],
+    );
+  }
+  Map<String, dynamic> toJson() {
+    return {
+      'option_id': optionId,
+      'value_id': valueId,
     };
   }
 }
@@ -374,11 +408,13 @@ class OrderItem {
   final int id;
   final int qty;
   final String note;
+  final List<OptionOrderItem> option;
 
   OrderItem({
     required this.id,
     required this.qty,
     required this.note,
+    required this.option,
   });
 
   factory OrderItem.fromJson(Map<String, dynamic> json) {
@@ -386,6 +422,9 @@ class OrderItem {
       id: json['id'],
       qty: json['qty'],
       note: json['note'],
+      option: (json['option'] as List<dynamic>)
+          .map((item) => OptionOrderItem.fromJson(item))
+          .toList(),
     );
   }
 
@@ -394,6 +433,7 @@ class OrderItem {
       'id': id,
       'qty': qty,
       'note': note,
+      'option': option.map((item) => item.toJson()).toList(),
     };
   }
 }
@@ -716,5 +756,149 @@ class DefaultResponse {
       'message': message,
       'success': success,
     };
+  }
+}
+
+class GetTransacationsResponse {
+  final List<TransactionData> data;
+  final int totalPages;
+  final int totalTransaction;
+
+  GetTransacationsResponse(
+      {required this.data,
+      required this.totalPages,
+      required this.totalTransaction});
+
+  factory GetTransacationsResponse.fromJson(Map<String, dynamic> json) {
+    return GetTransacationsResponse(
+      data: (json['data'] as List<dynamic>)
+          .map((e) => TransactionData.fromJson(e))
+          .toList(),
+      totalPages: json['total_pages'],
+      totalTransaction: json['total_transaction'],
+    );
+  }
+}
+
+class TransactionData {
+  final String orderId;
+  final String pc;
+  final int total;
+  final List<TransactionItem> items;
+  final String time;
+  final String status;
+  final String paymentMethod;
+  String? qris;
+
+  TransactionData({
+    required this.orderId,
+    required this.pc,
+    required this.total,
+    required this.items,
+    required this.time,
+    required this.status,
+    required this.paymentMethod,
+    this.qris,
+  });
+
+  factory TransactionData.fromJson(Map<String, dynamic> json) {
+    return TransactionData(
+      orderId: json['order_id'],
+      pc: json['pc'],
+      total: json['total'],
+      items: (json['items'] as List<dynamic>)
+          .map((e) => TransactionItem.fromJson(e))
+          .toList(),
+      time: json['time'],
+      status: json['status'],
+      paymentMethod: json['payment_method'],
+      qris: json['qris'],
+    );
+  }
+}
+
+class TransactionMenuOption {
+  final String option;
+  final String value;
+  final int price;
+
+  TransactionMenuOption({
+    required this.option,
+    required this.value,
+    required this.price,
+  });
+
+  factory TransactionMenuOption.fromJson(Map<String, dynamic> json) {
+    return TransactionMenuOption(
+      option: json['option'],
+      value: json['value'],
+      price: json['price'] ?? 69,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'option': option,
+      'value': value,
+      'price': price,
+    };
+  }
+}
+
+class TransactionItem {
+  final String name;
+  final int qty;
+  final int subTotal;
+  final String note;
+  final List<TransactionMenuOption> option;
+
+  TransactionItem({
+    required this.name,
+    required this.qty,
+    required this.subTotal,
+    required this.note,
+    required this.option,
+  });
+
+  factory TransactionItem.fromJson(Map<String, dynamic> json) {
+    return TransactionItem(
+      name: json['name'],
+      qty: json['qty'],
+      subTotal: json['sub_total'],
+      note: json['note'] ?? '',
+      option: (json['option'] as List<dynamic>)
+          .map((e) => TransactionMenuOption.fromJson(e))
+          .toList(),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'name': name,
+      'qty': qty,
+      'sub_total': subTotal,
+      'note': note,
+      'option': option.map((e) => e.toJson()).toList(),
+    };
+  }
+}
+
+class PaymentButton {
+  String name;
+  final String image;
+  final String type;
+
+  PaymentButton({
+    required this.name,
+    required this.image,
+    required this.type,
+  });
+
+  factory PaymentButton.fromJson(Map<String, dynamic> json) {
+    return PaymentButton(
+      name: json['name'],
+      image: json['image'],
+      type: json['type'],
+    );
   }
 }

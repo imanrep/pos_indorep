@@ -6,10 +6,14 @@ class MainProvider extends ChangeNotifier {
   String _apiUrl = '';
   String _mainRepo = '';
   String _appVersion = '';
+  String _printerAddress = '';
+  String _printerName = '';
 
   String get apiUrl => _apiUrl;
   String get mainRepo => _mainRepo;
   String get appVersion => _appVersion;
+  String get printerAddress => _printerAddress;
+  String get printerName => _printerName;
 
   MainProvider() {
     _initialize();
@@ -17,15 +21,38 @@ class MainProvider extends ChangeNotifier {
 
   Future<void> _initialize() async {
     await _loadApiUrl();
+    await _loadPrinterAddress();
+    await _loadPrinterName();
     loadAppVersion();
   }
 
   Future<void> _loadApiUrl() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     if (!prefs.containsKey('apiUrl')) {
-      await prefs.setString('apiUrl', 'http://112.78.128.73:8085');
+      await prefs.setString('apiUrl', 'https://warnet-api.indorep.com');
     } else {
-      _apiUrl = prefs.getString('apiUrl') ?? 'http://112.78.128.73:8085';
+      _apiUrl = prefs.getString('apiUrl') ?? 'https://warnet-api.indorep.com';
+    }
+    notifyListeners();
+  }
+
+  Future<void> _loadPrinterAddress() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    if (!prefs.containsKey('printerAddress')) {
+      await prefs.setString('printerAddress', '66:32:3D:2C:E0:EC');
+    } else {
+      _printerAddress =
+          prefs.getString('printerAddress') ?? '66:32:3D:2C:E0:EC';
+    }
+    notifyListeners();
+  }
+
+  Future<void> _loadPrinterName() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    if (!prefs.containsKey('printerName')) {
+      await prefs.setString('printerName', 'Bluetooth Printer');
+    } else {
+      _printerName = prefs.getString('printerName') ?? 'No printer selected';
     }
     notifyListeners();
   }
@@ -41,6 +68,20 @@ class MainProvider extends ChangeNotifier {
     _apiUrl = url;
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setString('apiUrl', url);
+    notifyListeners();
+  }
+
+  void setPrinterAddress(String address) async {
+    _printerAddress = address;
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString('printerAddress', address);
+    notifyListeners();
+  }
+
+  void setPrinterName(String name) async {
+    _printerName = name;
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString('printerName', name);
     notifyListeners();
   }
 }

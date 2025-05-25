@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:pos_indorep/provider/transaction_provider.dart';
 import 'package:pos_indorep/screen/transaction/components/transaction_detail_view.dart';
 import 'package:pos_indorep/screen/transaction/components/transaction_list_view.dart';
+import 'package:pos_indorep/screen/transaction/components/widget/pagination_widget.dart';
 import 'package:provider/provider.dart';
 
 class TransactionPage extends StatefulWidget {
@@ -15,8 +17,12 @@ class _TransactionPageState extends State<TransactionPage> {
   @override
   void initState() {
     super.initState();
-    // Provider.of<TransactionProvider>(context, listen: false)
-    //     .getAllTransactions();
+    _fetchAllTransaction();
+  }
+
+  Future<void> _fetchAllTransaction() async {
+    final provider = Provider.of<TransactionProvider>(context, listen: false);
+    provider.getAllTransactions(provider.currentPageIndex);
   }
 
   @override
@@ -31,10 +37,20 @@ class _TransactionPageState extends State<TransactionPage> {
               child: SingleChildScrollView(
                   child: Column(children: [
                 Padding(
-                  padding: const EdgeInsets.all(8.0),
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 24.0, vertical: 12.0),
                   child: Row(
                     children: [
-                      Text('Transaksi', style: TextStyle(fontSize: 24)),
+                      Text('Transaksi',
+                          style: GoogleFonts.inter(
+                              fontWeight: FontWeight.w600, fontSize: 28.0)),
+                      const Spacer(),
+                      IconButton(
+                        onPressed: () {
+                          provider.getAllTransactions(1);
+                        },
+                        icon: const Icon(Icons.refresh_rounded),
+                      )
                     ],
                   ),
                 ),
@@ -42,55 +58,16 @@ class _TransactionPageState extends State<TransactionPage> {
                   children: [
                     Expanded(
                       flex: 4,
-                      child: Padding(
-                        padding: const EdgeInsets.all(16.0),
-                        child: SizedBox(
-                          height: 46,
-                          width: MediaQuery.of(context).size.width * 0.5,
-                          child: SearchAnchor(builder: (BuildContext context,
-                              SearchController controller) {
-                            return SearchBar(
-                              hintText: 'Cari transaksi...',
-                              controller: controller,
-                              padding: const WidgetStatePropertyAll<EdgeInsets>(
-                                  EdgeInsets.symmetric(horizontal: 16.0)),
-                              onTap: () {
-                                controller.openView();
-                              },
-                              onChanged: (_) {
-                                controller.openView();
-                              },
-                              leading: const Icon(Icons.search),
-                            );
-                          }, suggestionsBuilder: (BuildContext context,
-                              SearchController controller) {
-                            return List<ListTile>.generate(5, (int index) {
-                              final String item = 'item $index';
-                              return ListTile(
-                                title: Text(item),
-                                onTap: () {
-                                  setState(() {
-                                    controller.closeView(item);
-                                  });
-                                },
-                              );
-                            });
-                          }),
-                        ),
-                      ),
+                      child: PaginationWidget(
+                          currentPage: provider.currentPageIndex,
+                          totalPages: provider.totalPages,
+                          onPageChanged: (provider.getAllTransactions)),
                     ),
+                    const SizedBox(height: 8),
                     Expanded(
-                      flex: 2,
+                      flex: 1,
                       child: Row(
                         children: [
-                          TextButton.icon(
-                            onPressed: () {},
-                            label: const Text('Urutkan'),
-                            icon: Icon(
-                              Icons.sort_rounded,
-                              size: 28,
-                            ),
-                          ),
                           TextButton.icon(
                             onPressed: () {},
                             label: const Text('Filter'),
@@ -104,6 +81,7 @@ class _TransactionPageState extends State<TransactionPage> {
                     ),
                   ],
                 ),
+                const SizedBox(height: 8),
                 TransactionListView(
                     transactions: provider.transactions,
                     onTransactionTap: (transaction) {

@@ -1,17 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:pos_indorep/helper/helper.dart';
 import 'package:pos_indorep/model/model.dart';
 import 'package:pos_indorep/screen/management/components/edit_option_dialog.dart';
 
 class OptionEditorWidget extends StatefulWidget {
   final OptionMenuIrep option;
   final Function(OptionMenuIrep) onOptionChanged;
+  final Function(int) onOptionValueDeleted;
   final Function(OptionMenuIrep) onDelete;
 
   const OptionEditorWidget({
     Key? key,
     required this.option,
     required this.onOptionChanged,
+    required this.onOptionValueDeleted,
     required this.onDelete,
   }) : super(key: key);
 
@@ -52,6 +55,9 @@ class _OptionEditorWidgetState extends State<OptionEditorWidget> {
                       context: context,
                       builder: (BuildContext context) {
                         return EditOptionDialog(
+                          onOptionValueDeleted: (int optionValueId) {
+                            widget.onOptionValueDeleted(optionValueId);
+                          },
                           option: widget.option,
                           onOptionChanged: (OptionMenuIrep option) {
                             widget.onOptionChanged(option);
@@ -75,14 +81,14 @@ class _OptionEditorWidgetState extends State<OptionEditorWidget> {
               return ListTile(
                 leading: Icon(Icons.check_box_outline_blank_rounded),
                 title: Text(
-                    "${optionValue.optionValueName} (+${optionValue.optionValuePrice})",
+                    "${optionValue.optionValueName} (+${Helper.rupiahFormatter(optionValue.optionValuePrice.toDouble())})",
                     style: GoogleFonts.inter(fontSize: 14)),
               );
             } else if (widget.option.optionType == "Radio") {
               return ListTile(
                 leading: Icon(Icons.radio_button_off_rounded),
                 title: Text(
-                    "${optionValue.optionValueName} (+${optionValue.optionValuePrice})",
+                    "${optionValue.optionValueName} (+${Helper.rupiahFormatter(optionValue.optionValuePrice.toDouble())})",
                     style: GoogleFonts.inter(fontSize: 14)),
               );
             }

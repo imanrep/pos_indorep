@@ -1,1 +1,30 @@
-{"flutter":{"platforms":{"android":{"default":{"projectId":"pariwisata-cireong","appId":"1:1081014321686:android:b877e2d3cf6b9a1b386b37","fileOutput":"android/app/google-services.json"}},"dart":{"lib/firebase_options.dart":{"projectId":"pariwisata-cireong","configurations":{"android":"1:1081014321686:android:b877e2d3cf6b9a1b386b37","web":"1:1081014321686:web:73f179db5c144f37386b37"}}}}}}
+{
+  "flutter": {
+    "platforms": {
+      "android": {
+        "default": {
+          "projectId": "pariwisata-cireong",
+          "appId": "1:1081014321686:android:b877e2d3cf6b9a1b386b37",
+          "fileOutput": "android/app/google-services.json"
+        }
+      },
+      "dart": {
+        "lib/firebase_options.dart": {
+          "projectId": "pariwisata-cireong",
+          "configurations": {
+            "android": "1:1081014321686:android:b877e2d3cf6b9a1b386b37",
+            "web": "1:1081014321686:web:73f179db5c144f37386b37"
+          }
+        }
+      }
+    }
+  },
+  "hosting": {
+    "public": "build/web",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ]
+  }
+}

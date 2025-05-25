@@ -5,6 +5,7 @@ import 'package:pos_indorep/provider/main_provider.dart';
 import 'package:pos_indorep/provider/menu_provider.dart';
 import 'package:pos_indorep/screen/management/components/edit_menu_view.dart';
 import 'package:pos_indorep/screen/management/components/menu_list_view.dart';
+import 'package:pos_indorep/screen/management/components/widget/confirmation_dialog.dart';
 import 'package:provider/provider.dart';
 
 class MenuManagementPage extends StatefulWidget {
@@ -17,6 +18,7 @@ class MenuManagementPage extends StatefulWidget {
 class _MenuManagementPageState extends State<MenuManagementPage>
     with TickerProviderStateMixin {
   late TabController _tabController;
+  bool isModified = false;
 
   @override
   void initState() {
@@ -175,7 +177,17 @@ class _MenuManagementPageState extends State<MenuManagementPage>
                                     menuNote: '',
                                     option: [],
                                   );
-                                  provider.selectMenu(newMenu);
+                                  if (provider.selectedMenu == null) {
+                                    provider.selectMenu(newMenu);
+                                  } else if (newMenu != provider.selectedMenu) {
+                                    showDialog(
+                                      context: context,
+                                      builder: (context) => ConfirmationDialog(
+                                          onConfirmation: (bool confirmed) {
+                                        provider.selectMenu(newMenu);
+                                      }),
+                                    );
+                                  }
                                 },
                               ),
                               // IconButton(
@@ -218,7 +230,13 @@ class _MenuManagementPageState extends State<MenuManagementPage>
             if (provider.selectedMenu == null) {
               return Center(child: Text('Select a menu item to view details'));
             } else {
-              return EditMenuView(menu: provider.selectedMenu!);
+              return EditMenuView(
+                  isMenuModified: (bool modified) {
+                    setState(() {
+                      isModified = modified;
+                    });
+                  },
+                  menu: provider.selectedMenu!);
             }
           }),
         ),

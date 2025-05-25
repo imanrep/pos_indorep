@@ -1,11 +1,11 @@
 {
-    "name": "pos_indorep",
-    "short_name": "pos_indorep",
+    "name": "POS Indorep",
+    "short_name": "POS Indorep",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
     "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "description": "INDOREP Point of Sales.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [

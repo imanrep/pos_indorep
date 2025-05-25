@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:pos_indorep/model/model.dart';
-import 'package:pos_indorep/provider/main_provider.dart';
 import 'package:pos_indorep/services/irepbe_services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -31,9 +30,9 @@ class MenuProvider with ChangeNotifier {
   Future<void> _loadApiUrl() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     if (!prefs.containsKey('apiUrl')) {
-      await prefs.setString('apiUrl', 'http://112.78.128.73:8085');
+      await prefs.setString('apiUrl', 'https://warnet-api.indorep.com');
     } else {
-      _apiUrl = prefs.getString('apiUrl') ?? 'http://112.78.128.73:8085';
+      _apiUrl = prefs.getString('apiUrl') ?? 'https://warnet-api.indorep.com';
     }
     notifyListeners();
   }
@@ -56,7 +55,7 @@ class MenuProvider with ChangeNotifier {
       fetchedMenus.sort((a, b) =>
           a.menuName.toLowerCase().compareTo(b.menuName.toLowerCase()));
       _allMenus = fetchedMenus;
-      _filteredMenus = fetchedMenus;
+      filterMenusByCategory(_selectedCategory);
       notifyListeners();
       fetchAllCategories();
     } catch (e) {
@@ -178,10 +177,10 @@ class MenuProvider with ChangeNotifier {
     }
   }
 
-  Future<void> editOptionValue(AddOptionValueRequest request) async {
+  Future<void> editOptionValue(EditOptionValueRequest request) async {
     IrepBE irepBE = IrepBE();
     try {
-      await irepBE.addOptionValue(request);
+      await irepBE.editOptionValue(request);
       fetchAllMenus();
     } catch (e) {
       fetchAllMenus();
@@ -207,7 +206,7 @@ class MenuProvider with ChangeNotifier {
   Future<DefaultResponse> deleteOptionValue(int optionValueId) async {
     IrepBE irepBE = IrepBE();
     try {
-      DefaultResponse res = await irepBE.deleteOption(optionValueId);
+      DefaultResponse res = await irepBE.deleteOptionValue(optionValueId);
       if (res.success) {
         await fetchAllMenus();
         notifyListeners();
