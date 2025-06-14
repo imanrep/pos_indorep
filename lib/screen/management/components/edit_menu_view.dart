@@ -111,19 +111,6 @@ class _EditMenuViewState extends State<EditMenuView> {
     super.dispose();
   }
 
-  void _isMenuModified() {
-    final isModified = widget.menu.menuName != titleController.text ||
-        widget.menu.menuType != categoryController.text ||
-        widget.menu.menuNote != descController.text ||
-        widget.menu.menuPrice !=
-            int.tryParse(
-                priceController.text.replaceAll(RegExp(r'[^0-9]'), '')) ||
-        widget.menu.available != availableNotifier.value ||
-        localOptions.length != widget.menu.option!.length;
-
-    widget.isMenuModified(isModified);
-  }
-
   @override
   Widget build(BuildContext context) {
     return Consumer<MenuProvider>(builder: (context, provider, child) {

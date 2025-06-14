@@ -147,7 +147,7 @@ class ClockWidget extends StatelessWidget {
 }
 
 class _ReceiptBottomSheet extends StatefulWidget {
-  const _ReceiptBottomSheet({super.key});
+  const _ReceiptBottomSheet();
 
   @override
   State<_ReceiptBottomSheet> createState() => _ReceiptBottomSheetState();
