@@ -1,6 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:install_plugin/install_plugin.dart';
+import 'package:flutter_app_installer/flutter_app_installer.dart';
 import 'package:pos_indorep/provider/main_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:path_provider/path_provider.dart';
@@ -53,7 +53,9 @@ class _VersionTileState extends State<VersionTile> {
 
       setState(() => isDownloading = false);
 
-      await InstallPlugin.installApk(filePath,); // update this to your package name
+      var flutterAppInstaller = FlutterAppInstaller();
+
+      await flutterAppInstaller.installApk(filePath: filePath);
     } catch (e) {
       setState(() => isDownloading = false);
       ScaffoldMessenger.of(context).showSnackBar(
