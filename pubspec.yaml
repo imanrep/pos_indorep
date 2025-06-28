@@ -58,7 +58,7 @@ dependencies:
   dio: ^5.8.0+1
   flutter_app_installer:
     git:
-    url: https://github.com/elmaleek03/flutter_app_installer.git
+      url: https://github.com/elmaleek03/flutter_app_installer.git
 
 
 dev_dependencies:
