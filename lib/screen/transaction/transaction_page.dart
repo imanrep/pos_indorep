@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:pos_indorep/provider/transaction_provider.dart';
+import 'package:pos_indorep/screen/transaction/components/rekap_bottom_sheet.dart';
 import 'package:pos_indorep/screen/transaction/components/transaction_detail_view.dart';
 import 'package:pos_indorep/screen/transaction/components/transaction_list_view.dart';
 import 'package:pos_indorep/screen/transaction/components/widget/pagination_widget.dart';
@@ -57,7 +58,7 @@ class _TransactionPageState extends State<TransactionPage> {
                 Row(
                   children: [
                     Expanded(
-                      flex: 4,
+                      flex: 3,
                       child: PaginationWidget(
                           currentPage: provider.currentPageIndex,
                           totalPages: provider.totalPages,
@@ -73,6 +74,36 @@ class _TransactionPageState extends State<TransactionPage> {
                             label: const Text('Filter'),
                             icon: Icon(
                               Icons.filter_alt_rounded,
+                              size: 28,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Expanded(
+                      flex: 1,
+                      child: Row(
+                        children: [
+                          TextButton.icon(
+                            onPressed: () {
+                              showModalBottomSheet(
+                                        isScrollControlled: true,
+                                        useSafeArea: true,
+                                        context: context,
+                                        shape: const RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.vertical(
+                                            top: Radius.circular(16.0),
+                                          ),
+                                        ),
+                                        builder: (context) {
+                                          return RekapBottomSheet(
+
+                                          );
+                                        });
+                            },
+                            label: const Text('Rekap'),
+                            icon: Icon(
+                              Icons.assignment_rounded,
                               size: 28,
                             ),
                           ),

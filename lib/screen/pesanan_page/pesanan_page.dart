@@ -147,14 +147,17 @@ class _PesananPageState extends State<PesananPage> {
                                         ),
                                         const Spacer(),
                                         Center(
-                                          child: Text(
-                                            textAlign: TextAlign.center,
-                                            overflow: TextOverflow.ellipsis,
-                                            maxLines: 2,
-                                            item.menuName,
-                                            style: GoogleFonts.inter(
-                                              fontSize: 14.0,
-                                              fontWeight: FontWeight.w600,
+                                          child: Padding(
+                                            padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                                            child: Text(
+                                              textAlign: TextAlign.center,
+                                              overflow: TextOverflow.ellipsis,
+                                              maxLines: 1,
+                                              item.menuName,
+                                              style: GoogleFonts.inter(
+                                                fontSize: 14.0,
+                                                fontWeight: FontWeight.w600,
+                                              ),
                                             ),
                                           ),
                                         ),

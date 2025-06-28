@@ -173,6 +173,7 @@ class _MenuManagementPageState extends State<MenuManagementPage>
                                     menuName: 'New Menu',
                                     menuType: category,
                                     menuPrice: 0,
+                                    hpp: 0,
                                     menuImage: '',
                                     menuNote: '',
                                     option: [],

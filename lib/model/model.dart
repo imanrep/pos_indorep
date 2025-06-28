@@ -128,6 +128,7 @@ class MenuIrep {
   final String menuName;
   final String menuImage;
   final int menuPrice;
+  final int hpp;
   final int menuId;
   final String menuNote;
   final bool available;
@@ -138,6 +139,7 @@ class MenuIrep {
     required this.menuName,
     required this.menuImage,
     required this.menuPrice,
+    required this.hpp,
     required this.menuId,
     required this.menuNote,
     required this.available,
@@ -150,6 +152,7 @@ class MenuIrep {
       menuName: data['menu_name'],
       menuImage: data['menu_image'],
       menuPrice: data['menu_price'],
+      hpp: data['hpp'],
       menuId: data['menu_id'],
       menuNote: data['menu_note'],
       available: data['available'],
@@ -167,6 +170,7 @@ class MenuIrep {
       'menu_name': menuName,
       'menu_image': menuImage,
       'menu_price': menuPrice,
+      'hpp': hpp,
       'menu_id': menuId,
       'menu_note': menuNote,
       'available': available,
@@ -231,6 +235,7 @@ class CartItem extends MenuIrep {
           menuName: title,
           menuImage: image,
           menuPrice: price.toInt(),
+          hpp: 0,
           menuId: menuId,
           menuNote: desc,
           available: available,
@@ -474,6 +479,7 @@ class AddMenuRequest {
   final String menuName;
   final String menuImage;
   final int menuPrice;
+  final int hpp;
   final String menuNote;
   final bool menuAvailable;
 
@@ -483,6 +489,7 @@ class AddMenuRequest {
     required this.menuName,
     required this.menuImage,
     required this.menuPrice,
+    required this.hpp,
     required this.menuNote,
     required this.menuAvailable,
   });
@@ -494,6 +501,7 @@ class AddMenuRequest {
       menuName: json['menu_name'],
       menuImage: json['menu_image'],
       menuPrice: json['menu_price'],
+      hpp: json['hpp'],
       menuNote: json['menu_note'],
       menuAvailable: json['menu_available'],
     );
@@ -506,6 +514,7 @@ class AddMenuRequest {
       'menu_name': menuName,
       'menu_image': menuImage,
       'menu_price': menuPrice,
+      'hpp': hpp,
       'menu_note': menuNote,
       'menu_available': menuAvailable,
     };

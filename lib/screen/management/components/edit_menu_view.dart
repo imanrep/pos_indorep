@@ -34,6 +34,7 @@ class _EditMenuViewState extends State<EditMenuView> {
   late TextEditingController categoryController;
   late TextEditingController descController;
   late TextEditingController priceController;
+  late TextEditingController hppController;
   late ValueNotifier<bool> availableNotifier;
   String? imageUrl;
 
@@ -64,6 +65,8 @@ class _EditMenuViewState extends State<EditMenuView> {
     descController = TextEditingController(text: widget.menu.menuNote);
     priceController =
         TextEditingController(text: formatter.format(widget.menu.menuPrice));
+    hppController =
+        TextEditingController(text: formatter.format(widget.menu.hpp));
     availableNotifier = ValueNotifier(widget.menu.available);
     imageUrl = widget.menu.menuImage;
     localOptions = widget.menu.option != null
@@ -154,6 +157,9 @@ class _EditMenuViewState extends State<EditMenuView> {
                         ? imageUrl!
                         : widget.menu.menuImage,
                     menuPrice: int.tryParse(priceController.text
+                            .replaceAll(RegExp(r'[^0-9]'), '')) ??
+                        0,
+                        hpp: int.tryParse(hppController.text
                             .replaceAll(RegExp(r'[^0-9]'), '')) ??
                         0,
                     menuNote: descController.text,
@@ -349,7 +355,7 @@ class _EditMenuViewState extends State<EditMenuView> {
                   TextFormField(
                     controller: priceController,
                     decoration: InputDecoration(
-                        labelText: 'Harga',
+                        labelText: 'Harga Jual',
                         labelStyle: GoogleFonts.inter(),
                         counterText: ""),
                     maxLength: 8,
@@ -369,6 +375,33 @@ class _EditMenuViewState extends State<EditMenuView> {
                               value.replaceAll(RegExp(r'[^0-9]'), '')) ==
                           null) {
                         return 'Masukkan harga yang valid';
+                      }
+                      return null;
+                    },
+                  ),
+                  TextFormField(
+                    controller: hppController,
+                    decoration: InputDecoration(
+                        labelText: 'Harga Pokok (HPP)',
+                        labelStyle: GoogleFonts.inter(),
+                        counterText: ""),
+                    maxLength: 8,
+                    keyboardType: TextInputType.number,
+                    inputFormatters: [RupiahFormatter()],
+                    onSaved: (value) {
+                      double rawValue = double.tryParse(
+                              value!.replaceAll(RegExp(r'[^0-9]'), '')) ??
+                          0.0;
+                      hppController.text = rawValue.toString();
+                    },
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Masukkan hpp';
+                      }
+                      if (double.tryParse(
+                              value.replaceAll(RegExp(r'[^0-9]'), '')) ==
+                          null) {
+                        return 'Masukkan hpp yang valid';
                       }
                       return null;
                     },
