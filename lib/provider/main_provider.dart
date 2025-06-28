@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:package_info_plus/package_info_plus.dart';
+import 'package:pos_indorep/services/irepbe_services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class MainProvider extends ChangeNotifier {
@@ -8,12 +9,18 @@ class MainProvider extends ChangeNotifier {
   String _appVersion = '';
   String _printerAddress = '';
   String _printerName = '';
+  String _latestVersion = '';
+  bool _isUpdateAvailable = false;
+  String? _updateUrl;
 
   String get apiUrl => _apiUrl;
   String get mainRepo => _mainRepo;
   String get appVersion => _appVersion;
   String get printerAddress => _printerAddress;
   String get printerName => _printerName;
+  String get latestVersion => _latestVersion;
+  bool get isUpdateAvailable => _isUpdateAvailable;
+  String? get updateUrl => _updateUrl;
 
   MainProvider() {
     _initialize();
@@ -23,7 +30,8 @@ class MainProvider extends ChangeNotifier {
     await _loadApiUrl();
     await _loadPrinterAddress();
     await _loadPrinterName();
-    loadAppVersion();
+    await loadAppVersion();
+
   }
 
   Future<void> _loadApiUrl() async {
@@ -57,7 +65,7 @@ class MainProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  void loadAppVersion() async {
+  Future<void> loadAppVersion() async {
     PackageInfo packageInfo = await PackageInfo.fromPlatform();
     String version = packageInfo.version;
     _appVersion = version;
@@ -84,4 +92,36 @@ class MainProvider extends ChangeNotifier {
     await prefs.setString('printerName', name);
     notifyListeners();
   }
+
+  Future<void> checkForAppUpdate() async {
+    final packageInfo = await PackageInfo.fromPlatform();
+    _appVersion = packageInfo.version;
+    var irepBE = IrepBE();
+
+    final fetchedVersion = await irepBE.fetchLatestVersionTag();
+    if (fetchedVersion == null) {
+      debugPrint('Could not fetch latest version');
+      return;
+    }
+
+    _latestVersion = fetchedVersion;
+    _isUpdateAvailable = _isNewerVersion(fetchedVersion, appVersion);
+
+    if (isUpdateAvailable) {
+      _updateUrl = await irepBE.fetchDownloadUrlForVersion(fetchedVersion);
+    }
+
+    notifyListeners();
+  }
+
+  bool _isNewerVersion(String latest, String current) {
+    final l = latest.split('.').map(int.parse).toList();
+    final c = current.split('.').map(int.parse).toList();
+    for (int i = 0; i < l.length; i++) {
+      if (i >= c.length || l[i] > c[i]) return true;
+      if (l[i] < c[i]) return false;
+    }
+    return false;
+  }
+  
 }

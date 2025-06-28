@@ -333,4 +333,36 @@ class IrepBE {
       success: false,
     );
   }
+
+   Future<String?> fetchLatestVersionTag() async {
+    final response = await http.get(Uri.parse(
+      'https://api.github.com/repos/YOUR_USER/YOUR_REPO/releases/latest',
+    ));
+
+    if (response.statusCode != 200) {
+      print("GitHub API error: ${response.statusCode}");
+      return null;
+    }
+
+    final json = jsonDecode(response.body);
+    final latestTag = json['tag_name']; // e.g. "v0.9.4"
+    return latestTag.replaceFirst("v", "");
+  }
+
+   Future<String?> fetchDownloadUrlForVersion(String tagName) async {
+    final response = await http.get(Uri.parse(
+      'https://api.github.com/repos/YOUR_USER/YOUR_REPO/releases/latest',
+    ));
+
+    if (response.statusCode != 200) return null;
+
+    final json = jsonDecode(response.body);
+    final asset = json['assets'].firstWhere(
+      (a) => a['name'] == 'INDOREP-POS-v$tagName.apk',
+      orElse: () => null,
+    );
+    return asset?['browser_download_url'];
+  }
+
+
 }

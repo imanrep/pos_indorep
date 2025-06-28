@@ -3,6 +3,7 @@ import 'package:flutter_bluetooth_printer/flutter_bluetooth_printer.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:pos_indorep/provider/main_provider.dart';
+import 'package:pos_indorep/screen/settings/components/version_tile.dart';
 import 'package:provider/provider.dart';
 
 class SettingsPage extends StatefulWidget {
@@ -65,11 +66,7 @@ class _SettingsPageState extends State<SettingsPage> {
                       }
                     },
                   ),
-                  ListTile(
-                    leading: Icon(Icons.info_outline_rounded),
-                    title: Text('Version'),
-                    subtitle: Text(provider.appVersion),
-                  ),
+                  VersionTile()
                 ],
               ),
             ),
