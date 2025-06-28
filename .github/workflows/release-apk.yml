@@ -8,10 +8,8 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-
+    
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
 
     - name: Set up Java
       uses: actions/setup-java@v3
@@ -19,10 +17,15 @@ jobs:
         distribution: 'temurin'
         java-version: '17'
 
-    - name: Set up Flutter
+    - name: Checkout code
+      uses: actions/checkout@v3
       uses: subosito/flutter-action@v2
+      id: flutter-action
       with:
-        flutter-version: 'stable'
+         architecture: x64
+    - run: |
+        git config --global --add safe.directory /opt/hostedtoolcache/flutter/${{ steps.flutter-action.outputs.CHANNEL }}-${{ steps.flutter-action.outputs.VERSION }}-${{ steps.flutter-action.outputs.ARCHITECTURE }}
+        flutter --version
 
     - name: Install dependencies
       run: flutter pub get
