@@ -31,6 +31,7 @@ class MainProvider extends ChangeNotifier {
     await _loadPrinterAddress();
     await _loadPrinterName();
     await loadAppVersion();
+    await checkForAppUpdate();
 
   }
 
@@ -109,6 +110,7 @@ class MainProvider extends ChangeNotifier {
 
     if (isUpdateAvailable) {
       _updateUrl = await irepBE.fetchDownloadUrlForVersion(fetchedVersion);
+      print(_updateUrl);
     }
 
     notifyListeners();

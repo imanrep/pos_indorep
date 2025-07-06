@@ -266,6 +266,30 @@ class _PrintViewState extends State<PrintView> {
                       ),
                       const SizedBox(height: 24),
                       Text(
+                        'INDOREP WIFI',
+                        style: GoogleFonts.robotoMono(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      Text(
+                        "username : ${widget.transaction.wifiUsername}" ?? '-',
+                        style: GoogleFonts.robotoMono(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w400,
+                        ),
+                      ),
+                      Text(
+                        "password : ${widget.transaction.wifiPassword}" ?? '-',
+                        style: GoogleFonts.robotoMono(
+                          fontSize: 18,
+                          fontStyle: FontStyle.italic,
+                          fontWeight: FontWeight.w400,
+                        ),
+                      ),
+                      const SizedBox(height: 32),
+                      Text(
                         'Terima Kasih!',
                         style: GoogleFonts.robotoMono(
                           fontSize: 18,

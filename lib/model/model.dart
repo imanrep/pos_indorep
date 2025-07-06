@@ -797,6 +797,8 @@ class TransactionData {
   final String time;
   final String status;
   final String paymentMethod;
+  String? wifiUsername;
+  String? wifiPassword;
   String? qris;
 
   TransactionData({
@@ -807,6 +809,8 @@ class TransactionData {
     required this.time,
     required this.status,
     required this.paymentMethod,
+    this.wifiUsername,
+    this.wifiPassword,
     this.qris,
   });
 
@@ -909,5 +913,37 @@ class PaymentButton {
       image: json['image'],
       type: json['type'],
     );
+  }
+}
+
+class AddWifiResponse {
+  final String message;
+  final bool success;
+  final String wifiUsername;
+  final String wifiPassword;
+
+  AddWifiResponse({
+    required this.message,
+    required this.success,
+    required this.wifiUsername,
+    required this.wifiPassword,
+  });
+
+  factory AddWifiResponse.fromJson(Map<String, dynamic> json) {
+    return AddWifiResponse(
+      message: json['message'],
+      success: json['success'],
+      wifiUsername: json['username'] ?? '-',
+      wifiPassword: json['password'] ?? '-',
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'message': message,
+      'success': success,
+      'username': wifiUsername,
+      'password': wifiPassword,
+    };
   }
 }

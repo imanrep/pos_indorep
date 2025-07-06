@@ -334,13 +334,24 @@ class IrepBE {
     );
   }
 
-   Future<String?> fetchLatestVersionTag() async {
-    final response = await http.get(Uri.parse(
-      'https://api.github.com/repos/YOUR_USER/YOUR_REPO/releases/latest',
-    ));
+  String githubUser = 'elmaleek03';
+  String githubRepo = 'pos_indorep';
+  String? githubToken;
+
+  Map<String, String> get _headers => {
+        'Accept': 'application/vnd.github+json',
+        if (githubToken != null) 'Authorization': 'Bearer $githubToken',
+        'X-GitHub-Api-Version': '2022-11-28',
+      };
+  Future<String?> fetchLatestVersionTag() async {
+    final url = Uri.parse(
+      'https://api.github.com/repos/$githubUser/$githubRepo/releases/latest',
+    );
+
+    final response = await http.get(url, headers: _headers);
 
     if (response.statusCode != 200) {
-      print("GitHub API error: ${response.statusCode}");
+      print("❌ GitHub API error: ${response.statusCode}");
       return null;
     }
 
@@ -349,20 +360,49 @@ class IrepBE {
     return latestTag.replaceFirst("v", "");
   }
 
-   Future<String?> fetchDownloadUrlForVersion(String tagName) async {
-    final response = await http.get(Uri.parse(
-      'https://api.github.com/repos/YOUR_USER/YOUR_REPO/releases/latest',
-    ));
+  Future<String?> fetchDownloadUrlForVersion(String tagName) async {
+    final url = Uri.parse(
+      'https://api.github.com/repos/$githubUser/$githubRepo/releases/latest',
+    );
 
-    if (response.statusCode != 200) return null;
+    final response = await http.get(url, headers: _headers);
+
+    if (response.statusCode != 200) {
+      print("❌ Failed to fetch release assets.");
+      return null;
+    }
 
     final json = jsonDecode(response.body);
-    final asset = json['assets'].firstWhere(
+    final asset = (json['assets'] as List).firstWhere(
       (a) => a['name'] == 'INDOREP-POS-v$tagName.apk',
       orElse: () => null,
     );
+
     return asset?['browser_download_url'];
   }
 
+  Future<AddWifiResponse> addWifi() async {
+    String baseUrl = await getBaseUrl();
+    final url = Uri.parse('${baseUrl}/addWifiCafe');
 
+    try {
+      final response = await http.get(
+        url,
+      );
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> data = jsonDecode(response.body);
+        return AddWifiResponse.fromJson(data);
+      } else {
+        print('Failed to add wifi: ${response.body}');
+      }
+    } catch (e) {}
+
+    // Return a default response instead of null
+    return AddWifiResponse(
+      message: "Failed",
+      success: false,
+      wifiUsername: '-',
+      wifiPassword: '-',
+    );
+  }
 }

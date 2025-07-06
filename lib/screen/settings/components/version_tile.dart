@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_app_installer/flutter_app_installer.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:pos_indorep/provider/main_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:path_provider/path_provider.dart';
@@ -21,8 +22,12 @@ class _VersionTileState extends State<VersionTile> {
         title: Text("Update Available"),
         content: Text("Install version $version?"),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context, false), child: Text("Cancel")),
-          ElevatedButton(onPressed: () => Navigator.pop(context, true), child: Text("Download")),
+          TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: Text("Cancel")),
+          ElevatedButton(
+              onPressed: () => Navigator.pop(context, true),
+              child: Text("Download")),
         ],
       ),
     );
@@ -37,9 +42,15 @@ class _VersionTileState extends State<VersionTile> {
     try {
       final dir = await getExternalStorageDirectory();
       final filePath = '${dir!.path}/INDOREP-POS-v$version.apk';
-
+      print('downloading from: $url');
       final dio = Dio();
       await dio.download(
+        options: Options(
+          headers: {
+            'Accept': 'application/vnd.github+json',
+            'X-GitHub-Api-Version': '2022-11-28',
+          },
+        ),
         url,
         filePath,
         onReceiveProgress: (received, total) {
@@ -58,6 +69,7 @@ class _VersionTileState extends State<VersionTile> {
       await flutterAppInstaller.installApk(filePath: filePath);
     } catch (e) {
       setState(() => isDownloading = false);
+      print(e.toString());
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Update failed: $e')),
       );
@@ -67,6 +79,7 @@ class _VersionTileState extends State<VersionTile> {
   @override
   Widget build(BuildContext context) {
     final provider = context.watch<MainProvider>();
+    var mainProvider = Provider.of<MainProvider>(context, listen: false);
 
     return ListTile(
       leading: Icon(
@@ -75,16 +88,18 @@ class _VersionTileState extends State<VersionTile> {
             : Icons.info_outline_rounded,
         color: provider.isUpdateAvailable ? Colors.orange : null,
       ),
-      title: Text('Version'),
+      title: Text('Version ${mainProvider.appVersion}'),
       subtitle: isDownloading
           ? LinearProgressIndicator(value: downloadProgress)
           : Text(
               provider.isUpdateAvailable
                   ? 'Update available: ${provider.latestVersion}'
                   : provider.appVersion,
+              style: GoogleFonts.inter(fontWeight: FontWeight.w600),
             ),
       onTap: provider.isUpdateAvailable && provider.updateUrl != null
-          ? () => _promptAndDownload(provider.updateUrl!, provider.latestVersion)
+          ? () =>
+              _promptAndDownload(provider.updateUrl!, provider.latestVersion)
           : null,
     );
   }

@@ -52,11 +52,14 @@ class _PaymentDialogBottomSheetState extends State<PaymentDialogBottomSheet> {
     if (request.payment == 'qris') {
       context.loaderOverlay.show();
       QrisOrderResponse response = await irepBE.createOrder(request);
+      AddWifiResponse wifiResponse = await irepBE.addWifi();
       if (response.success) {
         TransactionData transactionData = TransactionData(
           orderId: 'IDRPS-${response.orderID}',
           pc: "",
           paymentMethod: request.payment,
+          wifiUsername: wifiResponse.wifiUsername,
+          wifiPassword: wifiResponse.wifiPassword,
           total: response.total,
           status: response.success ? 'paid' : 'pending',
           time: response.time,
@@ -96,6 +99,7 @@ class _PaymentDialogBottomSheetState extends State<PaymentDialogBottomSheet> {
       // debugPrint(request.toJson().toString());
       context.loaderOverlay.show();
       QrisOrderResponse response = await irepBE.createOrder(request);
+      AddWifiResponse wifiResponse = await irepBE.addWifi();
       if (response.success) {
         var mainProvider = Provider.of<MainProvider>(context, listen: false);
         Uint8List openDrawerCommand =
@@ -108,6 +112,8 @@ class _PaymentDialogBottomSheetState extends State<PaymentDialogBottomSheet> {
           orderId: 'IDRPS-${response.orderID}',
           pc: "",
           paymentMethod: request.payment,
+          wifiUsername: wifiResponse.wifiUsername,
+          wifiPassword: wifiResponse.wifiPassword,
           total: response.total,
           status: response.success ? 'paid' : 'pending',
           time: response.time,

@@ -492,6 +492,32 @@ class _QrisPageTwoState extends State<QrisPageTwo> {
                                 size: 120.0,
                               ),
                             ),
+                            Text(
+                              'INDOREP WIFI',
+                              style: GoogleFonts.robotoMono(
+                                fontSize: 18,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            const SizedBox(height: 12),
+                            Text(
+                              "username : ${transactionData.wifiUsername}" ??
+                                  '-',
+                              style: GoogleFonts.robotoMono(
+                                fontSize: 18,
+                                fontWeight: FontWeight.w400,
+                              ),
+                            ),
+                            Text(
+                              "password : ${transactionData.wifiPassword}" ??
+                                  '-',
+                              style: GoogleFonts.robotoMono(
+                                fontSize: 18,
+                                fontStyle: FontStyle.italic,
+                                fontWeight: FontWeight.w400,
+                              ),
+                            ),
+                            const SizedBox(height: 32),
                             const SizedBox(height: 24),
                             Text(
                               'Terima Kasih!',
