@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:pos_indorep/model/model.dart';
+import 'package:pos_indorep/model/summary.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class IrepBE {
@@ -397,12 +398,53 @@ class IrepBE {
       }
     } catch (e) {}
 
-    // Return a default response instead of null
     return AddWifiResponse(
       message: "Failed",
       success: false,
       wifiUsername: '-',
       wifiPassword: '-',
+    );
+  }
+
+  Future<SummaryResponse> getSummary(
+      String? period, String? from, String? until) async {
+    String baseUrl = await getBaseUrl();
+
+    String getSummaryUrl() {
+      if (period == null) {
+        String fromString = from!;
+        String untilString = until!;
+        return '$baseUrl/salesSummary?date_from=$fromString&date_until=$untilString';
+      } else {
+        return '$baseUrl/salesSummary?period=$period';
+      }
+    }
+
+    final url = Uri.parse(getSummaryUrl());
+    print('Fetching summary from: $url');
+
+    try {
+      final response = await http.get(url);
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> data = jsonDecode(response.body);
+        return SummaryResponse.fromJson(data);
+      } else {
+        print('Failed to load summary: ${response.body}');
+      }
+    } catch (e) {
+      print('Error loading summary: $e');
+    }
+
+    return SummaryResponse(
+      products: [],
+      summary: Summary(
+        period: '',
+        from: '',
+        until: '',
+        totalIncome: 0,
+        totalItems: 0,
+        totalOrders: 0,
+      ),
     );
   }
 }

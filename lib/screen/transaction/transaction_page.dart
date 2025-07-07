@@ -71,7 +71,9 @@ class _TransactionPageState extends State<TransactionPage> {
                         children: [
                           TextButton.icon(
                             onPressed: () {},
-                            label: const Text('Filter'),
+                            label: Text('Filter',
+                                style: GoogleFonts.inter(
+                                    fontWeight: FontWeight.w600)),
                             icon: Icon(
                               Icons.filter_alt_rounded,
                               size: 28,
@@ -85,23 +87,23 @@ class _TransactionPageState extends State<TransactionPage> {
                       child: Row(
                         children: [
                           TextButton.icon(
-                            onPressed: () {
+                            onPressed: () async {
                               showModalBottomSheet(
-                                        isScrollControlled: true,
-                                        useSafeArea: true,
-                                        context: context,
-                                        shape: const RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.vertical(
-                                            top: Radius.circular(16.0),
-                                          ),
-                                        ),
-                                        builder: (context) {
-                                          return RekapBottomSheet(
-
-                                          );
-                                        });
+                                  isScrollControlled: true,
+                                  useSafeArea: true,
+                                  context: context,
+                                  shape: const RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.vertical(
+                                      top: Radius.circular(16.0),
+                                    ),
+                                  ),
+                                  builder: (context) {
+                                    return RekapBottomSheet();
+                                  });
                             },
-                            label: const Text('Rekap'),
+                            label: Text('Rekap',
+                                style: GoogleFonts.inter(
+                                    fontWeight: FontWeight.w600)),
                             icon: Icon(
                               Icons.assignment_rounded,
                               size: 28,
