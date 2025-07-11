@@ -337,11 +337,9 @@ class IrepBE {
 
   String githubUser = 'elmaleek03';
   String githubRepo = 'pos_indorep';
-  String? githubToken;
 
   Map<String, String> get _headers => {
         'Accept': 'application/vnd.github+json',
-        if (githubToken != null) 'Authorization': 'Bearer $githubToken',
         'X-GitHub-Api-Version': '2022-11-28',
       };
   Future<String?> fetchLatestVersionTag() async {

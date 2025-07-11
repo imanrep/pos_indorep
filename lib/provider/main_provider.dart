@@ -32,7 +32,6 @@ class MainProvider extends ChangeNotifier {
     await _loadPrinterName();
     await loadAppVersion();
     await checkForAppUpdate();
-
   }
 
   Future<void> _loadApiUrl() async {
@@ -101,7 +100,6 @@ class MainProvider extends ChangeNotifier {
 
     final fetchedVersion = await irepBE.fetchLatestVersionTag();
     if (fetchedVersion == null) {
-      debugPrint('Could not fetch latest version');
       return;
     }
 
@@ -125,5 +123,4 @@ class MainProvider extends ChangeNotifier {
     }
     return false;
   }
-  
 }

@@ -313,6 +313,26 @@ class _PrintViewState extends State<PrintView> {
       ),
       actions: [
         ElevatedButton.icon(
+          onPressed: isPrinting
+              ? () async {
+                  if (isPrinting == false && progress == 100) {
+                    Fluttertoast.showToast(
+                      msg: 'Masih mencetak struk...',
+                      toastLength: Toast.LENGTH_SHORT,
+                      gravity: ToastGravity.BOTTOM,
+                    );
+                    return;
+                  }
+                }
+              : null,
+          label: Text(
+              !isPrinting
+                  ? 'Order Detail'
+                  : 'Mencetak Struk ${((progress ?? 0) * 100).round()}%',
+              style: GoogleFonts.inter(fontWeight: FontWeight.w600)),
+          icon: Icon(Icons.receipt_long_rounded, size: 20),
+        ),
+        ElevatedButton.icon(
           onPressed: () async {
             if (controller == null) {
               Fluttertoast.showToast(
@@ -329,7 +349,7 @@ class _PrintViewState extends State<PrintView> {
           },
           label: Text(
               !isPrinting
-                  ? 'Cetak'
+                  ? 'Pelanggan'
                   : 'Mencetak Struk ${((progress ?? 0) * 100).round()}%',
               style: GoogleFonts.inter(fontWeight: FontWeight.w600)),
           icon: Icon(Icons.print_rounded, size: 20),
