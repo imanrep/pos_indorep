@@ -77,7 +77,7 @@ class _OrderDetailPrintViewState extends State<OrderDetailPrintView> {
     return AlertDialog(
        title: Row(
         children: [
-          Text('Transaksi Berhasil',
+          Text('Cetak Detail Pesanan',
               style: GoogleFonts.inter(fontWeight: FontWeight.w600)),
           const Spacer(),
           IconButton(
@@ -232,8 +232,8 @@ class _OrderDetailPrintViewState extends State<OrderDetailPrintView> {
           },
           label: Text(
               !isPrinting
-                  ? 'Pelanggan'
-                  : 'Mencetak Struk ${((progress ?? 0) * 100).round()}%',
+                  ? 'Cetak Detail'
+                  : 'Mencetak Detail ${((progress ?? 0) * 100).round()}%',
               style: GoogleFonts.inter(fontWeight: FontWeight.w600)),
           icon: Icon(Icons.print_rounded, size: 20),
         ),
