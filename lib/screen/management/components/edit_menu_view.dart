@@ -66,7 +66,7 @@ class _EditMenuViewState extends State<EditMenuView> {
     priceController =
         TextEditingController(text: formatter.format(widget.menu.menuPrice));
     hppController =
-        TextEditingController(text: formatter.format(widget.menu.hpp));
+        TextEditingController(text: formatter.format(widget.menu.hpp) );
     availableNotifier = ValueNotifier(widget.menu.available);
     imageUrl = widget.menu.menuImage;
     localOptions = widget.menu.option != null
@@ -120,7 +120,7 @@ class _EditMenuViewState extends State<EditMenuView> {
       return Scaffold(
         persistentFooterButtons: [
           Row(
-            mainAxisAlignment: MainAxisAlignment.end,
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
               widget.menu.menuId != 0
                   ? ElevatedButton(

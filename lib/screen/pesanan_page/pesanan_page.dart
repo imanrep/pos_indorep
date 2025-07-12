@@ -301,6 +301,7 @@ class _PesananPageState extends State<PesananPage> {
                                                     'Qty: ${item.qty}',
                                                     textAlign: TextAlign.center,
                                                     maxLines: 1,
+                                                    overflow: TextOverflow.ellipsis,
                                                     style: GoogleFonts.inter(
                                                       fontSize: 12.0,
                                                       fontWeight:
@@ -311,13 +312,17 @@ class _PesananPageState extends State<PesananPage> {
                                                 ),
                                               ),
                                               const SizedBox(width: 8.0),
-                                              Text(
-                                                Helper.rupiahFormatter(
-                                                    item.subTotal),
-                                                style: GoogleFonts.inter(
-                                                    fontSize: 12.0,
-                                                    fontWeight: FontWeight.w600,
-                                                    color: Colors.white),
+                                              Expanded(
+                                                child: Text(
+                                                  Helper.rupiahFormatter(
+                                                      item.subTotal),
+                                                  maxLines: 1,
+                                                  overflow: TextOverflow.ellipsis,
+                                                  style: GoogleFonts.inter(
+                                                      fontSize: 12.0,
+                                                      fontWeight: FontWeight.w600,
+                                                      color: Colors.white),
+                                                ),
                                               ),
                                             ],
                                           ),

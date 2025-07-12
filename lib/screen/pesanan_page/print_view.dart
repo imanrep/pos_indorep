@@ -8,6 +8,7 @@ import 'package:pos_indorep/model/model.dart';
 import 'package:pos_indorep/provider/cart_provider.dart';
 import 'package:pos_indorep/provider/main_provider.dart';
 import 'package:pos_indorep/provider/transaction_provider.dart';
+import 'package:pos_indorep/screen/pesanan_page/components/order_detail_print_view.dart';
 import 'package:provider/provider.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
@@ -87,29 +88,8 @@ class _PrintViewState extends State<PrintView> {
     }
 
     return AlertDialog(
-      title: Row(
-        children: [
-          Text('Transaksi Berhasil',
+      title: Text('Transaksi Berhasil',
               style: GoogleFonts.inter(fontWeight: FontWeight.w600)),
-          const Spacer(),
-          IconButton(
-            onPressed: () {
-              var transasctionProvider =
-                  Provider.of<TransactionProvider>(context, listen: false);
-              transasctionProvider.clearSelectedTransaction();
-              var cartProvider =
-                  Provider.of<CartProvider>(context, listen: false);
-              cartProvider.clearCart();
-              Navigator.pop(context);
-              Navigator.pop(context);
-            },
-            icon: Opacity(
-                opacity: isPrinting ? 1 : 0,
-                child: CircleAvatar(
-                    child: const Icon(Icons.close_rounded, size: 20))),
-          ),
-        ],
-      ),
       content: SizedBox(
         width: 400,
         child: Row(
@@ -313,22 +293,23 @@ class _PrintViewState extends State<PrintView> {
       ),
       actions: [
         ElevatedButton.icon(
-          onPressed: isPrinting
-              ? () async {
-                  if (isPrinting == false && progress == 100) {
-                    Fluttertoast.showToast(
-                      msg: 'Masih mencetak struk...',
-                      toastLength: Toast.LENGTH_SHORT,
-                      gravity: ToastGravity.BOTTOM,
-                    );
-                    return;
-                  }
-                }
-              : null,
+          onPressed: !isPrinting && progress == null
+              ? null
+              : () {
+                  Navigator.of(context).pop();
+                  showDialog(
+          barrierDismissible: false,
+          context: context,
+          builder: (context) => PopScope(
+            canPop: false,
+            child: OrderDetailPrintView(
+              transaction: widget.transaction,
+            ),
+          ),
+        );
+                },
           label: Text(
-              !isPrinting
-                  ? 'Order Detail'
-                  : 'Mencetak Struk ${((progress ?? 0) * 100).round()}%',
+                  'Order Detail',
               style: GoogleFonts.inter(fontWeight: FontWeight.w600)),
           icon: Icon(Icons.receipt_long_rounded, size: 20),
         ),

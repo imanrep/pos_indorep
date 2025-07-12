@@ -83,38 +83,51 @@ class _SettingsPageState extends State<SettingsPage> {
   }
 
   _buildServerSettingDialog(MainProvider provider) {
-    return AlertDialog(
-      title: Text('Server Setting'),
-      content: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          TextField(
-            controller: _serverUrlController,
-            decoration: InputDecoration(labelText: 'Server URL'),
+  return LayoutBuilder(
+    builder: (context, constraints) {
+      return AlertDialog(
+        title: Text('Server Setting'),
+        content: ConstrainedBox(
+          constraints: BoxConstraints(
+            maxHeight: constraints.maxHeight * 0.5, // Adjust height if needed
           ),
-        ],
-      ),
-      actions: [
-        TextButton(
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextField(
+                  controller: _serverUrlController,
+                  decoration: InputDecoration(labelText: 'Server URL'),
+                ),
+              ],
+            ),
+          ),
+        ),
+        actions: [
+          TextButton(
             onPressed: () {
               Navigator.of(context).pop();
             },
-            child: Text('Batal')),
-        ElevatedButton(
-          onPressed: () {
-            provider.setApiUrl(_serverUrlController.text);
-            Navigator.of(context).pop();
-            Fluttertoast.showToast(
-              msg: "New server URL has been saved",
-              toastLength: Toast.LENGTH_SHORT,
-              gravity: ToastGravity.BOTTOM,
-              textColor: Colors.white,
-              fontSize: 16.0,
-            );
-          },
-          child: Text('Simpan'),
-        )
-      ],
-    );
-  }
+            child: Text('Batal'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              provider.setApiUrl(_serverUrlController.text);
+              Navigator.of(context).pop();
+              Fluttertoast.showToast(
+                msg: "New server URL has been saved",
+                toastLength: Toast.LENGTH_SHORT,
+                gravity: ToastGravity.BOTTOM,
+                textColor: Colors.white,
+                fontSize: 16.0,
+              );
+            },
+            child: Text('Simpan'),
+          ),
+        ],
+      );
+    },
+  );
+}
+
 }

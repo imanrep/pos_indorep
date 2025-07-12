@@ -79,9 +79,16 @@ class _HomeScreenState extends State<HomeScreen> {
           ],
         ),
       ),
-      body: Row(
-        children: <Widget>[
-          NavigationRail(
+     body: Row(
+  children: <Widget>[
+    SingleChildScrollView(
+      physics: NeverScrollableScrollPhysics(),
+      child: ConstrainedBox(
+        constraints: BoxConstraints(
+          minHeight: MediaQuery.of(context).size.height,
+        ),
+        child: IntrinsicHeight(
+          child: NavigationRail(
             minWidth: 100,
             selectedIndex: _selectedIndex,
             onDestinationSelected: (int index) {
@@ -90,32 +97,18 @@ class _HomeScreenState extends State<HomeScreen> {
               });
             },
             labelType: labelType,
-            leading: showLeading
-                ? FloatingActionButton(
-                    elevation: 0,
-                    onPressed: () {
-                      // Add your onPressed code here!
-                    },
-                    child: const Icon(Icons.add),
-                  )
-                : null,
-            trailing: showTrailing
-                ? IconButton(
-                    icon: const Icon(Icons.more_horiz),
-                    onPressed: () {
-                      // Add your onPressed code here!
-                    },
-                  )
-                : null,
             destinations: _destinations,
           ),
-          const VerticalDivider(thickness: 1, width: 1),
-          // This is the main content.
-          Expanded(
-            child: _pages[_selectedIndex],
-          )
-        ],
+        ),
       ),
+    ),
+    const VerticalDivider(thickness: 1, width: 1),
+    Expanded(
+      child: _pages[_selectedIndex],
+    ),
+  ],
+),
+
     );
   }
 }
