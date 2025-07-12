@@ -10,6 +10,7 @@ import 'package:pos_indorep/provider/transaction_provider.dart';
 import 'package:pos_indorep/screen/home_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import 'package:flutter/services.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -29,6 +30,13 @@ void main() async {
   } else {
     await Firebase.initializeApp();
   }
+
+
+  await SystemChrome.setPreferredOrientations([
+    DeviceOrientation.landscapeLeft,
+    DeviceOrientation.landscapeRight,
+  ]);
+
   runApp(
     MultiProvider(
       providers: [
