@@ -13,7 +13,8 @@ import 'package:provider/provider.dart';
 class OrderDetailPrintView extends StatefulWidget {
   final TransactionData transaction;
   final ReceiptController? controller;
-  const OrderDetailPrintView({super.key, required this.transaction, this.controller});
+  const OrderDetailPrintView(
+      {super.key, required this.transaction, this.controller});
 
   @override
   State<OrderDetailPrintView> createState() => _OrderDetailPrintViewState();
@@ -37,9 +38,9 @@ class OrderDetailPrintView extends StatefulWidget {
 }
 
 class _OrderDetailPrintViewState extends State<OrderDetailPrintView> {
-   ReceiptController? controller;
-   bool isPrinting = false;
-    double? progress;
+  ReceiptController? controller;
+  bool isPrinting = false;
+  double? progress;
   @override
   void initState() {
     super.initState();
@@ -75,7 +76,7 @@ class _OrderDetailPrintViewState extends State<OrderDetailPrintView> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-       title: Row(
+      title: Row(
         children: [
           Text('Cetak Detail Pesanan',
               style: GoogleFonts.inter(fontWeight: FontWeight.w600)),
@@ -99,7 +100,7 @@ class _OrderDetailPrintViewState extends State<OrderDetailPrintView> {
         ],
       ),
       content: SizedBox(
-        width: 400,
+        width: 600,
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           mainAxisSize: MainAxisSize.min,
@@ -154,13 +155,13 @@ class _OrderDetailPrintViewState extends State<OrderDetailPrintView> {
                               dense: true,
                               contentPadding: EdgeInsets.zero,
                               leading: Text(
-                                  '${index + 1}.',
-                                  style: GoogleFonts.robotoMono(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w600,
-                                    color: Colors.black,
-                                  ),
+                                '${index + 1}.',
+                                style: GoogleFonts.robotoMono(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.black,
                                 ),
+                              ),
                               title: Text(
                                 cart.name,
                                 style: GoogleFonts.robotoMono(

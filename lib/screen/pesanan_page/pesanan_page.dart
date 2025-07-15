@@ -21,10 +21,17 @@ class PesananPage extends StatefulWidget {
 }
 
 class _PesananPageState extends State<PesananPage> {
+  final TextEditingController voucherController = TextEditingController();
   @override
   void initState() {
     super.initState();
     _fetchMenu();
+    _setVoucherText();
+  }
+
+  Future<void> _setVoucherText() async {
+    voucherController.text =
+        Provider.of<CartProvider>(context, listen: false).voucher ?? '';
   }
 
   Future<void> _fetchMenu() async {
@@ -148,7 +155,8 @@ class _PesananPageState extends State<PesananPage> {
                                         const Spacer(),
                                         Center(
                                           child: Padding(
-                                            padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                                            padding: const EdgeInsets.symmetric(
+                                                horizontal: 4.0),
                                             child: Text(
                                               textAlign: TextAlign.center,
                                               overflow: TextOverflow.ellipsis,
@@ -301,7 +309,8 @@ class _PesananPageState extends State<PesananPage> {
                                                     'Qty: ${item.qty}',
                                                     textAlign: TextAlign.center,
                                                     maxLines: 1,
-                                                    overflow: TextOverflow.ellipsis,
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
                                                     style: GoogleFonts.inter(
                                                       fontSize: 12.0,
                                                       fontWeight:
@@ -317,10 +326,12 @@ class _PesananPageState extends State<PesananPage> {
                                                   Helper.rupiahFormatter(
                                                       item.subTotal),
                                                   maxLines: 1,
-                                                  overflow: TextOverflow.ellipsis,
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
                                                   style: GoogleFonts.inter(
                                                       fontSize: 12.0,
-                                                      fontWeight: FontWeight.w600,
+                                                      fontWeight:
+                                                          FontWeight.w600,
                                                       color: Colors.white),
                                                 ),
                                               ),
@@ -539,6 +550,8 @@ class _PesananPageState extends State<PesananPage> {
                                         builder: (context) {
                                           return PaymentDialogBottomSheet(
                                             transaction: transaction,
+                                            voucherController:
+                                                voucherController,
                                           );
                                         });
                                     // showDialog(

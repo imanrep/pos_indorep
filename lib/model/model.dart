@@ -348,6 +348,7 @@ class TransactionModel {
 
 class QrisOrderResponse {
   final String message;
+  final int off;
   final int orderID;
   final String qris;
   final bool success;
@@ -356,6 +357,7 @@ class QrisOrderResponse {
 
   QrisOrderResponse({
     required this.message,
+    required this.off,
     required this.orderID,
     required this.qris,
     required this.success,
@@ -366,6 +368,7 @@ class QrisOrderResponse {
   factory QrisOrderResponse.fromJson(Map<String, dynamic> json) {
     return QrisOrderResponse(
       message: json['message'],
+      off: json['off'] ?? 0,
       orderID: json['orderID'],
       qris: json['qris'],
       success: json['success'],
@@ -377,6 +380,7 @@ class QrisOrderResponse {
   Map<String, dynamic> toJson() {
     return {
       'message': message,
+      'off': off,
       'orderID': orderID,
       'qris': qris,
       'success': success,
@@ -447,11 +451,13 @@ class QrisOrderRequest {
   final List<OrderItem> orders;
   final String payment;
   final String source;
+  String? voucher;
 
   QrisOrderRequest({
     required this.orders,
     required this.payment,
     required this.source,
+    this.voucher,
   });
 
   factory QrisOrderRequest.fromJson(Map<String, dynamic> json) {
@@ -461,6 +467,7 @@ class QrisOrderRequest {
           .toList(),
       payment: json['payment'],
       source: json['source'],
+      voucher: json['voucher'],
     );
   }
 
@@ -469,6 +476,52 @@ class QrisOrderRequest {
       'orders': orders.map((order) => order.toJson()).toList(),
       'payment': payment,
       'source': source,
+      'voucher': voucher,
+    };
+  }
+}
+
+class GetVoucherDetailsRequest {
+  final String voucher;
+
+  GetVoucherDetailsRequest({required this.voucher});
+
+  factory GetVoucherDetailsRequest.fromJson(Map<String, dynamic> json) {
+    return GetVoucherDetailsRequest(
+      voucher: json['voucher'],
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'voucher': voucher,
+    };
+  }
+}
+
+class GetVoucherDetailsResponse {
+  final String message;
+  final int off;
+  final bool success;
+
+  GetVoucherDetailsResponse({
+    required this.message,
+    required this.off,
+    required this.success,
+  });
+
+  factory GetVoucherDetailsResponse.fromJson(Map<String, dynamic> json) {
+    return GetVoucherDetailsResponse(
+      message: json['message'],
+      off: json['off'],
+      success: json['success'],
+    );
+  }
+  Map<String, dynamic> toJson() {
+    return {
+      'message': message,
+      'off': off,
+      'success': success,
     };
   }
 }

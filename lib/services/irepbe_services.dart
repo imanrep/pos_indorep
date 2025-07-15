@@ -82,6 +82,7 @@ class IrepBE {
     // Return a default response instead of null
     return QrisOrderResponse(
       message: "Failed",
+      off: 0,
       orderID: 0,
       qris: "",
       success: false,
@@ -443,6 +444,34 @@ class IrepBE {
         totalItems: 0,
         totalOrders: 0,
       ),
+    );
+  }
+
+  Future<GetVoucherDetailsResponse> getVoucherDetails(
+      String voucherCode) async {
+    String baseUrl = await getBaseUrl();
+    final url = Uri.parse('${baseUrl}/getVoucher');
+
+    try {
+      final response = await http.post(
+        url,
+        headers: {'Content-Type': 'application/json'}, // Add this
+        body: jsonEncode({'voucher': voucherCode}), // Use jsonEncode
+      );
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> data = jsonDecode(response.body);
+        print(data);
+        return GetVoucherDetailsResponse.fromJson(data);
+      } else {
+        print('Failed to load voucher details: ${response.body}');
+      }
+    } catch (e) {
+      print('Error loading voucher details: $e');
+    }
+    return GetVoucherDetailsResponse(
+      message: "Failed",
+      success: false,
+      off: 0,
     );
   }
 }

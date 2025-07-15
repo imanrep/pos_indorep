@@ -14,10 +14,12 @@ import 'package:provider/provider.dart';
 
 class PaymentDialogBottomSheet extends StatefulWidget {
   final TransactionModel transaction;
+  final TextEditingController voucherController;
 
   const PaymentDialogBottomSheet({
     super.key,
     required this.transaction,
+    required this.voucherController,
   });
 
   @override
@@ -172,6 +174,19 @@ class _PaymentDialogBottomSheetState extends State<PaymentDialogBottomSheet> {
 
   @override
   Widget build(BuildContext context) {
+    var cartProvider = Provider.of<CartProvider>(context, listen: false);
+
+    String getTotalWithVoucher() {
+      final int total = widget.transaction.total.toInt();
+      final int? off = cartProvider.off;
+      if (off != null && off > 0) {
+        final double discount = total * (off / 100);
+        final int discountedTotal = total - discount.round();
+        return Helper.rupiahFormatter(discountedTotal.toDouble());
+      }
+      return Helper.rupiahFormatter(total.toDouble());
+    }
+
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -180,6 +195,7 @@ class _PaymentDialogBottomSheetState extends State<PaymentDialogBottomSheet> {
         ),
         centerTitle: true,
       ),
+      resizeToAvoidBottomInset: true,
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
@@ -187,6 +203,93 @@ class _PaymentDialogBottomSheetState extends State<PaymentDialogBottomSheet> {
             mainAxisSize: MainAxisSize.min,
             children: [
               CurrentOrder(transaction: widget.transaction),
+              Row(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text(
+                      'Voucher:',
+                      style: GoogleFonts.inter(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                    child: TextField(
+                      controller: widget.voucherController,
+                      onChanged: (value) {
+                        cartProvider.setVoucher(value.toUpperCase());
+
+                        if (value != value.toUpperCase()) {
+                          widget.voucherController.value =
+                              widget.voucherController.value.copyWith(
+                            text: value.toUpperCase(),
+                            selection:
+                                TextSelection.collapsed(offset: value.length),
+                          );
+                        }
+                      },
+                      textCapitalization: TextCapitalization.characters,
+                      inputFormatters: [
+                        FilteringTextInputFormatter.allow(RegExp(r'[A-Z0-9]')),
+                      ],
+                      decoration: InputDecoration(
+                        contentPadding: const EdgeInsets.symmetric(
+                            vertical: 12, horizontal: 16),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(24),
+                          borderSide: BorderSide(
+                            color: IndorepColor.text,
+                          ),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(24),
+                          borderSide: BorderSide(
+                            color: IndorepColor.text,
+                          ),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(24),
+                          borderSide: BorderSide(
+                            color: IndorepColor.primary,
+                            width: 2,
+                          ),
+                        ),
+                        hintText: 'Kode Voucher',
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Consumer<CartProvider>(
+                    builder: (context, cartProvider, child) {
+                      final isVoucherEmpty = cartProvider.voucher == null ||
+                          cartProvider.voucher!.isEmpty;
+                      return CircleAvatar(
+                        radius: 22,
+                        backgroundColor:
+                            isVoucherEmpty ? Colors.grey : IndorepColor.primary,
+                        child: IconButton(
+                          icon: const Icon(Icons.check, color: Colors.white),
+                          onPressed: isVoucherEmpty
+                              ? null
+                              : () async {
+                                  // Call provider to check voucher
+                                  await cartProvider.getVoucherDetails();
+                                  if (cartProvider.off != null &&
+                                      cartProvider.off! > 0) {
+                                    print(
+                                        'Voucher applied: ${cartProvider.off}');
+                                  } else {
+                                    print('Voucher not applied or invalid');
+                                  }
+                                },
+                        ),
+                      );
+                    },
+                  ),
+                ],
+              ),
               const SizedBox(height: 32),
             ],
           ),
@@ -232,56 +335,76 @@ class _PaymentDialogBottomSheetState extends State<PaymentDialogBottomSheet> {
             ),
             Padding(
               padding: const EdgeInsets.all(8.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  Text(
-                    'Total : ${Helper.rupiahFormatter(widget.transaction.total.toDouble())}',
-                    style: GoogleFonts.inter(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  ElevatedButton.icon(
-                    style: ElevatedButton.styleFrom(
-                      minimumSize: const Size(150, 50),
-                      padding: const EdgeInsets.symmetric(horizontal: 24),
-                      backgroundColor: IndorepColor.primary,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                    ),
-                    onPressed: _selectedPaymentMethod == null
-                        ? null
-                        : () {
-                            CartProvider cartProvider =
-                                Provider.of<CartProvider>(context,
-                                    listen: false);
-                            var request = QrisOrderRequest(
-                                orders: cartProvider.currentOrder,
-                                payment: _selectedPaymentMethod!.type,
-                                source: 'cafe');
-                            _handlePayment(request, widget.transaction.cart);
-                          },
-                    icon: Icon(
-                      Icons.arrow_forward_rounded,
-                      color:
-                          isValidPaymentMethod() ? Colors.white : Colors.grey,
-                    ),
-                    label: Text(
-                      'Bayar',
+              child: Consumer<CartProvider>(
+                  builder: (context, cartProvider, child) {
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    cartProvider.off != null && cartProvider.off != 0
+                        ? Text(
+                            'Voucher: ${cartProvider.voucher} diterapkan, diskon ${cartProvider.off}%',
+                            style: GoogleFonts.inter(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w400,
+                            ),
+                          )
+                        : const SizedBox.shrink(),
+                    const SizedBox(height: 8),
+                    Text(
+                      'Total : ${getTotalWithVoucher()}',
                       style: GoogleFonts.inter(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
+                        color: cartProvider.off != null && cartProvider.off != 0
+                            ? Colors.green
+                            : Colors.white,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    ElevatedButton.icon(
+                      style: ElevatedButton.styleFrom(
+                        minimumSize: const Size(150, 50),
+                        padding: const EdgeInsets.symmetric(horizontal: 24),
+                        backgroundColor: IndorepColor.primary,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                      onPressed: _selectedPaymentMethod == null
+                          ? null
+                          : () {
+                              var request = QrisOrderRequest(
+                                orders: cartProvider.currentOrder,
+                                payment: _selectedPaymentMethod!.type,
+                                source: 'cafe',
+                                voucher: (cartProvider.off != null &&
+                                        cartProvider.voucher != null &&
+                                        cartProvider.voucher!.isNotEmpty)
+                                    ? cartProvider.voucher
+                                    : null,
+                              );
+                              _handlePayment(request, widget.transaction.cart);
+                            },
+                      icon: Icon(
+                        Icons.arrow_forward_rounded,
                         color:
                             isValidPaymentMethod() ? Colors.white : Colors.grey,
                       ),
+                      label: Text(
+                        'Bayar',
+                        style: GoogleFonts.inter(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: isValidPaymentMethod()
+                              ? Colors.white
+                              : Colors.grey,
+                        ),
+                      ),
                     ),
-                  ),
-                ],
-              ),
+                  ],
+                );
+              }),
             ),
           ],
         ),
