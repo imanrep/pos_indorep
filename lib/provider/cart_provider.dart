@@ -27,6 +27,8 @@ class CartProvider with ChangeNotifier {
     _currentCart.clear();
     _currentOrder.clear();
     _totalCurrentCart = 0;
+    _voucher = null;
+    _off = 0;
     notifyListeners();
   }
 
