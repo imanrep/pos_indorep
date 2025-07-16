@@ -26,12 +26,6 @@ class _PesananPageState extends State<PesananPage> {
   void initState() {
     super.initState();
     _fetchMenu();
-    _setVoucherText();
-  }
-
-  Future<void> _setVoucherText() async {
-    voucherController.text =
-        Provider.of<CartProvider>(context, listen: false).voucher ?? '';
   }
 
   Future<void> _fetchMenu() async {
@@ -550,8 +544,6 @@ class _PesananPageState extends State<PesananPage> {
                                         builder: (context) {
                                           return PaymentDialogBottomSheet(
                                             transaction: transaction,
-                                            voucherController:
-                                                voucherController,
                                           );
                                         });
                                     // showDialog(

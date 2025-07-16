@@ -4,9 +4,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:pos_indorep/helper/helper.dart';
 import 'package:pos_indorep/model/model.dart';
-import 'package:pos_indorep/provider/cart_provider.dart';
 import 'package:pos_indorep/provider/main_provider.dart';
-import 'package:pos_indorep/provider/transaction_provider.dart';
 import 'package:pos_indorep/screen/pesanan_page/components/order_detail_print_view.dart';
 import 'package:pos_indorep/services/irepbe_services.dart';
 import 'package:provider/provider.dart';
@@ -58,8 +56,8 @@ class _QrisPrintViewState extends State<QrisPrintView> {
     return AlertDialog(
       title: Column(
         children: [
-           Text("Proses Pesanan",
-                  style: GoogleFonts.inter(fontWeight: FontWeight.w600)),
+          Text("Proses Pesanan",
+              style: GoogleFonts.inter(fontWeight: FontWeight.w600)),
           const SizedBox(height: 8),
           Row(
             children: List.generate(pages.length, (index) {
@@ -290,26 +288,25 @@ class _QrisPageTwoState extends State<QrisPageTwo> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 ElevatedButton.icon(
-          onPressed: !isPrinting && progress == null
-              ? null
-              : () {
-                  Navigator.of(context).pop();
-                  showDialog(
-          barrierDismissible: false,
-          context: context,
-          builder: (context) => PopScope(
-            canPop: false,
-            child: OrderDetailPrintView(
-              transaction: widget.transactionData,
-            ),
-          ),
-        );
-                },
-          label: Text(
-                  'Order Detail',
-              style: GoogleFonts.inter(fontWeight: FontWeight.w600)),
-          icon: Icon(Icons.receipt_long_rounded, size: 20),
-        ),
+                  onPressed: !isPrinting && progress == null
+                      ? null
+                      : () {
+                          Navigator.of(context).pop();
+                          showDialog(
+                            barrierDismissible: false,
+                            context: context,
+                            builder: (context) => PopScope(
+                              canPop: false,
+                              child: OrderDetailPrintView(
+                                transaction: widget.transactionData,
+                              ),
+                            ),
+                          );
+                        },
+                  label: Text('Order Detail',
+                      style: GoogleFonts.inter(fontWeight: FontWeight.w600)),
+                  icon: Icon(Icons.receipt_long_rounded, size: 20),
+                ),
                 ElevatedButton.icon(
                   onPressed: () async {
                     if (controller == null) {
@@ -507,16 +504,14 @@ class _QrisPageTwoState extends State<QrisPageTwo> {
                             ),
                             const SizedBox(height: 12),
                             Text(
-                              "username : ${transactionData.wifiUsername}" ??
-                                  '-',
+                              "username : ${transactionData.wifiUsername}",
                               style: GoogleFonts.robotoMono(
                                 fontSize: 18,
                                 fontWeight: FontWeight.w400,
                               ),
                             ),
                             Text(
-                              "password : ${transactionData.wifiPassword}" ??
-                                  '-',
+                              "password : ${transactionData.wifiPassword}",
                               style: GoogleFonts.robotoMono(
                                 fontSize: 18,
                                 fontStyle: FontStyle.italic,

@@ -68,47 +68,45 @@ class _HomeScreenState extends State<HomeScreen> {
         elevation: 1,
         title: Row(
           children: [
-            Icon(Icons.facebook_rounded, color: IndorepColor.primary, size: 38),
+            Image.asset('assets/images/app_icon.png', width: 48, height: 48),
             const SizedBox(width: 8),
             Text('INDOREP CAFE',
                 style: GoogleFonts.inter(
-                  fontWeight: FontWeight.w600,
-                )),
+                    fontWeight: FontWeight.w800, fontStyle: FontStyle.italic)),
             const Spacer(),
             ClockWidget()
           ],
         ),
       ),
-     body: Row(
-  children: <Widget>[
-    SingleChildScrollView(
-      physics: NeverScrollableScrollPhysics(),
-      child: ConstrainedBox(
-        constraints: BoxConstraints(
-          minHeight: MediaQuery.of(context).size.height,
-        ),
-        child: IntrinsicHeight(
-          child: NavigationRail(
-            minWidth: 100,
-            selectedIndex: _selectedIndex,
-            onDestinationSelected: (int index) {
-              setState(() {
-                _selectedIndex = index;
-              });
-            },
-            labelType: labelType,
-            destinations: _destinations,
+      body: Row(
+        children: <Widget>[
+          SingleChildScrollView(
+            physics: NeverScrollableScrollPhysics(),
+            child: ConstrainedBox(
+              constraints: BoxConstraints(
+                minHeight: MediaQuery.of(context).size.height,
+              ),
+              child: IntrinsicHeight(
+                child: NavigationRail(
+                  minWidth: 100,
+                  selectedIndex: _selectedIndex,
+                  onDestinationSelected: (int index) {
+                    setState(() {
+                      _selectedIndex = index;
+                    });
+                  },
+                  labelType: labelType,
+                  destinations: _destinations,
+                ),
+              ),
+            ),
           ),
-        ),
+          const VerticalDivider(thickness: 1, width: 1),
+          Expanded(
+            child: _pages[_selectedIndex],
+          ),
+        ],
       ),
-    ),
-    const VerticalDivider(thickness: 1, width: 1),
-    Expanded(
-      child: _pages[_selectedIndex],
-    ),
-  ],
-),
-
     );
   }
 }

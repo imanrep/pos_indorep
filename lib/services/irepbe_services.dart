@@ -450,28 +450,33 @@ class IrepBE {
   Future<GetVoucherDetailsResponse> getVoucherDetails(
       String voucherCode) async {
     String baseUrl = await getBaseUrl();
-    final url = Uri.parse('${baseUrl}/getVoucher');
+    final url = Uri.parse('$baseUrl/getVoucher');
 
     try {
       final response = await http.post(
         url,
-        headers: {'Content-Type': 'application/json'}, // Add this
-        body: jsonEncode({'voucher': voucherCode}), // Use jsonEncode
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({'voucher': voucherCode}),
       );
+
+      final Map<String, dynamic> data = jsonDecode(response.body);
+
       if (response.statusCode == 200) {
-        final Map<String, dynamic> data = jsonDecode(response.body);
-        print(data);
         return GetVoucherDetailsResponse.fromJson(data);
       } else {
-        print('Failed to load voucher details: ${response.body}');
+        // 400, 404, etc
+        return GetVoucherDetailsResponse(
+          message: data['message'] ?? 'Unknown error',
+          success: false,
+          off: 0,
+        );
       }
     } catch (e) {
-      print('Error loading voucher details: $e');
+      return GetVoucherDetailsResponse(
+        message: 'Connection error. Please try again.',
+        success: false,
+        off: 0,
+      );
     }
-    return GetVoucherDetailsResponse(
-      message: "Failed",
-      success: false,
-      off: 0,
-    );
   }
 }

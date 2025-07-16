@@ -1,12 +1,12 @@
-import 'dart:typed_data';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bluetooth_printer/flutter_bluetooth_printer.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:pos_indorep/helper/helper.dart';
-import 'package:pos_indorep/helper/printing_progress_dialog.dart';
 import 'package:pos_indorep/model/model.dart';
+import 'package:pos_indorep/provider/main_provider.dart';
+import 'package:provider/provider.dart';
 import 'package:qr_flutter/qr_flutter.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 class TransactionDetailView extends StatefulWidget {
   final TransactionData transaction;
@@ -18,7 +18,35 @@ class TransactionDetailView extends StatefulWidget {
 
 class _TransactionDetailViewState extends State<TransactionDetailView> {
   ReceiptController? controller;
-  String printerAddress = "66:32:3D:2C:E0:EC";
+  double? progress;
+  bool isPrinting = false;
+
+  Future<void> _startPrint() async {
+    final provider = Provider.of<MainProvider>(context, listen: false);
+    final address = provider.printerAddress;
+
+    if (address.isEmpty) {
+      Fluttertoast.showToast(
+        msg: 'Tidak ada printer yang terhubung',
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+      );
+      return;
+    }
+
+    controller!.print(
+      address: address,
+      addFeeds: 5,
+      keepConnected: true,
+      onProgress: (total, sent) {
+        if (mounted) {
+          setState(() {
+            progress = sent / total;
+          });
+        }
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -200,25 +228,29 @@ class _TransactionDetailViewState extends State<TransactionDetailView> {
               onInitialized: (ctrl) => setState(() => controller = ctrl),
             ),
           ),
-          ElevatedButton(
-              onPressed: () async {
-                PrintingProgressDialog.print(
-                  context,
-                  device: printerAddress,
-                  controller: controller!,
+          ElevatedButton.icon(
+            onPressed: () async {
+              if (controller == null) {
+                Fluttertoast.showToast(
+                  msg: 'Printer belum siap!',
+                  toastLength: Toast.LENGTH_SHORT,
+                  gravity: ToastGravity.BOTTOM,
                 );
-              },
-              child: Text('Print')),
-          ElevatedButton(
-              onPressed: () async {
-                Uint8List openDrawerCommand =
-                    Uint8List.fromList([27, 112, 0, 100, 250]);
-                FlutterBluetoothPrinter.printBytes(
-                    address: printerAddress,
-                    keepConnected: false,
-                    data: openDrawerCommand);
-              },
-              child: Text('Open Drawer')),
+                return;
+              }
+              setState(() {
+                isPrinting = true;
+              });
+              await _startPrint();
+            },
+            label: Text(
+                !isPrinting
+                    ? 'Cetak Struk'
+                    : 'Mencetak Struk ${((progress ?? 0) * 100).round()}%',
+                style: GoogleFonts.inter(fontWeight: FontWeight.w600)),
+            icon: Icon(Icons.print_rounded, size: 20),
+          ),
+          const SizedBox(height: 16),
         ],
       ),
     );

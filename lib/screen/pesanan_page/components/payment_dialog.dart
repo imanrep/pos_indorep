@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bluetooth_printer/flutter_bluetooth_printer.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:loader_overlay/loader_overlay.dart';
 import 'package:pos_indorep/helper/helper.dart';
@@ -14,12 +15,10 @@ import 'package:provider/provider.dart';
 
 class PaymentDialogBottomSheet extends StatefulWidget {
   final TransactionModel transaction;
-  final TextEditingController voucherController;
 
   const PaymentDialogBottomSheet({
     super.key,
     required this.transaction,
-    required this.voucherController,
   });
 
   @override
@@ -28,6 +27,10 @@ class PaymentDialogBottomSheet extends StatefulWidget {
 }
 
 class _PaymentDialogBottomSheetState extends State<PaymentDialogBottomSheet> {
+  GetVoucherDetailsResponse? voucherDetails;
+  late String appliedVoucherCode;
+  late TextEditingController voucherController;
+
   final List<PaymentButton> _paymentMethods = [
     PaymentButton(
       name: 'Cash',
@@ -157,28 +160,25 @@ class _PaymentDialogBottomSheetState extends State<PaymentDialogBottomSheet> {
         );
       }
     }
-    //   if (response.success) {
+  }
 
-    //     Navigator.pop(context);
-    //   } else {
-    //     // Handle failed payment
-    //     // Implement your failure logic here
-    //     ScaffoldMessenger.of(context).showSnackBar(
-    //       SnackBar(
-    //         content: Text('Payment failed: ${response.message}'),
-    //       ),
-    //     );
-    // }
-    // }
+  @override
+  void initState() {
+    super.initState();
+    voucherController = TextEditingController();
+  }
+
+  @override
+  void dispose() {
+    voucherController.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    var cartProvider = Provider.of<CartProvider>(context, listen: false);
-
     String getTotalWithVoucher() {
       final int total = widget.transaction.total.toInt();
-      final int? off = cartProvider.off;
+      final int off = voucherDetails?.off ?? 0;
       if (off != null && off > 0) {
         final double discount = total * (off / 100);
         final int discountedTotal = total - discount.round();
@@ -217,18 +217,18 @@ class _PaymentDialogBottomSheetState extends State<PaymentDialogBottomSheet> {
                   ),
                   Expanded(
                     child: TextField(
-                      controller: widget.voucherController,
+                      controller: voucherController,
                       onChanged: (value) {
-                        cartProvider.setVoucher(value.toUpperCase());
-
                         if (value != value.toUpperCase()) {
-                          widget.voucherController.value =
-                              widget.voucherController.value.copyWith(
+                          voucherController.value =
+                              voucherController.value.copyWith(
                             text: value.toUpperCase(),
                             selection:
                                 TextSelection.collapsed(offset: value.length),
                           );
                         }
+                        setState(
+                            () {}); // Trigger rebuild to update button state
                       },
                       textCapitalization: TextCapitalization.characters,
                       inputFormatters: [
@@ -261,32 +261,47 @@ class _PaymentDialogBottomSheetState extends State<PaymentDialogBottomSheet> {
                     ),
                   ),
                   const SizedBox(width: 8),
-                  Consumer<CartProvider>(
-                    builder: (context, cartProvider, child) {
-                      final isVoucherEmpty = cartProvider.voucher == null ||
-                          cartProvider.voucher!.isEmpty;
-                      return CircleAvatar(
-                        radius: 22,
-                        backgroundColor:
-                            isVoucherEmpty ? Colors.grey : IndorepColor.primary,
-                        child: IconButton(
-                          icon: const Icon(Icons.check, color: Colors.white),
-                          onPressed: isVoucherEmpty
-                              ? null
-                              : () async {
-                                  // Call provider to check voucher
-                                  await cartProvider.getVoucherDetails();
-                                  if (cartProvider.off != null &&
-                                      cartProvider.off! > 0) {
-                                    print(
-                                        'Voucher applied: ${cartProvider.off}');
-                                  } else {
-                                    print('Voucher not applied or invalid');
-                                  }
-                                },
-                        ),
-                      );
-                    },
+                  CircleAvatar(
+                    radius: 22,
+                    backgroundColor: voucherController.text.isEmpty
+                        ? Colors.grey
+                        : IndorepColor.primary,
+                    child: IconButton(
+                      icon: const Icon(Icons.check, color: Colors.white),
+                      onPressed: voucherController.text.isEmpty
+                          ? null
+                          : () async {
+                              var irepBE = IrepBE();
+                              var result = await irepBE
+                                  .getVoucherDetails(voucherController.text);
+                              if (result.success) {
+                                Fluttertoast.showToast(
+                                  msg:
+                                      'Voucher diterapkan, diskon ${result.off}%',
+                                  toastLength: Toast.LENGTH_SHORT,
+                                  gravity: ToastGravity.BOTTOM,
+                                  timeInSecForIosWeb: 1,
+                                  fontSize: 16.0,
+                                );
+                                setState(() {
+                                  voucherDetails = result;
+                                  appliedVoucherCode =
+                                      voucherController.text.toUpperCase();
+                                });
+                              } else {
+                                Fluttertoast.showToast(
+                                  msg: result.message.isNotEmpty
+                                      ? result.message[0].toUpperCase() +
+                                          result.message.substring(1)
+                                      : result.message,
+                                  toastLength: Toast.LENGTH_SHORT,
+                                  gravity: ToastGravity.BOTTOM,
+                                  timeInSecForIosWeb: 1,
+                                  fontSize: 16.0,
+                                );
+                              }
+                            },
+                    ),
                   ),
                 ],
               ),
@@ -341,9 +356,9 @@ class _PaymentDialogBottomSheetState extends State<PaymentDialogBottomSheet> {
                   crossAxisAlignment: CrossAxisAlignment.end,
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
-                    cartProvider.off != null && cartProvider.off != 0
+                    voucherDetails != null
                         ? Text(
-                            'Voucher: ${cartProvider.voucher} diterapkan, diskon ${cartProvider.off}%',
+                            'Voucher "$appliedVoucherCode" diterapkan, diskon ${voucherDetails!.off}%',
                             style: GoogleFonts.inter(
                               fontSize: 12,
                               fontWeight: FontWeight.w400,
@@ -356,7 +371,7 @@ class _PaymentDialogBottomSheetState extends State<PaymentDialogBottomSheet> {
                       style: GoogleFonts.inter(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
-                        color: cartProvider.off != null && cartProvider.off != 0
+                        color: voucherDetails != null
                             ? Colors.green
                             : Colors.white,
                       ),
@@ -378,10 +393,8 @@ class _PaymentDialogBottomSheetState extends State<PaymentDialogBottomSheet> {
                                 orders: cartProvider.currentOrder,
                                 payment: _selectedPaymentMethod!.type,
                                 source: 'cafe',
-                                voucher: (cartProvider.off != null &&
-                                        cartProvider.voucher != null &&
-                                        cartProvider.voucher!.isNotEmpty)
-                                    ? cartProvider.voucher
+                                voucher: voucherDetails != null
+                                    ? voucherController.text
                                     : null,
                               );
                               _handlePayment(request, widget.transaction.cart);

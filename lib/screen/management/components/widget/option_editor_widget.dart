@@ -42,11 +42,14 @@ class _OptionEditorWidgetState extends State<OptionEditorWidget> {
         children: [
           Row(
             children: [
-              Text(
-                  '${widget.option.optionName} - ${optionTypeString()} (${widget.option.optionValue.length})',
-                  style: GoogleFonts.inter(
-                      fontSize: 16, fontWeight: FontWeight.w600)),
-              const Spacer(),
+              Expanded(
+                child: Text(
+                    '${widget.option.optionName} - ${optionTypeString()} (${widget.option.optionValue.length})',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: GoogleFonts.inter(
+                        fontSize: 16, fontWeight: FontWeight.w600)),
+              ),
               IconButton(
                 icon: Icon(Icons.edit),
                 onPressed: () {

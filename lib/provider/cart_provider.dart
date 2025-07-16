@@ -1,19 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:pos_indorep/model/model.dart';
-import 'package:pos_indorep/services/irepbe_services.dart';
 
 class CartProvider with ChangeNotifier {
   List<CartItem> _currentCart = [];
   List<OrderItem> _currentOrder = [];
   double _totalCurrentCart = 0;
-  String? _voucher;
-  int? _off = 0;
 
   List<CartItem> get currentCart => _currentCart;
   List<OrderItem> get currentOrder => _currentOrder;
   double get totalCurrentCart => _totalCurrentCart;
-  String? get voucher => _voucher;
-  int? get off => _off;
 
   void calculateTotalCart() {
     _totalCurrentCart = 0;
@@ -27,8 +22,6 @@ class CartProvider with ChangeNotifier {
     _currentCart.clear();
     _currentOrder.clear();
     _totalCurrentCart = 0;
-    _voucher = null;
-    _off = 0;
     notifyListeners();
   }
 
@@ -51,34 +44,6 @@ class CartProvider with ChangeNotifier {
     );
     calculateTotalCart();
     notifyListeners();
-  }
-
-  void setVoucher(String? voucher) {
-    _voucher = voucher;
-    notifyListeners();
-  }
-
-  void setOff(int? off) {
-    _off = off;
-    notifyListeners();
-  }
-
-  Future<void> getVoucherDetails() async {
-    var irepBE = IrepBE();
-    try {
-      final value = await irepBE.getVoucherDetails(_voucher ?? '');
-      if (value.success && value.off != 0) {
-        _off = value.off;
-      } else {
-        _off = 0;
-      }
-      notifyListeners();
-    } catch (error) {
-      debugPrint('Error fetching voucher details: $error');
-      _off = 0;
-      _voucher = null;
-      notifyListeners();
-    }
   }
 
   void updateQty(String cartId, int qty) {
