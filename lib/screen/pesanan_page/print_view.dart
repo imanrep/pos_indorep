@@ -5,17 +5,20 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:pos_indorep/helper/helper.dart';
 import 'package:pos_indorep/helper/printing_progress_dialog.dart';
 import 'package:pos_indorep/model/model.dart';
-import 'package:pos_indorep/provider/cart_provider.dart';
 import 'package:pos_indorep/provider/main_provider.dart';
-import 'package:pos_indorep/provider/transaction_provider.dart';
 import 'package:pos_indorep/screen/pesanan_page/components/order_detail_print_view.dart';
 import 'package:provider/provider.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
 class PrintView extends StatefulWidget {
   final TransactionData transaction;
+  final int cashGiven;
   final ReceiptController? controller;
-  const PrintView({super.key, required this.transaction, this.controller});
+  const PrintView(
+      {super.key,
+      required this.transaction,
+      required this.cashGiven,
+      this.controller});
 
   @override
   State<PrintView> createState() => _PrintViewState();
@@ -42,6 +45,7 @@ class _PrintViewState extends State<PrintView> {
   bool isPrinting = false;
   ReceiptController? controller;
   double? progress;
+
   @override
   void initState() {
     super.initState();
@@ -89,7 +93,7 @@ class _PrintViewState extends State<PrintView> {
 
     return AlertDialog(
       title: Text('Transaksi Berhasil',
-              style: GoogleFonts.inter(fontWeight: FontWeight.w600)),
+          style: GoogleFonts.inter(fontWeight: FontWeight.w600)),
       content: SizedBox(
         width: 400,
         child: Row(
@@ -220,6 +224,28 @@ class _PrintViewState extends State<PrintView> {
                           ),
                         ),
                       ),
+                      const SizedBox(height: 4),
+                      Align(
+                        alignment: Alignment.centerRight,
+                        child: Text(
+                          'Bayar: ${Helper.rupiahFormatter(widget.cashGiven.toDouble())}',
+                          style: GoogleFonts.robotoMono(
+                            fontSize: 20,
+                            fontWeight: FontWeight.w400,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Align(
+                        alignment: Alignment.centerRight,
+                        child: Text(
+                          'Kembali: ${Helper.rupiahFormatter((widget.cashGiven - widget.transaction.total).toDouble())}',
+                          style: GoogleFonts.robotoMono(
+                            fontSize: 20,
+                            fontWeight: FontWeight.w400,
+                          ),
+                        ),
+                      ),
                       const SizedBox(height: 32),
                       Text(
                         'Info, saran, dan masukan',
@@ -298,18 +324,17 @@ class _PrintViewState extends State<PrintView> {
               : () {
                   Navigator.of(context).pop();
                   showDialog(
-          barrierDismissible: false,
-          context: context,
-          builder: (context) => PopScope(
-            canPop: false,
-            child: OrderDetailPrintView(
-              transaction: widget.transaction,
-            ),
-          ),
-        );
+                    barrierDismissible: false,
+                    context: context,
+                    builder: (context) => PopScope(
+                      canPop: false,
+                      child: OrderDetailPrintView(
+                        transaction: widget.transaction,
+                      ),
+                    ),
+                  );
                 },
-          label: Text(
-                  'Order Detail',
+          label: Text('Order Detail',
               style: GoogleFonts.inter(fontWeight: FontWeight.w600)),
           icon: Icon(Icons.receipt_long_rounded, size: 20),
         ),

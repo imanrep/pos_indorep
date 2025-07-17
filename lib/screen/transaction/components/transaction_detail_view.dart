@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:pos_indorep/helper/helper.dart';
 import 'package:pos_indorep/model/model.dart';
 import 'package:pos_indorep/provider/main_provider.dart';
+import 'package:pos_indorep/screen/transaction/components/order_detail_print_view_dua.dart';
 import 'package:provider/provider.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -249,6 +250,24 @@ class _TransactionDetailViewState extends State<TransactionDetailView> {
                     : 'Mencetak Struk ${((progress ?? 0) * 100).round()}%',
                 style: GoogleFonts.inter(fontWeight: FontWeight.w600)),
             icon: Icon(Icons.print_rounded, size: 20),
+          ),
+          const SizedBox(height: 4),
+          ElevatedButton.icon(
+            onPressed: () {
+              showDialog(
+                barrierDismissible: false,
+                context: context,
+                builder: (context) => PopScope(
+                  canPop: false,
+                  child: OrderDetailPrintViewDua(
+                    transaction: widget.transaction,
+                  ),
+                ),
+              );
+            },
+            label: Text('Order Detail',
+                style: GoogleFonts.inter(fontWeight: FontWeight.w600)),
+            icon: Icon(Icons.receipt_long_rounded, size: 20),
           ),
           const SizedBox(height: 16),
         ],

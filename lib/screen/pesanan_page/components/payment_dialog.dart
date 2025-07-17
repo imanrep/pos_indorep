@@ -8,6 +8,7 @@ import 'package:pos_indorep/helper/helper.dart';
 import 'package:pos_indorep/model/model.dart';
 import 'package:pos_indorep/provider/cart_provider.dart';
 import 'package:pos_indorep/provider/main_provider.dart';
+import 'package:pos_indorep/screen/pesanan_page/components/widget/cash_payment_dialog.dart';
 import 'package:pos_indorep/screen/pesanan_page/print_view.dart';
 import 'package:pos_indorep/screen/pesanan_page/qris_print_view.dart';
 import 'package:pos_indorep/services/irepbe_services.dart';
@@ -50,8 +51,8 @@ class _PaymentDialogBottomSheetState extends State<PaymentDialogBottomSheet> {
     return _selectedPaymentMethod != null;
   }
 
-  Future<void> _handlePayment(
-      QrisOrderRequest request, List<CartItem> transaction) async {
+  Future<void> _handlePayment(QrisOrderRequest request,
+      List<CartItem> transaction, int grandTotal) async {
     IrepBE irepBE = IrepBE();
     // Handle QRIS payment
     if (request.payment == 'qris') {
@@ -101,63 +102,69 @@ class _PaymentDialogBottomSheetState extends State<PaymentDialogBottomSheet> {
 
       // Handle Cash payment
     } else if (request.payment == 'cash') {
-      // debugPrint(request.toJson().toString());
-      context.loaderOverlay.show();
-      QrisOrderResponse response = await irepBE.createOrder(request);
-      AddWifiResponse wifiResponse = await irepBE.addWifi();
-      if (response.success) {
-        var mainProvider = Provider.of<MainProvider>(context, listen: false);
-        Uint8List openDrawerCommand =
-            Uint8List.fromList([27, 112, 0, 100, 250]);
-        FlutterBluetoothPrinter.printBytes(
-            address: mainProvider.printerAddress,
-            keepConnected: false,
-            data: openDrawerCommand);
-        TransactionData transactionData = TransactionData(
-          orderId: 'IDRPS-${response.orderID}',
-          pc: "",
-          paymentMethod: request.payment,
-          wifiUsername: wifiResponse.wifiUsername,
-          wifiPassword: wifiResponse.wifiPassword,
-          total: response.total,
-          status: response.success ? 'paid' : 'pending',
-          time: response.time,
-          items: transaction.map((cart) {
-            return TransactionItem(
-                name: cart.menuName,
-                note: cart.notes,
-                option: [
-                  for (final option in cart.selectedOptions)
-                    for (final optVal
-                        in option.optionValue.where((v) => v.isSelected))
-                      TransactionMenuOption(
-                        option: option.optionName,
-                        value: optVal.optionValueName,
-                        price: optVal.optionValuePrice,
-                      ),
-                ],
-                qty: cart.qty,
-                subTotal: cart.menuPrice);
-          }).toList(),
-        );
-        context.loaderOverlay.hide();
-        showDialog(
-          barrierDismissible: false,
-          context: context,
-          builder: (context) => PopScope(
-            canPop: false,
-            child: PrintView(
-              transaction: transactionData,
+      final int? cashGiven = await showDialog<int>(
+        context: context,
+        builder: (context) => CashPaymentDialog(totalAmount: grandTotal),
+      );
+      if (cashGiven != null && cashGiven >= grandTotal) {
+        context.loaderOverlay.show();
+        QrisOrderResponse response = await irepBE.createOrder(request);
+        AddWifiResponse wifiResponse = await irepBE.addWifi();
+        if (response.success) {
+          var mainProvider = Provider.of<MainProvider>(context, listen: false);
+          Uint8List openDrawerCommand =
+              Uint8List.fromList([27, 112, 0, 100, 250]);
+          FlutterBluetoothPrinter.printBytes(
+              address: mainProvider.printerAddress,
+              keepConnected: false,
+              data: openDrawerCommand);
+          TransactionData transactionData = TransactionData(
+            orderId: 'IDRPS-${response.orderID}',
+            pc: "",
+            paymentMethod: request.payment,
+            wifiUsername: wifiResponse.wifiUsername,
+            wifiPassword: wifiResponse.wifiPassword,
+            total: response.total,
+            status: response.success ? 'paid' : 'pending',
+            time: response.time,
+            items: transaction.map((cart) {
+              return TransactionItem(
+                  name: cart.menuName,
+                  note: cart.notes,
+                  option: [
+                    for (final option in cart.selectedOptions)
+                      for (final optVal
+                          in option.optionValue.where((v) => v.isSelected))
+                        TransactionMenuOption(
+                          option: option.optionName,
+                          value: optVal.optionValueName,
+                          price: optVal.optionValuePrice,
+                        ),
+                  ],
+                  qty: cart.qty,
+                  subTotal: cart.menuPrice);
+            }).toList(),
+          );
+          context.loaderOverlay.hide();
+          showDialog(
+            barrierDismissible: false,
+            context: context,
+            builder: (context) => PopScope(
+              canPop: false,
+              child: PrintView(
+                transaction: transactionData,
+                cashGiven: cashGiven,
+              ),
             ),
-          ),
-        );
-      } else {
-        // Handle failed payment
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Payment failed: ${response.message}'),
-          ),
-        );
+          );
+        } else {
+          // Handle failed payment
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Payment failed: ${response.message}'),
+            ),
+          );
+        }
       }
     }
   }
@@ -179,7 +186,7 @@ class _PaymentDialogBottomSheetState extends State<PaymentDialogBottomSheet> {
     String getTotalWithVoucher() {
       final int total = widget.transaction.total.toInt();
       final int off = voucherDetails?.off ?? 0;
-      if (off != null && off > 0) {
+      if (off > 0) {
         final double discount = total * (off / 100);
         final int discountedTotal = total - discount.round();
         return Helper.rupiahFormatter(discountedTotal.toDouble());
@@ -388,7 +395,12 @@ class _PaymentDialogBottomSheetState extends State<PaymentDialogBottomSheet> {
                       ),
                       onPressed: _selectedPaymentMethod == null
                           ? null
-                          : () {
+                          : () async {
+                              var total = voucherDetails != null
+                                  ? cartProvider.totalCurrentCart -
+                                      (cartProvider.totalCurrentCart *
+                                          (voucherDetails!.off / 100))
+                                  : cartProvider.totalCurrentCart;
                               var request = QrisOrderRequest(
                                 orders: cartProvider.currentOrder,
                                 payment: _selectedPaymentMethod!.type,
@@ -397,7 +409,8 @@ class _PaymentDialogBottomSheetState extends State<PaymentDialogBottomSheet> {
                                     ? voucherController.text
                                     : null,
                               );
-                              _handlePayment(request, widget.transaction.cart);
+                              await _handlePayment(request,
+                                  widget.transaction.cart, total.toInt());
                             },
                       icon: Icon(
                         Icons.arrow_forward_rounded,

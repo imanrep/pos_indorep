@@ -50,7 +50,6 @@ class IrepBE {
       print('Error loading transactions: $e');
     }
 
-    // Return a default response instead of null
     return GetTransacationsResponse(
       data: [],
       totalPages: 0,
