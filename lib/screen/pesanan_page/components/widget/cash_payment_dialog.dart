@@ -32,41 +32,61 @@ class _CashPaymentDialogState extends State<CashPaymentDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final maxHeight =
+        MediaQuery.of(context).size.height * 0.85; // 85% of screen height
+
     return AlertDialog(
-      title: const Text('Pembayaran Tunai'),
-      content: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(Helper.rupiahFormatter(widget.totalAmount.toDouble()),
-              style:
-                  const TextStyle(fontSize: 18, fontWeight: FontWeight.w800)),
-          const SizedBox(height: 12),
-          Text('Uang Diberikan:',
-              style: const TextStyle(fontWeight: FontWeight.bold)),
-          const SizedBox(height: 8),
-          Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Text('${Helper.rupiahFormatter(_cashGiven.toDouble())}',
-                style: const TextStyle(fontSize: 24)),
-          ),
-          const SizedBox(height: 8),
-          Text('Kembalian:',
-              style: const TextStyle(
+      content: ConstrainedBox(
+        constraints: BoxConstraints(maxHeight: maxHeight),
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                'Total Pembayaran: ${Helper.rupiahFormatter(widget.totalAmount.toDouble())}',
+                style:
+                    const TextStyle(fontSize: 18, fontWeight: FontWeight.w800),
+              ),
+              const SizedBox(height: 12),
+              Text(
+                'Uang Diberikan:',
+                style: const TextStyle(fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 8),
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Text(
+                  Helper.rupiahFormatter(_cashGiven.toDouble()),
+                  style: const TextStyle(fontSize: 24),
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Kembalian:',
+                style: const TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.bold,
-                  color: Colors.green)),
-          Text(
-              '${_kembalian < 0 ? 0 : Helper.rupiahFormatter(_kembalian.toDouble())}',
-              style: const TextStyle(
+                  color: Colors.green,
+                ),
+              ),
+              Text(
+                _kembalian < 0
+                    ? 'Rp0'
+                    : Helper.rupiahFormatter(_kembalian.toDouble()),
+                style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
-                  color: Colors.green)),
-          const SizedBox(height: 12),
-          _buildNumberPad(),
-        ],
+                  color: Colors.green,
+                ),
+              ),
+              const SizedBox(height: 12),
+              _buildNumberPad(),
+            ],
+          ),
+        ),
       ),
       actions: [
         TextButton(
@@ -78,7 +98,7 @@ class _CashPaymentDialogState extends State<CashPaymentDialog> {
               ? () => Navigator.pop(context, _cashGiven)
               : null,
           child: const Text('Lanjutkan'),
-        )
+        ),
       ],
     );
   }
