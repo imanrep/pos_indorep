@@ -80,13 +80,15 @@ class OrderSummary {
   });
 
   factory OrderSummary.fromJson(Map<String, dynamic> json) {
-    var productList = json['products'] as List;
+    var productList = json['products'] as List?;
 
     return OrderSummary(
-      products: productList.map((item) => OrderProduct.fromJson(item)).toList(),
-      totalIncome: json['total_income'],
-      off: json['off'],
-      actualAmount: json['actual_amount'],
+      products: productList != null
+          ? productList.map((item) => OrderProduct.fromJson(item)).toList()
+          : [],
+      totalIncome: json['total_income'] ?? 0,
+      off: json['off'] ?? 0,
+      actualAmount: json['actual_amount'] ?? 0,
     );
   }
 

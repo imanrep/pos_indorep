@@ -45,9 +45,9 @@ class DateRangeBar extends StatelessWidget {
             child: Text(
               label,
               style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.w600,
-                    fontSize: 18,
-                  ),
+                  fontWeight: FontWeight.w600,
+                  fontSize: 18,
+                  color: Theme.of(context).colorScheme.primary),
             ),
           ),
         ],
