@@ -66,30 +66,95 @@ class Summary {
   }
 }
 
+class OrderSummary {
+  final List<OrderProduct> products;
+  final int totalIncome;
+  final int off;
+  final int actualAmount;
+
+  OrderSummary({
+    required this.products,
+    required this.totalIncome,
+    required this.off,
+    required this.actualAmount,
+  });
+
+  factory OrderSummary.fromJson(Map<String, dynamic> json) {
+    var productList = json['products'] as List;
+
+    return OrderSummary(
+      products: productList.map((item) => OrderProduct.fromJson(item)).toList(),
+      totalIncome: json['total_income'],
+      off: json['off'],
+      actualAmount: json['actual_amount'],
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'products': products.map((e) => e.toJson()).toList(),
+      'total_income': totalIncome,
+      'off': off,
+      'actual_amount': actualAmount,
+    };
+  }
+}
+
+class OrderProduct {
+  final String productName;
+  final int qtySold;
+  final int amount;
+
+  OrderProduct({
+    required this.productName,
+    required this.qtySold,
+    required this.amount,
+  });
+
+  factory OrderProduct.fromJson(Map<String, dynamic> json) {
+    return OrderProduct(
+      productName: json['product_name'],
+      qtySold: json['qty_sold'],
+      amount: json['amount'],
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'product_name': productName,
+      'qty_sold': qtySold,
+      'amount': amount,
+    };
+  }
+}
+
 class SummaryResponse {
   final List<ProductSummary>? products;
+  final List<OrderSummary>? orders;
   final Summary summary;
 
   SummaryResponse({
     this.products,
+    this.orders,
     required this.summary,
   });
 
   factory SummaryResponse.fromJson(Map<String, dynamic> json) {
     var productList = json['products'] as List?;
-    List<ProductSummary>? products = productList
-        ?.map((item) => ProductSummary.fromJson(item as Map<String, dynamic>))
-        .toList();
+    var orderList = json['orders'] as List?;
 
     return SummaryResponse(
-      products: products,
-      summary: Summary.fromJson(json['summary'] as Map<String, dynamic>),
+      products:
+          productList?.map((item) => ProductSummary.fromJson(item)).toList(),
+      orders: orderList?.map((item) => OrderSummary.fromJson(item)).toList(),
+      summary: Summary.fromJson(json['summary']),
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
       'products': products?.map((e) => e.toJson()).toList() ?? [],
+      'orders': orders?.map((e) => e.toJson()).toList() ?? [],
       'summary': summary.toJson(),
     };
   }
