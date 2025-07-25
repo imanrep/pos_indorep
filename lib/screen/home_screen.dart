@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bluetooth_printer/flutter_bluetooth_printer.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
-import 'package:pos_indorep/helper/helper.dart';
 import 'package:pos_indorep/screen/pesanan_page/pesanan_page.dart';
 import 'package:pos_indorep/screen/management/menu_management_page.dart';
 import 'package:pos_indorep/screen/settings/settings_page.dart';
@@ -45,11 +44,6 @@ class _HomeScreenState extends State<HomeScreen> {
       selectedIcon: Icon(Icons.settings_rounded),
       label: Text('Settings'),
     ),
-    // NavigationRailDestination(
-    //   icon: Icon(Icons.table_bar_outlined),
-    //   selectedIcon: Icon(Icons.table_bar_outlined),
-    //   label: Text('Meja'),
-    // ),
   ];
 
   final List<Widget> _pages = <Widget>[

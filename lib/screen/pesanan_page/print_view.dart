@@ -280,14 +280,14 @@ class _PrintViewState extends State<PrintView> {
                       ),
                       const SizedBox(height: 12),
                       Text(
-                        "username : ${widget.transaction.wifiUsername}" ?? '-',
+                        "username : ${widget.transaction.wifiUsername}",
                         style: GoogleFonts.robotoMono(
                           fontSize: 18,
                           fontWeight: FontWeight.w400,
                         ),
                       ),
                       Text(
-                        "password : ${widget.transaction.wifiPassword}" ?? '-',
+                        "password : ${widget.transaction.wifiPassword}",
                         style: GoogleFonts.robotoMono(
                           fontSize: 18,
                           fontStyle: FontStyle.italic,

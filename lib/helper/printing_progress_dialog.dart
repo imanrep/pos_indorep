@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bluetooth_printer/flutter_bluetooth_printer.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -38,19 +36,10 @@ class PrintingProgressDialog extends StatefulWidget {
 
 class _PrintingProgressDialogState extends State<PrintingProgressDialog> {
   double? progress;
-  Timer? _timeoutTimer;
-  bool _isTimeout = false;
 
   @override
   void initState() {
     super.initState();
-    _timeoutTimer = Timer(const Duration(seconds: 10), () {
-      if ((progress ?? 0) == 0) {
-        setState(() {
-          _isTimeout = true;
-        });
-      }
-    });
     widget.controller.print(
       address: widget.device,
       addFeeds: 5,
@@ -80,7 +69,7 @@ class _PrintingProgressDialogState extends State<PrintingProgressDialog> {
               ),
             ),
             const Spacer(),
-            ((progress ?? 0) * 100).round() != 100 && _isTimeout
+            ((progress ?? 0) * 100).round() != 100
                 ? IconButton(
                     icon: const Icon(Icons.close_rounded, size: 24),
                     onPressed: () async {
