@@ -12,6 +12,15 @@ class Helper {
     return formatter.format(price);
   }
 
+  static String rupiahFormatterTwo(int price) {
+    final formatter = NumberFormat.currency(
+      locale: 'id_ID',
+      symbol: 'Rp ',
+      decimalDigits: 0,
+    );
+    return formatter.format(price);
+  }
+
   static String dateFormatterTwo(String dateTimeString) {
     DateTime dt = DateTime.parse(dateTimeString);
     // final dayOfWeek = DateFormat('EEEE', 'id_ID').format(dt);

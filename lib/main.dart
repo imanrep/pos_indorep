@@ -8,29 +8,28 @@ import 'package:pos_indorep/provider/main_provider.dart';
 import 'package:pos_indorep/provider/menu_provider.dart';
 import 'package:pos_indorep/provider/transaction_provider.dart';
 import 'package:pos_indorep/screen/home_screen.dart';
+import 'package:pos_indorep/screen/web/main_web.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:flutter/services.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await initializeDateFormatting('id_ID', null); // Initialize Indonesian locale
+  await initializeDateFormatting('id_ID', null);
   if (kIsWeb) {
     await Firebase.initializeApp(
       options: const FirebaseOptions(
-        apiKey: "AIzaSyAeR0FuthfHhmNg221oGLzY6f8vBBqRQmc",
-        authDomain: "pariwisata-cireong.firebaseapp.com",
-        projectId: "pariwisata-cireong",
-        storageBucket: "pariwisata-cireong.appspot.com",
-        messagingSenderId: "1081014321686",
-        appId: "1:1081014321686:web:73f179db5c144f37386b37",
-        measurementId: "G-ZGYP2QXW1K",
-      ),
+          apiKey: "AIzaSyAeR0FuthfHhmNg221oGLzY6f8vBBqRQmc",
+          authDomain: "pariwisata-cireong.firebaseapp.com",
+          projectId: "pariwisata-cireong",
+          storageBucket: "pariwisata-cireong.appspot.com",
+          messagingSenderId: "1081014321686",
+          appId: "1:1081014321686:web:73f179db5c144f37386b37",
+          measurementId: "G-ZGYP2QXW1K"),
     );
   } else {
     await Firebase.initializeApp();
   }
-
 
   await SystemChrome.setPreferredOrientations([
     DeviceOrientation.landscapeLeft,
@@ -45,7 +44,7 @@ void main() async {
         ChangeNotifierProvider(create: (_) => TransactionProvider()),
         ChangeNotifierProvider(create: (_) => MenuProvider()),
       ],
-      child: GlobalLoaderOverlay(child: MyApp()),
+      child: GlobalLoaderOverlay(child: kIsWeb ? MyWebApp() : MyApp()),
     ),
   );
 }
@@ -73,6 +72,34 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
       ),
       home: const HomeScreen(),
+      debugShowCheckedModeBanner: false,
+    );
+  }
+}
+
+class MyWebApp extends StatelessWidget {
+  const MyWebApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'INDOREP Net',
+      themeMode: ThemeMode.dark, // Change this to ThemeMode.system for auto
+      theme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: IndorepColor.primary,
+          brightness: Brightness.light, // Light Mode
+        ),
+        useMaterial3: true,
+      ),
+      darkTheme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: IndorepColor.primary,
+          brightness: Brightness.dark, // Dark Mode
+        ),
+        useMaterial3: true,
+      ),
+      home: WarnetDashboard(),
       debugShowCheckedModeBanner: false,
     );
   }
