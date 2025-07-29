@@ -7,8 +7,9 @@ import 'package:pos_indorep/provider/cart_provider.dart';
 import 'package:pos_indorep/provider/main_provider.dart';
 import 'package:pos_indorep/provider/menu_provider.dart';
 import 'package:pos_indorep/provider/transaction_provider.dart';
+import 'package:pos_indorep/provider/web/web_transaksi_provider.dart';
 import 'package:pos_indorep/screen/home_screen.dart';
-import 'package:pos_indorep/screen/web/main_web.dart';
+import 'package:pos_indorep/web/screen/warnet_dashboard_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:flutter/services.dart';
@@ -43,6 +44,7 @@ void main() async {
         ChangeNotifierProvider(create: (_) => CartProvider()),
         ChangeNotifierProvider(create: (_) => TransactionProvider()),
         ChangeNotifierProvider(create: (_) => MenuProvider()),
+        ChangeNotifierProvider(create: (_) => WebTransaksiProvider()),
       ],
       child: GlobalLoaderOverlay(child: kIsWeb ? MyWebApp() : MyApp()),
     ),
@@ -99,7 +101,7 @@ class MyWebApp extends StatelessWidget {
         ),
         useMaterial3: true,
       ),
-      home: WarnetDashboard(),
+      home: WarnetDashboardScreen(),
       debugShowCheckedModeBanner: false,
     );
   }

@@ -1,5 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:pos_indorep/screen/web/web_model.dart';
+import 'package:pos_indorep/web/model/web_model.dart';
 
 class WebServices {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
