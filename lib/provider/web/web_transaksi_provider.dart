@@ -18,8 +18,8 @@ class WebTransaksiProvider extends ChangeNotifier {
   String _selectedMethod = 'Cash';
   String _selectedOperator = 'Agung';
 
-  List<QueryDocumentSnapshot> _currentWarnetEntries = [];
-  List<QueryDocumentSnapshot> _currentBeveragesEntries = [];
+  List<IndorepWarnetModel> _currentWarnetEntries = [];
+  List<IndorepBeveragesModel> _currentBeveragesEntries = [];
 
   bool _isLoadingEntries = true;
   bool _isLoadingBeverages = true;
@@ -56,8 +56,8 @@ class WebTransaksiProvider extends ChangeNotifier {
   WarnetPaket get selectedPackage => _selectedPackage;
   String get selectedMethod => _selectedMethod;
   String get selectedOperator => _selectedOperator;
-  List<QueryDocumentSnapshot> get currentWarnetEntries => _currentWarnetEntries;
-  List<QueryDocumentSnapshot> get currentBeveragesEntries =>
+  List<IndorepWarnetModel> get currentWarnetEntries => _currentWarnetEntries;
+  List<IndorepBeveragesModel> get currentBeveragesEntries =>
       _currentBeveragesEntries;
 
   bool get isLoadingEntries => _isLoadingEntries;
@@ -114,7 +114,11 @@ class WebTransaksiProvider extends ChangeNotifier {
     _isLoadingBeverages = true;
     notifyListeners();
     final snapshot = await _services.getBeveragesByDate(date).first;
-    _currentBeveragesEntries = snapshot.docs;
+    List<IndorepBeveragesModel> data = snapshot.docs
+        .map((doc) =>
+            IndorepBeveragesModel.fromJson(doc.data() as Map<String, dynamic>))
+        .toList();
+    _currentBeveragesEntries = data;
     _isLoadingBeverages = false;
     notifyListeners();
   }
@@ -124,7 +128,11 @@ class WebTransaksiProvider extends ChangeNotifier {
     notifyListeners();
     final snapshot = await _services.getWarnetEntriesByDate(date).first;
 
-    _currentWarnetEntries = snapshot.docs;
+    List<IndorepWarnetModel> data = snapshot.docs
+        .map((doc) =>
+            IndorepWarnetModel.fromJson(doc.data() as Map<String, dynamic>))
+        .toList();
+    _currentWarnetEntries = data;
     _isLoadingEntries = false;
     notifyListeners();
   }

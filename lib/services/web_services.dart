@@ -10,7 +10,6 @@ class WebServices {
     return snapshot.docs.map((doc) => doc.id).toList();
   }
 
-  // Set current operator state
   Future<void> setCurrentOperator(String operatorId) async {
     await _firestore.collection('appState').doc('currentOperator').set({
       'operator': operatorId,
@@ -18,7 +17,6 @@ class WebServices {
     });
   }
 
-  // Get current operator state
   Future<String?> getCurrentOperator() async {
     final doc =
         await _firestore.collection('appState').doc('currentOperator').get();
@@ -67,6 +65,7 @@ class WebServices {
         .collection('cashier')
         .where('timestamp', isGreaterThanOrEqualTo: startTimestamp)
         .where('timestamp', isLessThan: endTimestamp)
+        .orderBy('timestamp', descending: true)
         .snapshots();
   }
 
@@ -79,6 +78,7 @@ class WebServices {
         .collection('beverages')
         .where('timestamp', isGreaterThanOrEqualTo: startTimestamp)
         .where('timestamp', isLessThan: endTimestamp)
+        .orderBy('timestamp', descending: true)
         .snapshots();
   }
 

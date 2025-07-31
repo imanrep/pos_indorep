@@ -62,6 +62,7 @@ dependencies:
   rename_app: ^1.6.5
   flutter_launcher_icons: ^0.14.4
   cloud_firestore: ^5.6.12
+  fluent_ui: ^4.12.0
 
 
 dev_dependencies:

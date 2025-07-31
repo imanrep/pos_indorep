@@ -1,10 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:pos_indorep/services/web_services.dart';
-import 'package:pos_indorep/web/screen/dashboard/components/beverages_form.dart';
-import 'package:pos_indorep/web/screen/dashboard/components/beverages_transaction_list.dart';
-import 'package:pos_indorep/web/screen/dashboard/components/warnet_form.dart';
-import 'package:pos_indorep/web/screen/dashboard/components/warnet_transaction_list.dart';
+import 'package:pos_indorep/web/screen/transaksi/components/beverages_form.dart';
+import 'package:pos_indorep/web/screen/transaksi/components/beverages_transaction_list.dart';
+import 'package:pos_indorep/web/screen/transaksi/components/warnet_form.dart';
+import 'package:pos_indorep/web/screen/transaksi/components/warnet_transaction_list.dart';
 
 class TransaksiPage extends StatefulWidget {
   const TransaksiPage({super.key});
@@ -17,13 +18,17 @@ class _TransaksiPageState extends State<TransaksiPage> {
   final WebServices _services = WebServices();
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: LayoutBuilder(
+    return ScaffoldPage.scrollable(
+      header: PageHeader(
+        title: Text(
+          'Transaksi',
+          style: FluentTheme.of(context).typography.title,
+        ),
+      ),
+      children: [
+        LayoutBuilder(
           builder: (context, constraints) {
-            bool isWide =
-                constraints.maxWidth > 800; // adjust breakpoint as needed
+            bool isWide = constraints.maxWidth > 800;
             Widget warnetSection = SizedBox(
               width: isWide ? constraints.maxWidth / 2 - 12 : double.infinity,
               child: StreamBuilder<QuerySnapshot>(
@@ -63,7 +68,6 @@ class _TransaksiPageState extends State<TransaksiPage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   warnetSection,
-                  const SizedBox(width: 8),
                   beveragesSection,
                 ],
               );
@@ -71,14 +75,13 @@ class _TransaksiPageState extends State<TransaksiPage> {
               return Column(
                 children: [
                   warnetSection,
-                  const SizedBox(height: 24),
                   beveragesSection,
                 ],
               );
             }
           },
         ),
-      ),
+      ],
     );
   }
 }

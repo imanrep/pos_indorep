@@ -57,8 +57,6 @@ class DateBar extends StatelessWidget {
                   ),
             ),
           ),
-          // ...existing code...
-          // ...existing code...
           const SizedBox(width: 24),
           (selectedDate.year == DateTime.now().year &&
                   selectedDate.month == DateTime.now().month &&

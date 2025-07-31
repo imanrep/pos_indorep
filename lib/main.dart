@@ -1,4 +1,5 @@
 import 'package:firebase_core/firebase_core.dart';
+import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:loader_overlay/loader_overlay.dart';
@@ -7,9 +8,10 @@ import 'package:pos_indorep/provider/cart_provider.dart';
 import 'package:pos_indorep/provider/main_provider.dart';
 import 'package:pos_indorep/provider/menu_provider.dart';
 import 'package:pos_indorep/provider/transaction_provider.dart';
+import 'package:pos_indorep/provider/web/web_main_provider.dart';
 import 'package:pos_indorep/provider/web/web_transaksi_provider.dart';
 import 'package:pos_indorep/screen/home_screen.dart';
-import 'package:pos_indorep/web/screen/warnet_dashboard_screen.dart';
+import 'package:pos_indorep/web/screen/warnet_home_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:flutter/services.dart';
@@ -45,6 +47,7 @@ void main() async {
         ChangeNotifierProvider(create: (_) => TransactionProvider()),
         ChangeNotifierProvider(create: (_) => MenuProvider()),
         ChangeNotifierProvider(create: (_) => WebTransaksiProvider()),
+        ChangeNotifierProvider(create: (_) => WebMainProvider()),
       ],
       child: GlobalLoaderOverlay(child: kIsWeb ? MyWebApp() : MyApp()),
     ),
@@ -84,24 +87,24 @@ class MyWebApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return FluentApp(
       title: 'INDOREP Net',
-      themeMode: ThemeMode.dark, // Change this to ThemeMode.system for auto
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: IndorepColor.primary,
-          brightness: Brightness.light, // Light Mode
+      themeMode: ThemeMode.dark, // Change to ThemeMode.system for auto
+      theme: FluentThemeData(
+        brightness: Brightness.dark,
+        visualDensity: VisualDensity.standard,
+        focusTheme: FocusThemeData(
+          glowFactor: is10footScreen(context) ? 2.0 : 0.0,
         ),
-        useMaterial3: true,
       ),
-      darkTheme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: IndorepColor.primary,
-          brightness: Brightness.dark, // Dark Mode
+      darkTheme: FluentThemeData(
+        brightness: Brightness.dark,
+        visualDensity: VisualDensity.standard,
+        focusTheme: FocusThemeData(
+          glowFactor: is10footScreen(context) ? 2.0 : 0.0,
         ),
-        useMaterial3: true,
       ),
-      home: WarnetDashboardScreen(),
+      home: const WarnetHomeScreen(),
       debugShowCheckedModeBanner: false,
     );
   }
