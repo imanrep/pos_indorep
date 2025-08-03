@@ -29,12 +29,15 @@ class _TransactionListViewState extends State<TransactionListView> {
         itemCount: widget.transactions.length,
         itemBuilder: (context, index) {
           final transaction = widget.transactions[index];
-
-          String total = Helper.rupiahFormatter(transaction.total.toDouble());
+          final amount = (transaction.actualAmount ?? transaction.total) ?? 0;
+          String total = Helper.rupiahFormatter(amount.toDouble());
           String date = Helper.dateFormatterTwo(transaction.time);
           String time = Helper.timeFormatterTwo(transaction.time);
-          String totalCart = transaction.items.length.toString();
-          String orderType = transaction.pc.isEmpty ? 'Cafe' : 'Warnet';
+          String totalCart = (transaction.items
+              .fold(0, (sum, item) => sum + item.qty)).toString();
+          String orderType = transaction.pc != null ? 'Warnet' : 'Cafe';
+          String orderId = transaction.orderId;
+          bool isDiskon = transaction.off != null && transaction.off! > 0;
 
           // Determine order status
           String orderStatus;
@@ -57,16 +60,48 @@ class _TransactionListViewState extends State<TransactionListView> {
             ),
             child: ListTile(
               onTap: () => widget.onTransactionTap(transaction),
-              subtitle: Text(
-                '$date - $time | $total (${transaction.paymentMethod.toUpperCase()})',
-                style: GoogleFonts.inter(fontWeight: FontWeight.w400),
+              subtitle: Row(
+                children: [
+                  Text(
+                    '$date | $total (${transaction.paymentMethod.toUpperCase()})',
+                    style: GoogleFonts.inter(fontWeight: FontWeight.w400),
+                  ),
+                  const SizedBox(width: 8),
+                  if (isDiskon)
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 8, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: Colors.red.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Text(
+                        'Diskon ${transaction.off}%',
+                        style: GoogleFonts.inter(
+                            fontSize: 12, fontWeight: FontWeight.w500),
+                      ),
+                    ),
+                ],
               ),
               title: Row(
                 children: [
-                  Text('$orderType - $totalCart Item',
+                  Text('$orderType - $time',
                       style: GoogleFonts.inter(
                           fontSize: 16, fontWeight: FontWeight.w600)),
                   const SizedBox(width: 8),
+                  Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: Colors.blueGrey.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Text(
+                      '$totalCart item(s)',
+                      style: GoogleFonts.inter(
+                          fontSize: 12, fontWeight: FontWeight.w500),
+                    ),
+                  ),
                 ],
               ),
               leading: CircleAvatar(

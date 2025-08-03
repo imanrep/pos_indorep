@@ -231,7 +231,7 @@ class _PrintViewState extends State<PrintView> {
                       Align(
                         alignment: Alignment.centerRight,
                         child: Text(
-                          'Total: ${Helper.rupiahFormatter(widget.transaction.total.toDouble())}',
+                          'Diskon: ${Helper.rupiahFormatter((widget.transaction.off ?? 0).toDouble())}',
                           style: GoogleFonts.robotoMono(
                             fontSize: 22,
                             fontWeight: FontWeight.w600,
@@ -239,6 +239,17 @@ class _PrintViewState extends State<PrintView> {
                         ),
                       ),
                       const SizedBox(height: 4),
+                      Align(
+                        alignment: Alignment.centerRight,
+                        child: Text(
+                          'Total: ${Helper.rupiahFormatter(((widget.transaction.actualAmount ?? widget.transaction.total) ?? 0).toDouble())}',
+                          style: GoogleFonts.robotoMono(
+                            fontSize: 22,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 16),
                       Align(
                         alignment: Alignment.centerRight,
                         child: Text(
@@ -253,7 +264,7 @@ class _PrintViewState extends State<PrintView> {
                       Align(
                         alignment: Alignment.centerRight,
                         child: Text(
-                          'Kembali: ${Helper.rupiahFormatter((widget.cashGiven - widget.transaction.total).toDouble())}',
+                          'Kembali: ${Helper.rupiahFormatter((widget.cashGiven - (widget.transaction.actualAmount ?? widget.transaction.total ?? 0)).toDouble())}',
                           style: GoogleFonts.robotoMono(
                             fontSize: 20,
                             fontWeight: FontWeight.w400,

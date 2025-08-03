@@ -845,8 +845,11 @@ class GetTransacationsResponse {
 
 class TransactionData {
   final String orderId;
-  final String pc;
-  final int total;
+  final String? pc;
+  final int? total;
+  final int? totalIncome;
+  final int? actualAmount;
+  final int? off;
   final List<TransactionItem> items;
   final String time;
   final String status;
@@ -857,8 +860,11 @@ class TransactionData {
 
   TransactionData({
     required this.orderId,
-    required this.pc,
-    required this.total,
+    this.pc,
+    this.total,
+    this.totalIncome,
+    this.actualAmount,
+    this.off,
     required this.items,
     required this.time,
     required this.status,
@@ -873,6 +879,9 @@ class TransactionData {
       orderId: json['order_id'],
       pc: json['pc'],
       total: json['total'],
+      totalIncome: json['total_income'],
+      actualAmount: json['actual_amount'],
+      off: json['off'],
       items: (json['items'] as List<dynamic>)
           .map((e) => TransactionItem.fromJson(e))
           .toList(),

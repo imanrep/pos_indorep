@@ -190,10 +190,27 @@ class _TransactionDetailViewState extends State<TransactionDetailView> {
                       },
                     ),
                     const SizedBox(height: 24),
+                    if (widget.transaction.off != null &&
+                        widget.transaction.off! > 0)
+                      Align(
+                        alignment: Alignment.centerRight,
+                        child: Text(
+                          'Diskon: ${Helper.rupiahFormatter(((widget.transaction.totalIncome ?? 0) * (widget.transaction.off ?? 0) / 100).toDouble())}',
+                          style: GoogleFonts.robotoMono(
+                            fontSize: 18,
+                            fontStyle: FontStyle.italic,
+                            fontWeight: FontWeight.w400,
+                          ),
+                        ),
+                      )
+                    else
+                      const SizedBox.shrink(),
+                    const SizedBox(height: 4),
+                    const SizedBox(height: 4),
                     Align(
                       alignment: Alignment.centerRight,
                       child: Text(
-                        'Total: ${Helper.rupiahFormatter(widget.transaction.total.toDouble())}',
+                        'Total: ${Helper.rupiahFormatter(((widget.transaction.actualAmount ?? widget.transaction.total) ?? 0).toDouble())}',
                         style: GoogleFonts.robotoMono(
                           fontSize: 22,
                           fontWeight: FontWeight.w600,

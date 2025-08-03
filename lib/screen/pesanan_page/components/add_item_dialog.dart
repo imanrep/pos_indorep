@@ -151,7 +151,7 @@ class _AddItemDialogState extends State<AddItemDialog> {
                   borderRadius: BorderRadius.circular(16),
                 ),
               ),
-              maxLength: 15,
+              maxLength: 30,
               inputFormatters: [
                 FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z0-9/&=\s]')),
               ],

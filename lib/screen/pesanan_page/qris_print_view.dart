@@ -168,8 +168,8 @@ class _QrisPageOneState extends State<QrisPageOne> {
               ),
             ),
             Text(
-              'Total : ${Helper.rupiahFormatter(transactionData.total.toDouble())}',
-              style: GoogleFonts.inter(
+              'Total: ${Helper.rupiahFormatter(((transactionData.actualAmount ?? transactionData.total) ?? 0).toDouble())}',
+              style: GoogleFonts.robotoMono(
                 fontSize: 18,
                 fontWeight: FontWeight.w600,
               ),
@@ -479,7 +479,18 @@ class _QrisPageTwoState extends State<QrisPageTwo> {
                             Align(
                               alignment: Alignment.centerRight,
                               child: Text(
-                                'Total: ${Helper.rupiahFormatter(widget.transactionData.total.toDouble())}',
+                                'Total: ${Helper.rupiahFormatter(((widget.transactionData.actualAmount ?? widget.transactionData.total) ?? 0).toDouble())}',
+                                style: GoogleFonts.robotoMono(
+                                  fontSize: 22,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Align(
+                              alignment: Alignment.centerRight,
+                              child: Text(
+                                'Total: ${Helper.rupiahFormatter(((widget.transactionData.actualAmount ?? widget.transactionData.total) ?? 0).toDouble())}',
                                 style: GoogleFonts.robotoMono(
                                   fontSize: 22,
                                   fontWeight: FontWeight.w600,
@@ -491,7 +502,6 @@ class _QrisPageTwoState extends State<QrisPageTwo> {
                               'Info, saran, dan masukan',
                               style: GoogleFonts.robotoMono(
                                 fontSize: 18,
-                                fontStyle: FontStyle.italic,
                                 fontWeight: FontWeight.w400,
                               ),
                             ),
