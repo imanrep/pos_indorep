@@ -446,9 +446,11 @@ class _PesananPageState extends State<PesananPage> {
                                               children: [
                                                 IconButton(
                                                   onPressed: () {
-                                                    provider.updateQty(
-                                                        item.cartId,
-                                                        item.qty - 1);
+                                                    provider
+                                                        .updateQtyCartAndOrder(
+                                                            index,
+                                                            item.cartId,
+                                                            item.qty - 1);
                                                   },
                                                   icon: const Icon(
                                                     Icons.remove_rounded,
@@ -457,9 +459,11 @@ class _PesananPageState extends State<PesananPage> {
                                                 ),
                                                 IconButton(
                                                   onPressed: () {
-                                                    provider.updateQty(
-                                                        item.cartId,
-                                                        item.qty + 1);
+                                                    provider
+                                                        .updateQtyCartAndOrder(
+                                                            index,
+                                                            item.cartId,
+                                                            item.qty + 1);
                                                   },
                                                   icon: const Icon(
                                                       Icons.add_rounded,

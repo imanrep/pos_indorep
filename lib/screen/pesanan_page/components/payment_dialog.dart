@@ -412,6 +412,32 @@ class _PaymentDialogBottomSheetState extends State<PaymentDialogBottomSheet> {
                               await _handlePayment(request,
                                   widget.transaction.cart, total.toInt());
                             },
+                      onLongPress: () {
+                        var request = QrisOrderRequest(
+                          orders: cartProvider.currentOrder,
+                          payment: _selectedPaymentMethod!.type,
+                          source: 'cafe',
+                          voucher: voucherDetails != null
+                              ? voucherController.text
+                              : null,
+                        );
+                        showDialog(
+                            context: context,
+                            builder: (context) {
+                              return AlertDialog(
+                                title: Text('Hi!'),
+                                content: Text('${request.toJson()}'),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () {
+                                      Navigator.of(context).pop();
+                                    },
+                                    child: Text('Close'),
+                                  ),
+                                ],
+                              );
+                            });
+                      },
                       icon: Icon(
                         Icons.arrow_forward_rounded,
                         color:

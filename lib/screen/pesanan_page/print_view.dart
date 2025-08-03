@@ -124,7 +124,7 @@ class _PrintViewState extends State<PrintView> {
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Text('${widget.transaction.orderId}',
+                            Text(widget.transaction.orderId,
                                 style: GoogleFonts.robotoMono(fontSize: 18)),
                             Text(
                                 '${Helper.dateFormatterTwo(widget.transaction.time)} - ${Helper.timeFormatterTwo(widget.transaction.time)}',
@@ -208,6 +208,20 @@ class _PrintViewState extends State<PrintView> {
                                       ),
                                     ),
                                   ),
+                                cart.note.isNotEmpty
+                                    ? Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                            vertical: 8.0),
+                                        child: Text(
+                                          'Catatan: ${cart.note}',
+                                          style: GoogleFonts.robotoMono(
+                                            fontSize: 14,
+                                            fontStyle: FontStyle.italic,
+                                            color: Colors.black,
+                                          ),
+                                        ),
+                                      )
+                                    : const SizedBox.shrink(),
                               ],
                             ),
                           );

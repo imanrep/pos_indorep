@@ -46,10 +46,12 @@ class CartProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  void updateQty(String cartId, int qty) {
+  void updateQtyCartAndOrder(int index, String cartId, int qty) {
     final cartItem = _currentCart.firstWhere((item) => item.cartId == cartId);
+
     if (qty > 0) {
       cartItem.updateQty(qty);
+      _currentOrder[index].qty = qty;
       calculateTotalCart();
       notifyListeners();
     }

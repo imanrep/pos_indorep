@@ -243,7 +243,6 @@ class CartItem extends MenuIrep {
     _calculateSubTotal();
   }
 
-  /// **Recalculate subtotal including selected add-ons**
   void _calculateSubTotal() {
     addOnPrice = selectedOptions
         .expand((option) => option.optionValue)
@@ -253,7 +252,6 @@ class CartItem extends MenuIrep {
     subTotal = (menuPrice.toDouble() + addOnPrice) * qty;
   }
 
-  /// **Update quantity and recalculate subtotal**
   void updateQty(int newQty) {
     qty = newQty;
     _calculateSubTotal();
@@ -414,7 +412,7 @@ class OptionOrderItem {
 
 class OrderItem {
   final int id;
-  final int qty;
+  int qty;
   final String note;
   final List<OptionOrderItem> option;
 
@@ -443,6 +441,10 @@ class OrderItem {
       'note': note,
       'option': option.map((item) => item.toJson()).toList(),
     };
+  }
+
+  void updateQty(int newQty) {
+    qty = newQty;
   }
 }
 

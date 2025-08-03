@@ -170,6 +170,20 @@ class _TransactionDetailViewState extends State<TransactionDetailView> {
                                     ),
                                   ),
                                 ),
+                              cart.note.isNotEmpty
+                                  ? Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          vertical: 8.0),
+                                      child: Text(
+                                        'Catatan: ${cart.note}',
+                                        style: GoogleFonts.robotoMono(
+                                          fontSize: 14,
+                                          fontStyle: FontStyle.italic,
+                                          color: Colors.black,
+                                        ),
+                                      ),
+                                    )
+                                  : const SizedBox.shrink(),
                             ],
                           ),
                         );
