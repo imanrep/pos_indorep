@@ -498,7 +498,7 @@ class _PesananPageState extends State<PesananPage> {
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceBetween,
                                   children: [
-                                    Text('Total',
+                                    Text('Subtotal :',
                                         style: const TextStyle(
                                             fontSize: 16.0,
                                             fontWeight: FontWeight.w600)),
@@ -522,7 +522,6 @@ class _PesananPageState extends State<PesananPage> {
                                     var irepBE = IrepBE();
                                     TransactionModel transaction =
                                         TransactionModel(
-                                      nama: 'Ujang',
                                       transactionDate:
                                           DateTime.now().millisecondsSinceEpoch,
                                       transactionId: Uuid().v4(),

@@ -304,14 +304,12 @@ class CartItem extends MenuIrep {
 }
 
 class TransactionModel {
-  final String nama;
   final String transactionId;
   final int transactionDate;
   final List<CartItem> cart;
   final double total;
   final String paymentMethod;
   TransactionModel({
-    required this.nama,
     required this.transactionId,
     required this.transactionDate,
     required this.cart,
@@ -321,7 +319,6 @@ class TransactionModel {
 
   factory TransactionModel.fromMap(Map<String, dynamic> data) {
     return TransactionModel(
-      nama: data['nama'],
       transactionId: data['transactionId'],
       transactionDate: data['transactionDate'],
       cart: List<CartItem>.from(
@@ -333,7 +330,6 @@ class TransactionModel {
 
   Map<String, dynamic> toMap() {
     return {
-      'nama': nama,
       'transactionId': transactionId,
       'transactionDate': transactionDate,
       'cart': cart.map((x) => x.toMap()).toList(),
@@ -845,6 +841,7 @@ class GetTransacationsResponse {
 
 class TransactionData {
   final String orderId;
+  String? nama;
   final String? pc;
   final int? total;
   final int? totalIncome;
@@ -860,6 +857,7 @@ class TransactionData {
 
   TransactionData({
     required this.orderId,
+    this.nama,
     this.pc,
     this.total,
     this.totalIncome,
@@ -877,6 +875,7 @@ class TransactionData {
   factory TransactionData.fromJson(Map<String, dynamic> json) {
     return TransactionData(
       orderId: json['order_id'],
+      nama: json['nama'] ?? '',
       pc: json['pc'],
       total: json['total'],
       totalIncome: json['total_income'],

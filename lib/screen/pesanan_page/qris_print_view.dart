@@ -277,6 +277,11 @@ class _QrisPageTwoState extends State<QrisPageTwo> {
       orderStatus = widget.transactionData.status; // fallback
     }
 
+    bool isWarnet = widget.transactionData.pc != null &&
+        widget.transactionData.pc!.isNotEmpty;
+    String pcNumber = widget.transactionData.pc ?? 'INDOREP-PC';
+    String orderType = isWarnet ? 'Warnet' : 'Cafe';
+
     final transactionData = widget.transactionData;
     return SingleChildScrollView(
       child: Padding(
@@ -383,6 +388,31 @@ class _QrisPageTwoState extends State<QrisPageTwo> {
                                     MainAxisAlignment.spaceBetween,
                                 children: [
                                   Text(
+                                    '$orderType',
+                                    style: GoogleFonts.robotoMono(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.w400,
+                                    ),
+                                  ),
+                                  Text(
+                                    'Pelanggan: ${widget.transactionData.nama ?? 'Umum'}',
+                                    style: GoogleFonts.robotoMono(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.w400,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 16),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
                                     'Via: ${widget.transactionData.paymentMethod.toUpperCase()}',
                                     style: GoogleFonts.robotoMono(
                                       fontSize: 18,
@@ -399,6 +429,31 @@ class _QrisPageTwoState extends State<QrisPageTwo> {
                                 ],
                               ),
                             ),
+                            // const SizedBox(height: 8),
+                            // Padding(
+                            //   padding:
+                            //       const EdgeInsets.symmetric(horizontal: 16),
+                            //   child: Row(
+                            //     mainAxisAlignment:
+                            //         MainAxisAlignment.spaceBetween,
+                            //     children: [
+                            //       Text(
+                            //         'Via: ${widget.transactionData.paymentMethod.toUpperCase()}',
+                            //         style: GoogleFonts.robotoMono(
+                            //           fontSize: 18,
+                            //           fontWeight: FontWeight.w400,
+                            //         ),
+                            //       ),
+                            //       Text(
+                            //         'Status: ${orderStatus.toUpperCase()}',
+                            //         style: GoogleFonts.robotoMono(
+                            //           fontSize: 18,
+                            //           fontWeight: FontWeight.w400,
+                            //         ),
+                            //       ),
+                            //     ],
+                            //   ),
+                            // ),
                             Text('--------------------------------',
                                 style: GoogleFonts.robotoMono(fontSize: 18)),
                             const SizedBox(height: 12),
@@ -476,17 +531,24 @@ class _QrisPageTwoState extends State<QrisPageTwo> {
                               },
                             ),
                             const SizedBox(height: 24),
-                            Align(
-                              alignment: Alignment.centerRight,
-                              child: Text(
-                                'Total: ${Helper.rupiahFormatter(((widget.transactionData.actualAmount ?? widget.transactionData.total) ?? 0).toDouble())}',
-                                style: GoogleFonts.robotoMono(
-                                  fontSize: 22,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                            ),
-                            const SizedBox(height: 4),
+                            widget.transactionData.off != null &&
+                                    widget.transactionData.off! > 0
+                                ? Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        'Diskon:',
+                                        style: GoogleFonts.robotoMono(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 4),
+                                    ],
+                                  )
+                                : const SizedBox.shrink(),
+
                             Align(
                               alignment: Alignment.centerRight,
                               child: Text(
@@ -515,7 +577,7 @@ class _QrisPageTwoState extends State<QrisPageTwo> {
                             const SizedBox(height: 24),
                             Center(
                               child: QrImageView(
-                                data: "https://youtu.be/dQw4w9WgXcQ",
+                                data: "https://www.instagram.com/indorep.id/",
                                 version: QrVersions.auto,
                                 size: 120.0,
                               ),

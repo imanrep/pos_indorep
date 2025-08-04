@@ -91,6 +91,11 @@ class _PrintViewState extends State<PrintView> {
       orderStatus = widget.transaction.status; // fallback
     }
 
+    bool isWarnet =
+        widget.transaction.pc != null && widget.transaction.pc!.isNotEmpty;
+    String pcNumber = widget.transaction.pc ?? 'INDOREP-PC';
+    String orderType = isWarnet ? 'Warnet' : 'Cafe';
+
     return AlertDialog(
       title: Text('Transaksi Berhasil',
           style: GoogleFonts.inter(fontWeight: FontWeight.w600)),
@@ -129,6 +134,29 @@ class _PrintViewState extends State<PrintView> {
                             Text(
                                 '${Helper.dateFormatterTwo(widget.transaction.time)} - ${Helper.timeFormatterTwo(widget.transaction.time)}',
                                 style: GoogleFonts.robotoMono(fontSize: 18)),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              '$orderType',
+                              style: GoogleFonts.robotoMono(
+                                fontSize: 18,
+                                fontWeight: FontWeight.w400,
+                              ),
+                            ),
+                            Text(
+                              'Pelanggan: ${widget.transaction.nama ?? 'Umum'}',
+                              style: GoogleFonts.robotoMono(
+                                fontSize: 18,
+                                fontWeight: FontWeight.w400,
+                              ),
+                            ),
                           ],
                         ),
                       ),
@@ -290,7 +318,7 @@ class _PrintViewState extends State<PrintView> {
                       const SizedBox(height: 24),
                       Center(
                         child: QrImageView(
-                          data: "https://youtu.be/dQw4w9WgXcQ",
+                          data: "https://www.instagram.com/indorep.id/",
                           version: QrVersions.auto,
                           size: 120.0,
                         ),

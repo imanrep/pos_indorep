@@ -62,6 +62,10 @@ class _TransactionDetailViewState extends State<TransactionDetailView> {
       orderStatus = widget.transaction.status; // fallback
     }
 
+    bool isWarnet = widget.transaction.pc != null;
+    String pcNumber = widget.transaction.pc ?? 'INDOREP-PC';
+    String orderType = isWarnet ? 'Warnet' : 'Cafe';
+
     return SingleChildScrollView(
       child: Column(
         children: [
@@ -80,10 +84,10 @@ class _TransactionDetailViewState extends State<TransactionDetailView> {
                         style: GoogleFonts.robotoMono(fontSize: 18)),
                     const SizedBox(height: 24),
                     Text(
-                        '-------------------------------------------------------------',
+                        '----------------------------------------------------------------',
                         style: GoogleFonts.robotoMono(fontSize: 18)),
                     Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
@@ -95,9 +99,40 @@ class _TransactionDetailViewState extends State<TransactionDetailView> {
                         ],
                       ),
                     ),
+                    isWarnet
+                        ? Column(
+                            children: [
+                              const SizedBox(height: 8),
+                              Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 20),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      orderType,
+                                      style: GoogleFonts.robotoMono(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.w400,
+                                      ),
+                                    ),
+                                    Text(
+                                      'PC: $pcNumber',
+                                      style: GoogleFonts.robotoMono(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.w400,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          )
+                        : const SizedBox.shrink(),
                     const SizedBox(height: 8),
                     Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
@@ -119,7 +154,7 @@ class _TransactionDetailViewState extends State<TransactionDetailView> {
                       ),
                     ),
                     Text(
-                        '-------------------------------------------------------------',
+                        '----------------------------------------------------------------',
                         style: GoogleFonts.robotoMono(fontSize: 18)),
                     const SizedBox(height: 12),
                     Align(
@@ -235,7 +270,7 @@ class _TransactionDetailViewState extends State<TransactionDetailView> {
                     const SizedBox(height: 24),
                     Center(
                       child: QrImageView(
-                        data: "DUMMY-QR-123456",
+                        data: "https://www.instagram.com/indorep.id/",
                         version: QrVersions.auto,
                         size: 120.0,
                       ),

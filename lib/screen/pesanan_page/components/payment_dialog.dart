@@ -31,6 +31,7 @@ class _PaymentDialogBottomSheetState extends State<PaymentDialogBottomSheet> {
   GetVoucherDetailsResponse? voucherDetails;
   late String appliedVoucherCode;
   late TextEditingController voucherController;
+  late TextEditingController nameController;
 
   final List<PaymentButton> _paymentMethods = [
     PaymentButton(
@@ -56,72 +57,20 @@ class _PaymentDialogBottomSheetState extends State<PaymentDialogBottomSheet> {
     IrepBE irepBE = IrepBE();
     // Handle QRIS payment
     if (request.payment == 'qris') {
-      context.loaderOverlay.show();
-      QrisOrderResponse response = await irepBE.createOrder(request);
-      AddWifiResponse wifiResponse = await irepBE.addWifi();
-      if (response.success) {
-        TransactionData transactionData = TransactionData(
-          orderId: 'IDRPS-${response.orderID}',
-          pc: "",
-          paymentMethod: request.payment,
-          wifiUsername: wifiResponse.wifiUsername,
-          wifiPassword: wifiResponse.wifiPassword,
-          totalIncome: (response.total * (response.off / 100)).toInt(),
-          off: response.off,
-          actualAmount: response.total,
-          status: response.success ? 'paid' : 'pending',
-          time: response.time,
-          qris: response.qris,
-          items: transaction.map((cart) {
-            return TransactionItem(
-                name: cart.menuName,
-                note: cart.notes,
-                option: [
-                  for (final option in cart.selectedOptions)
-                    for (final optVal
-                        in option.optionValue.where((v) => v.isSelected))
-                      TransactionMenuOption(
-                        option: option.optionName,
-                        value: optVal.optionValueName,
-                        price: optVal.optionValuePrice,
-                      ),
-                ],
-                qty: cart.qty,
-                subTotal: cart.menuPrice);
-          }).toList(),
-        );
-        context.loaderOverlay.hide();
-        showDialog(
-          barrierDismissible: false,
-          context: context,
-          builder: (context) => PopScope(
-              canPop: false,
-              child: QrisPrintView(
-                transactionData: transactionData,
-              )),
-        );
-      }
-
-      // Handle Cash payment
-    } else if (request.payment == 'cash') {
-      final int? cashGiven = await showDialog<int>(
+      final name = await showDialog(
         context: context,
-        builder: (context) => CashPaymentDialog(totalAmount: grandTotal),
+        builder: (context) => nameInputDialog(context),
       );
-      if (cashGiven != null && cashGiven >= grandTotal) {
+      if (name == null || name.isEmpty) {
+        return;
+      } else {
         context.loaderOverlay.show();
         QrisOrderResponse response = await irepBE.createOrder(request);
         AddWifiResponse wifiResponse = await irepBE.addWifi();
         if (response.success) {
-          var mainProvider = Provider.of<MainProvider>(context, listen: false);
-          Uint8List openDrawerCommand =
-              Uint8List.fromList([27, 112, 0, 100, 250]);
-          FlutterBluetoothPrinter.printBytes(
-              address: mainProvider.printerAddress,
-              keepConnected: false,
-              data: openDrawerCommand);
           TransactionData transactionData = TransactionData(
             orderId: 'IDRPS-${response.orderID}',
+            nama: name,
             pc: "",
             paymentMethod: request.payment,
             wifiUsername: wifiResponse.wifiUsername,
@@ -131,6 +80,7 @@ class _PaymentDialogBottomSheetState extends State<PaymentDialogBottomSheet> {
             actualAmount: response.total,
             status: response.success ? 'paid' : 'pending',
             time: response.time,
+            qris: response.qris,
             items: transaction.map((cart) {
               return TransactionItem(
                   name: cart.menuName,
@@ -154,20 +104,89 @@ class _PaymentDialogBottomSheetState extends State<PaymentDialogBottomSheet> {
             barrierDismissible: false,
             context: context,
             builder: (context) => PopScope(
-              canPop: false,
-              child: PrintView(
-                transaction: transactionData,
-                cashGiven: cashGiven,
+                canPop: false,
+                child: QrisPrintView(
+                  transactionData: transactionData,
+                )),
+          );
+        }
+      }
+      // Handle Cash payment
+    } else if (request.payment == 'cash') {
+      final name = await showDialog(
+        context: context,
+        builder: (context) => nameInputDialog(context),
+      );
+      if (name == null || name.isEmpty) {
+        return;
+      } else {
+        final int? cashGiven = await showDialog<int>(
+          context: context,
+          builder: (context) => CashPaymentDialog(totalAmount: grandTotal),
+        );
+        if (cashGiven != null && cashGiven >= grandTotal) {
+          context.loaderOverlay.show();
+          QrisOrderResponse response = await irepBE.createOrder(request);
+          AddWifiResponse wifiResponse = await irepBE.addWifi();
+          if (response.success) {
+            var mainProvider =
+                Provider.of<MainProvider>(context, listen: false);
+            Uint8List openDrawerCommand =
+                Uint8List.fromList([27, 112, 0, 100, 250]);
+            FlutterBluetoothPrinter.printBytes(
+                address: mainProvider.printerAddress,
+                keepConnected: false,
+                data: openDrawerCommand);
+            TransactionData transactionData = TransactionData(
+              orderId: 'IDRPS-${response.orderID}',
+              nama: name,
+              pc: "",
+              paymentMethod: request.payment,
+              wifiUsername: wifiResponse.wifiUsername,
+              wifiPassword: wifiResponse.wifiPassword,
+              totalIncome: (response.total * (response.off / 100)).toInt(),
+              off: response.off,
+              actualAmount: response.total,
+              status: response.success ? 'paid' : 'pending',
+              time: response.time,
+              items: transaction.map((cart) {
+                return TransactionItem(
+                    name: cart.menuName,
+                    note: cart.notes,
+                    option: [
+                      for (final option in cart.selectedOptions)
+                        for (final optVal
+                            in option.optionValue.where((v) => v.isSelected))
+                          TransactionMenuOption(
+                            option: option.optionName,
+                            value: optVal.optionValueName,
+                            price: optVal.optionValuePrice,
+                          ),
+                    ],
+                    qty: cart.qty,
+                    subTotal: cart.menuPrice);
+              }).toList(),
+            );
+            context.loaderOverlay.hide();
+            showDialog(
+              barrierDismissible: false,
+              context: context,
+              builder: (context) => PopScope(
+                canPop: false,
+                child: PrintView(
+                  transaction: transactionData,
+                  cashGiven: cashGiven,
+                ),
               ),
-            ),
-          );
-        } else {
-          // Handle failed payment
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Payment failed: ${response.message}'),
-            ),
-          );
+            );
+          } else {
+            // Handle failed payment
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('Payment failed: ${response.message}'),
+              ),
+            );
+          }
         }
       }
     }
@@ -177,11 +196,13 @@ class _PaymentDialogBottomSheetState extends State<PaymentDialogBottomSheet> {
   void initState() {
     super.initState();
     voucherController = TextEditingController();
+    nameController = TextEditingController();
   }
 
   @override
   void dispose() {
     voucherController.dispose();
+    nameController.dispose();
     super.dispose();
   }
 
@@ -214,108 +235,6 @@ class _PaymentDialogBottomSheetState extends State<PaymentDialogBottomSheet> {
             mainAxisSize: MainAxisSize.min,
             children: [
               CurrentOrder(transaction: widget.transaction),
-              Row(
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Text(
-                      'Voucher:',
-                      style: GoogleFonts.inter(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
-                  Expanded(
-                    child: TextField(
-                      controller: voucherController,
-                      onChanged: (value) {
-                        if (value != value.toUpperCase()) {
-                          voucherController.value =
-                              voucherController.value.copyWith(
-                            text: value.toUpperCase(),
-                            selection:
-                                TextSelection.collapsed(offset: value.length),
-                          );
-                        }
-                        setState(
-                            () {}); // Trigger rebuild to update button state
-                      },
-                      textCapitalization: TextCapitalization.characters,
-                      inputFormatters: [
-                        FilteringTextInputFormatter.allow(RegExp(r'[A-Z0-9]')),
-                      ],
-                      decoration: InputDecoration(
-                        contentPadding: const EdgeInsets.symmetric(
-                            vertical: 12, horizontal: 16),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(24),
-                          borderSide: BorderSide(
-                            color: IndorepColor.text,
-                          ),
-                        ),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(24),
-                          borderSide: BorderSide(
-                            color: IndorepColor.text,
-                          ),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(24),
-                          borderSide: BorderSide(
-                            color: IndorepColor.primary,
-                            width: 2,
-                          ),
-                        ),
-                        hintText: 'Kode Voucher',
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  CircleAvatar(
-                    radius: 22,
-                    backgroundColor: voucherController.text.isEmpty
-                        ? Colors.grey
-                        : IndorepColor.primary,
-                    child: IconButton(
-                      icon: const Icon(Icons.check, color: Colors.white),
-                      onPressed: voucherController.text.isEmpty
-                          ? null
-                          : () async {
-                              var irepBE = IrepBE();
-                              var result = await irepBE
-                                  .getVoucherDetails(voucherController.text);
-                              if (result.success) {
-                                Fluttertoast.showToast(
-                                  msg:
-                                      'Voucher diterapkan, diskon ${result.off}%',
-                                  toastLength: Toast.LENGTH_SHORT,
-                                  gravity: ToastGravity.BOTTOM,
-                                  timeInSecForIosWeb: 1,
-                                  fontSize: 16.0,
-                                );
-                                setState(() {
-                                  voucherDetails = result;
-                                  appliedVoucherCode =
-                                      voucherController.text.toUpperCase();
-                                });
-                              } else {
-                                Fluttertoast.showToast(
-                                  msg: result.message.isNotEmpty
-                                      ? result.message[0].toUpperCase() +
-                                          result.message.substring(1)
-                                      : result.message,
-                                  toastLength: Toast.LENGTH_SHORT,
-                                  gravity: ToastGravity.BOTTOM,
-                                  timeInSecForIosWeb: 1,
-                                  fontSize: 16.0,
-                                );
-                              }
-                            },
-                    ),
-                  ),
-                ],
-              ),
               const SizedBox(height: 32),
             ],
           ),
@@ -331,6 +250,7 @@ class _PaymentDialogBottomSheetState extends State<PaymentDialogBottomSheet> {
                 padding: const EdgeInsets.all(8.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
                     Text(
                       'Pilih Metode pembayaran :',
@@ -375,7 +295,63 @@ class _PaymentDialogBottomSheetState extends State<PaymentDialogBottomSheet> {
                               fontWeight: FontWeight.w400,
                             ),
                           )
-                        : const SizedBox.shrink(),
+                        : GestureDetector(
+                            onTap: () async {
+                              String capitalize(String s) => s.isNotEmpty
+                                  ? '${s[0].toUpperCase()}${s.substring(1)}'
+                                  : s;
+                              final result = await showDialog(
+                                context: context,
+                                builder: (context) => vocInputDialog(context),
+                              );
+
+                              if (result != null) {
+                                if (result.success) {
+                                  setState(() {
+                                    voucherDetails = result;
+                                    appliedVoucherCode =
+                                        voucherController.text.toUpperCase();
+                                  });
+                                  Fluttertoast.showToast(
+                                      msg: capitalize("Voucher diterapkan!"));
+                                } else {
+                                  Fluttertoast.showToast(
+                                      msg: capitalize(result.message));
+                                }
+                              }
+                            },
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                vertical: 8,
+                                horizontal: 12,
+                              ),
+                              decoration: BoxDecoration(
+                                color:
+                                    IndorepColor.primary.withValues(alpha: 0.1),
+                                borderRadius: BorderRadius.circular(8),
+                                border: Border.all(color: IndorepColor.primary),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(
+                                    Icons.sell_rounded,
+                                    color: IndorepColor.primary,
+                                    size: 18,
+                                  ),
+                                  const SizedBox(width: 6),
+                                  Text(
+                                    'Punya Voucher?',
+                                    style: GoogleFonts.inter(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w600,
+                                      color: IndorepColor.primary,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
                     const SizedBox(height: 8),
                     Text(
                       'Total : ${getTotalWithVoucher()}',
@@ -448,7 +424,7 @@ class _PaymentDialogBottomSheetState extends State<PaymentDialogBottomSheet> {
                             isValidPaymentMethod() ? Colors.white : Colors.grey,
                       ),
                       label: Text(
-                        'Bayar',
+                        'Lanjut',
                         style: GoogleFonts.inter(
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
@@ -465,6 +441,144 @@ class _PaymentDialogBottomSheetState extends State<PaymentDialogBottomSheet> {
           ],
         ),
       ],
+    );
+  }
+
+  AlertDialog nameInputDialog(BuildContext context) {
+    return AlertDialog(
+      title: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text('Nama Pelanggan', style: GoogleFonts.inter()),
+          const SizedBox(width: 14),
+          GestureDetector(
+            onTap: () => Navigator.pop(context, null), // return null if closed
+            child: const CircleAvatar(child: Icon(Icons.close)),
+          )
+        ],
+      ),
+      content: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 8.0),
+        child: Row(
+          children: [
+            Expanded(
+              child: TextField(
+                controller: nameController,
+                onChanged: (value) {
+                  if (value != value.toUpperCase()) {
+                    nameController.value = nameController.value.copyWith(
+                      text: value.toUpperCase(),
+                      selection: TextSelection.collapsed(offset: value.length),
+                    );
+                  }
+                },
+                textCapitalization: TextCapitalization.characters,
+                inputFormatters: [
+                  FilteringTextInputFormatter.allow(RegExp(r'[A-z 0-9]')),
+                ],
+                decoration: InputDecoration(
+                  contentPadding:
+                      const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(24),
+                  ),
+                  hintText: 'Ujang Abdul Jabar',
+                  hintStyle: GoogleFonts.inter(fontStyle: FontStyle.italic),
+                ),
+              ),
+            ),
+            const SizedBox(width: 8),
+            ValueListenableBuilder<TextEditingValue>(
+              valueListenable: nameController,
+              builder: (context, value, _) {
+                return CircleAvatar(
+                  radius: 22,
+                  backgroundColor:
+                      value.text.isEmpty ? Colors.grey : IndorepColor.primary,
+                  child: IconButton(
+                    icon: const Icon(Icons.check, color: Colors.white),
+                    onPressed: value.text.isEmpty
+                        ? null
+                        : () {
+                            Navigator.pop(context, nameController.text);
+                          },
+                  ),
+                );
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  AlertDialog vocInputDialog(BuildContext context) {
+    return AlertDialog(
+      title: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text('Input Voucher', style: GoogleFonts.inter()),
+          GestureDetector(
+            onTap: () => Navigator.pop(context, null), // return null if closed
+            child: const CircleAvatar(child: Icon(Icons.close)),
+          )
+        ],
+      ),
+      content: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 8.0),
+        child: Row(
+          children: [
+            Expanded(
+              child: TextField(
+                controller: voucherController,
+                onChanged: (value) {
+                  if (value != value.toUpperCase()) {
+                    voucherController.value = voucherController.value.copyWith(
+                      text: value.toUpperCase(),
+                      selection: TextSelection.collapsed(offset: value.length),
+                    );
+                  }
+                },
+                textCapitalization: TextCapitalization.characters,
+                inputFormatters: [
+                  FilteringTextInputFormatter.allow(RegExp(r'[A-z0-9]')),
+                ],
+                decoration: InputDecoration(
+                  contentPadding:
+                      const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(24),
+                  ),
+                  hintText: 'IDRPV1A2B',
+                  hintStyle: GoogleFonts.inter(fontStyle: FontStyle.italic),
+                ),
+              ),
+            ),
+            const SizedBox(width: 8),
+            ValueListenableBuilder<TextEditingValue>(
+              valueListenable: voucherController,
+              builder: (context, value, _) {
+                return CircleAvatar(
+                  radius: 22,
+                  backgroundColor:
+                      value.text.isEmpty ? Colors.grey : IndorepColor.primary,
+                  child: IconButton(
+                    icon: const Icon(Icons.check, color: Colors.white),
+                    onPressed: value.text.isEmpty
+                        ? null
+                        : () async {
+                            var irepBE = IrepBE();
+                            GetVoucherDetailsResponse res =
+                                await irepBE.getVoucherDetails(value.text);
+                            Navigator.pop(context, res);
+                          },
+                  ),
+                );
+              },
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
