@@ -15,25 +15,65 @@ class WarnetHomeScreen extends StatefulWidget {
 
 class _WarnetHomeScreenState extends State<WarnetHomeScreen> {
   int _selectedIndex = 0;
+  final moreOptionsController = FlyoutController();
 
   @override
   Widget build(BuildContext context) {
     return Consumer<WebMainProvider>(builder: (context, provider, child) {
+      List<MenuFlyoutItem> menuItemsOffline = [
+        MenuFlyoutItem(
+          leading: const Icon(FluentIcons.error),
+          text: Text('Update API Key'),
+          onPressed: () => updateApiKeyDialog(context),
+        )
+      ];
+
+      List<MenuFlyoutItem> menuItems = [
+        MenuFlyoutItem(
+          leading: provider.serverOnline
+              ? const Icon(FluentIcons.check_mark)
+              : const Icon(FluentIcons.error),
+          text: Text('Server Status'),
+          onPressed: () {},
+        ),
+        MenuFlyoutItem(
+          leading: const Icon(FluentIcons.switch_user),
+          text: Text(provider.currentOperator),
+          onPressed: () {},
+        )
+      ];
+
       return NavigationView(
         appBar: NavigationAppBar(
+          leading:
+              Image.asset('assets/images/app_icon.png', width: 38, height: 38),
           title: Row(
             children: [
-              Image.asset('assets/images/app_icon.png', width: 38, height: 38),
-              const SizedBox(width: 8),
               Expanded(
-                child: Text(
-                  'INDOREP Net Dashboard',
-                  style: GoogleFonts.inter(
-                    fontSize: 20,
-                    fontWeight: FontWeight.w600,
-                  ),
-                  overflow: TextOverflow.ellipsis,
-                  maxLines: 1,
+                child: LayoutBuilder(
+                  builder: (context, constraints) {
+                    if (constraints.maxWidth > 480) {
+                      return Text(
+                        'INDOREP Net Dashboard',
+                        style: GoogleFonts.inter(
+                          fontSize: 20,
+                          fontWeight: FontWeight.w600,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
+                      );
+                    } else {
+                      return Text(
+                        'Dashboard',
+                        style: GoogleFonts.inter(
+                          fontSize: 20,
+                          fontWeight: FontWeight.w600,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
+                      );
+                    }
+                  },
                 ),
               ),
             ],
@@ -43,23 +83,64 @@ class _WarnetHomeScreenState extends State<WarnetHomeScreen> {
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text(
-                  'Shift OP : ',
-                  style: GoogleFonts.inter(
-                      fontSize: 16, fontWeight: FontWeight.w600),
-                ),
-                const SizedBox(width: 8),
-                ComboBox<String>(
-                  value: provider.currentOperator,
-                  items: provider.operators
-                      .map((op) => ComboBoxItem(value: op, child: Text(op)))
-                      .toList(),
-                  onChanged: (value) {
-                    if (value != null) {
-                      provider.setCurrentOperator(value);
-                    }
-                  },
-                ),
+                // Text(
+                //   'Shift : ',
+                //   style: GoogleFonts.inter(
+                //       fontSize: 16, fontWeight: FontWeight.w600),
+                // ),
+                // const SizedBox(width: 8),
+                // ComboBox<String>(
+                //   value: provider.currentOperator,
+                //   items: provider.operators
+                //       .map((op) => ComboBoxItem(value: op, child: Text(op)))
+                //       .toList(),
+                //   onChanged: (value) {
+                //     if (value != null) {
+                //       provider.setCurrentOperator(value);
+                //     }
+                //   },
+                // ),
+                // const SizedBox(width: 16),
+                FlyoutTarget(
+                    controller: moreOptionsController,
+                    child: Button(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 2.0),
+                        child: Row(
+                          children: [
+                            provider.serverOnline
+                                ? CircleAvatar(
+                                    backgroundColor: Colors.green,
+                                    radius: 8,
+                                  )
+                                : CircleAvatar(
+                                    backgroundColor: Colors.red,
+                                    radius: 8,
+                                  ),
+                            const SizedBox(width: 8),
+                            provider.serverOnline
+                                ? Text(provider.currentOperator)
+                                : const Text('Offline'),
+                          ],
+                        ),
+                      ),
+                      onPressed: () {
+                        moreOptionsController.showFlyout(
+                          autoModeConfiguration: FlyoutAutoConfiguration(
+                            preferredMode: FlyoutPlacementMode.bottomCenter,
+                          ),
+                          barrierDismissible: true,
+                          dismissOnPointerMoveAway: false,
+                          dismissWithEsc: true,
+                          builder: (context) {
+                            return MenuFlyout(
+                                items: provider.serverOnline
+                                    ? menuItems
+                                    : menuItemsOffline);
+                          },
+                        );
+                      },
+                    )),
                 const SizedBox(width: 16),
               ],
             ),
@@ -84,10 +165,43 @@ class _WarnetHomeScreenState extends State<WarnetHomeScreen> {
               title: const Text('PC Management'),
               body: const PcManagementScreen(),
             ),
-            // Add more PaneItems as needed
           ],
         ),
       );
     });
+  }
+
+  void updateApiKeyDialog(BuildContext context) async {
+    final result = await showDialog<String>(
+      context: context,
+      builder: (context) => ContentDialog(
+        title: Text('Update API Key'),
+        content: InfoLabel(
+          label: 'Input new API key:',
+          child: SizedBox(
+            height: 32,
+            child: TextBox(
+              placeholder: 'eyJ...',
+            ),
+          ),
+        ),
+        actions: [
+          Button(
+            child: const Text('Cancel'),
+            onPressed: () {
+              Navigator.pop(context);
+              Navigator.pop(context);
+            },
+          ),
+          FilledButton(
+              child: const Text('Update'),
+              onPressed: () {
+                Navigator.pop(context);
+                Navigator.pop(context, 'API Key Updated');
+              }),
+        ],
+      ),
+    );
+    setState(() {});
   }
 }

@@ -1,5 +1,8 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:pos_indorep/model/model.dart';
+import 'package:pos_indorep/screen/transaction/transaction_page.dart';
 import 'package:pos_indorep/services/irepbe_services.dart';
 
 class TransactionProvider extends ChangeNotifier {
@@ -8,15 +11,60 @@ class TransactionProvider extends ChangeNotifier {
   TransactionData? _selectedTransaction;
   int _currentPageIndex = 1;
   int _totalPages = 0;
+  FilterType _filterSource = FilterType.all;
+  Set<String> _newOrderIds = {};
 
-  List<TransactionData> get transactions => _allTransactions;
+  Timer? _refreshTimer;
+
+  // Firestore reference
+  final String userId = 'INDOREP-POS';
+  final FirebaseFirestore firestore = FirebaseFirestore.instance;
+
+  List<TransactionData> get allTransactions => _allTransactions;
   List<TransactionData> get filteredTransactions => _filteredTransactions;
   TransactionData? get selectedTransaction => _selectedTransaction;
   int get currentPageIndex => _currentPageIndex;
   int get totalPages => _totalPages;
+  FilterType get filterSource => _filterSource;
+  Set<String> get newOrderIds => _newOrderIds;
+
+  // Red dot if any visible transaction is in newOrderIds
+  bool get hasNewData =>
+      _filteredTransactions.any((tx) => _newOrderIds.contains(tx.orderId));
 
   TransactionProvider() {
-    getAllTransactions(1);
+    _init();
+  }
+
+  Future<void> _init() async {
+    await _loadNewOrderIds();
+    await getAllTransactions(1);
+    _refreshTimer = Timer.periodic(
+      const Duration(seconds: 10),
+      (timer) {
+        getAllTransactions(_currentPageIndex);
+        _loadNewOrderIds(); // Keep in sync with Firestore
+      },
+    );
+  }
+
+  Future<void> _loadNewOrderIds() async {
+    final doc = await firestore.collection('users').doc(userId).get();
+    final ids = doc.data()?['newOrderIds'] as List<dynamic>? ?? [];
+    _newOrderIds = ids.map((e) => e.toString()).toSet();
+    notifyListeners();
+  }
+
+  Future<void> _saveNewOrderIds() async {
+    await firestore.collection('users').doc(userId).set({
+      'newOrderIds': _newOrderIds.toList(),
+    }, SetOptions(merge: true));
+  }
+
+  @override
+  void dispose() {
+    _refreshTimer?.cancel();
+    super.dispose();
   }
 
   Future<void> getAllTransactions(int page) async {
@@ -37,22 +85,32 @@ class TransactionProvider extends ChangeNotifier {
     }
   }
 
-  // void filterTransactionsByTimeframe(DateTime start, DateTime end) {
-  //   _filteredTransactions = _allTransactions
-  //       .where((transaction) =>
-  //           transaction.transactionDate >= start.millisecondsSinceEpoch &&
-  //           transaction.transactionDate <= end.millisecondsSinceEpoch)
-  //       .toList();
-  //   notifyListeners();
-  // }
+  // Call this when a transaction is tapped/seen
+  Future<void> markOrderIdAsSeen(String orderId) async {
+    if (_newOrderIds.contains(orderId)) {
+      _newOrderIds.remove(orderId);
+      await _saveNewOrderIds();
+      notifyListeners();
+    }
+  }
 
-  // Future<void> addTransaction(TransactionModel transaction) {
-  //   try {
-  //     return _firebaseService.addTransaction(transaction);
-  //   } catch (e) {
-  //     rethrow;
-  //   }
-  // }
+  void filterTransactionsByType(FilterType type) {
+    _filterSource = type;
+    if (type == FilterType.all) {
+      _filteredTransactions = _allTransactions;
+    } else if (type == FilterType.cafe) {
+      _filteredTransactions = _allTransactions
+          .where((transaction) =>
+              transaction.pc == null || transaction.pc!.isEmpty)
+          .toList();
+    } else if (type == FilterType.warnet) {
+      _filteredTransactions = _allTransactions
+          .where((transaction) =>
+              transaction.pc != null && transaction.pc!.isNotEmpty)
+          .toList();
+    }
+    notifyListeners();
+  }
 
   void selectTransaction(TransactionData transaction) {
     _selectedTransaction = transaction;

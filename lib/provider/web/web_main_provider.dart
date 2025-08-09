@@ -3,9 +3,11 @@ import 'package:pos_indorep/services/web_services.dart';
 
 class WebMainProvider extends ChangeNotifier {
   String _currentOperator = 'Agung';
+  bool _serverOnline = false;
   final List<String> _operators = ['Agung', 'Asep', 'Fajar', 'Gume'];
 
   String get currentOperator => _currentOperator;
+  bool get serverOnline => _serverOnline;
   List<String> get operators => _operators;
 
   WebMainProvider() {

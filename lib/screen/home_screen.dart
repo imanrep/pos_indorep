@@ -4,10 +4,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bluetooth_printer/flutter_bluetooth_printer.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
+import 'package:pos_indorep/provider/transaction_provider.dart';
+import 'package:pos_indorep/screen/dashboard/tablet_dashoard_page.dart';
 import 'package:pos_indorep/screen/pesanan_page/pesanan_page.dart';
 import 'package:pos_indorep/screen/management/menu_management_page.dart';
 import 'package:pos_indorep/screen/settings/settings_page.dart';
 import 'package:pos_indorep/screen/transaction/transaction_page.dart';
+import 'package:provider/provider.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -22,41 +25,80 @@ class _HomeScreenState extends State<HomeScreen> {
   bool showLeading = false;
   bool showTrailing = false;
   double groupAlignment = -1.0;
-  final List<NavigationRailDestination> _destinations =
-      const <NavigationRailDestination>[
-    NavigationRailDestination(
-      icon: Icon(Icons.book_outlined),
-      selectedIcon: Icon(Icons.book_outlined),
-      label: Text('Pesanan'),
-    ),
-    NavigationRailDestination(
-      icon: Icon(Icons.receipt_long_rounded),
-      selectedIcon: Icon(Icons.receipt_long_rounded),
-      label: Text('Transaksi'),
-    ),
-    NavigationRailDestination(
-      icon: Icon(Icons.lunch_dining_outlined),
-      selectedIcon: Icon(Icons.lunch_dining_outlined),
-      label: Text('Menu'),
-    ),
-    NavigationRailDestination(
-      icon: Icon(Icons.settings_rounded),
-      selectedIcon: Icon(Icons.settings_rounded),
-      label: Text('Settings'),
-    ),
-  ];
-
-  final List<Widget> _pages = <Widget>[
-    PesananPage(),
-    TransactionPage(),
-    MenuManagementPage(),
-    SettingsPage(),
-    // MejaPage(),
-  ];
 
   @override
   Widget build(BuildContext context) {
     // final provider = Provider.of<MenuProvider>(context);
+    final List<NavigationRailDestination> _destinations =
+        <NavigationRailDestination>[
+      NavigationRailDestination(
+        icon: Icon(Icons.space_dashboard_outlined),
+        selectedIcon: Icon(Icons.space_dashboard_rounded),
+        label: Text('Dashboard'),
+      ),
+      NavigationRailDestination(
+        icon: Icon(Icons.book_outlined),
+        selectedIcon: Icon(Icons.book),
+        label: Text('Pesanan'),
+      ),
+      NavigationRailDestination(
+        icon: Consumer<TransactionProvider>(
+            builder: (context, transactionProvider, child) {
+          if (transactionProvider.hasNewData) {
+            return Stack(
+              children: [
+                Icon(Icons.receipt_long_rounded),
+                Positioned(
+                  right: 0,
+                  top: 0,
+                  child: Icon(Icons.circle, color: Colors.red, size: 12),
+                ),
+              ],
+            );
+          } else {
+            return Icon(Icons.receipt_long_rounded);
+          }
+        }),
+        selectedIcon: Consumer<TransactionProvider>(
+            builder: (context, transactionProvider, child) {
+          if (transactionProvider.hasNewData) {
+            return Stack(
+              children: [
+                Icon(Icons.receipt_long_rounded),
+                Positioned(
+                  right: 0,
+                  top: 0,
+                  child: Icon(Icons.circle, color: Colors.red, size: 12),
+                ),
+              ],
+            );
+          } else {
+            return Icon(Icons.receipt_long_rounded);
+          }
+        }),
+        label: Text('Transaksi'),
+      ),
+      NavigationRailDestination(
+        icon: Icon(Icons.lunch_dining_outlined),
+        selectedIcon: Icon(Icons.lunch_dining),
+        label: Text('Menu'),
+      ),
+      NavigationRailDestination(
+        icon: Icon(Icons.settings_outlined),
+        selectedIcon: Icon(Icons.settings_rounded),
+        label: Text('Settings'),
+      ),
+    ];
+
+    final List<Widget> _pages = <Widget>[
+      TabletDashboardPage(),
+      PesananPage(),
+      TransactionPage(),
+      MenuManagementPage(),
+      SettingsPage(),
+      // MejaPage(),
+    ];
+
     return Scaffold(
       appBar: AppBar(
         elevation: 1,

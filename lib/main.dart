@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:loader_overlay/loader_overlay.dart';
 import 'package:pos_indorep/helper/helper.dart';
 import 'package:pos_indorep/provider/cart_provider.dart';
+import 'package:pos_indorep/provider/dashboard_provider.dart';
 import 'package:pos_indorep/provider/main_provider.dart';
 import 'package:pos_indorep/provider/menu_provider.dart';
 import 'package:pos_indorep/provider/transaction_provider.dart';
@@ -43,6 +44,7 @@ void main() async {
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => MainProvider()),
+        ChangeNotifierProvider(create: (_) => DashboardProvider()),
         ChangeNotifierProvider(create: (_) => CartProvider()),
         ChangeNotifierProvider(create: (_) => TransactionProvider()),
         ChangeNotifierProvider(create: (_) => MenuProvider()),

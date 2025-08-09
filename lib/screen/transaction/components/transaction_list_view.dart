@@ -29,6 +29,7 @@ class _TransactionListViewState extends State<TransactionListView> {
         itemCount: widget.transactions.length,
         itemBuilder: (context, index) {
           final transaction = widget.transactions[index];
+          // int newTransactionIndex =
           final amount = (transaction.actualAmount ?? transaction.total) ?? 0;
           String total = Helper.rupiahFormatter(amount.toDouble());
           String date = Helper.dateFormatterTwo(transaction.time);
@@ -104,10 +105,23 @@ class _TransactionListViewState extends State<TransactionListView> {
                   ),
                 ],
               ),
-              leading: CircleAvatar(
-                backgroundColor: Colors.blueGrey,
-                child:
-                    Text(orderType[0], style: TextStyle(color: Colors.white)),
+              leading: Stack(
+                children: [
+                  CircleAvatar(
+                    backgroundColor: Colors.grey.withOpacity(0.2),
+                    child: Text('${orderType[0]}${orderType[2]}',
+                        style: TextStyle(
+                            color: Colors.white, fontWeight: FontWeight.w400)),
+                  ),
+                  provider.newOrderIds.contains(orderId)
+                      ? Positioned(
+                          right: 0,
+                          top: 0,
+                          child:
+                              Icon(Icons.circle, color: Colors.red, size: 12),
+                        )
+                      : SizedBox.shrink(),
+                ],
               ),
               trailing: Row(
                 mainAxisSize: MainAxisSize
