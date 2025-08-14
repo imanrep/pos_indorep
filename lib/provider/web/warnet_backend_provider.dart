@@ -50,10 +50,10 @@ class WarnetBackendProvider extends ChangeNotifier {
   int get omzetKulkas => _omzetKulkas;
 
   WarnetBackendProvider() {
-    _init();
+    init();
   }
 
-  Future<void> _init() async {
+  Future<void> init() async {
     await getAllCustomerWarnet('');
     await getKulkasItem();
     setJumlahMember(allWarnetCustomers!.members.length);

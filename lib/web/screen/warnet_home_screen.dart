@@ -1,5 +1,6 @@
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:pos_indorep/provider/web/warnet_backend_provider.dart';
 import 'package:pos_indorep/provider/web/web_main_provider.dart';
 import 'package:pos_indorep/web/screen/dashboard/web_dashboard_page.dart';
 import 'package:pos_indorep/web/screen/pc_management/pc_management_screen.dart';
@@ -19,6 +20,7 @@ class _WarnetHomeScreenState extends State<WarnetHomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final warnetState = Provider.of<WarnetBackendProvider>(context, listen: false);
     return Consumer<WebMainProvider>(builder: (context, provider, child) {
       List<MenuFlyoutItem> menuItemsOffline = [
         MenuFlyoutItem(
@@ -102,7 +104,9 @@ class _WarnetHomeScreenState extends State<WarnetHomeScreen> {
                   height: 34,
                   child: Button(
                     child: Icon(FluentIcons.refresh),
-                    onPressed: () {},
+                    onPressed: () {
+                      warnetState.init();
+                    },
                   ),
                 ),
                 const SizedBox(width: 16),

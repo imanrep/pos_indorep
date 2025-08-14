@@ -54,7 +54,7 @@ class _WebDashboardPageState extends State<WebDashboardPage> {
                       ),
                       WebDashboardCard(
                         title: "Jumlah Item Kulkas",
-                        subtitle: "0",
+                        subtitle: provider.jumlahItemKulkas.toString(),
                         icon: FluentIcons.eat_drink,
                         isWidthExpanded: false,
                       ),

@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:firebase_core/firebase_core.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/foundation.dart';
@@ -21,18 +23,19 @@ import 'package:flutter/services.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await initializeDateFormatting('id_ID', null);
-  if (kIsWeb) {
+  if (kIsWeb || Platform.isWindows) {
     await Firebase.initializeApp(
       options: const FirebaseOptions(
-          apiKey: "AIzaSyAeR0FuthfHhmNg221oGLzY6f8vBBqRQmc",
-          authDomain: "pariwisata-cireong.firebaseapp.com",
-          projectId: "pariwisata-cireong",
-          storageBucket: "pariwisata-cireong.appspot.com",
-          messagingSenderId: "1081014321686",
-          appId: "1:1081014321686:web:73f179db5c144f37386b37",
-          measurementId: "G-ZGYP2QXW1K"),
+        apiKey: "AIzaSyAeR0FuthfHhmNg221oGLzY6f8vBBqRQmc",
+        authDomain: "pariwisata-cireong.firebaseapp.com",
+        projectId: "pariwisata-cireong",
+        storageBucket: "pariwisata-cireong.appspot.com",
+        messagingSenderId: "1081014321686",
+        appId: "1:1081014321686:web:73f179db5c144f37386b37",
+        measurementId: "G-ZGYP2QXW1K",
+      ),
     );
-  } else {
+  } else if (!Platform.isWindows) {
     await Firebase.initializeApp();
   }
 
@@ -53,7 +56,7 @@ void main() async {
         ChangeNotifierProvider(create: (_) => WebMainProvider()),
         ChangeNotifierProvider(create: (_) => WarnetBackendProvider()),
       ],
-      child: GlobalLoaderOverlay(child: kIsWeb ? MyWebApp() : MyApp()),
+      child: GlobalLoaderOverlay(child: kIsWeb || Platform.isWindows ? MyWebApp() : MyApp()),
     ),
   );
 }

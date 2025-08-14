@@ -2,9 +2,11 @@ import 'package:fluent_ui/fluent_ui.dart';
 import 'package:pos_indorep/helper/helper.dart';
 import 'package:pos_indorep/provider/web/warnet_backend_provider.dart';
 import 'package:pos_indorep/services/warnet_backend_services.dart';
+import 'package:pos_indorep/web/model/create_member_response.dart';
 import 'package:pos_indorep/web/model/member_model.dart';
 import 'package:pos_indorep/web/model/topup_member_request.dart';
 import 'package:pos_indorep/web/model/topup_member_response.dart';
+import 'package:pos_indorep/web/screen/transaksi/components/warnet_member_list/components/qris_print_dialog.dart';
 import 'package:provider/provider.dart';
 
 class MemberTopupDialog extends StatefulWidget {
@@ -56,7 +58,15 @@ class _MemberTopupDialogState extends State<MemberTopupDialog> {
       setState(() {
         _isLoading = false;
       });
-      Navigator.pop(context);
+      await showDialog<String>(
+          context: context,
+          builder: (context) => QrisPrintDialog(
+            response: CreateMemberResponse(message: res.message, orderID: res.orderID, password: "", qris: res.qris ?? "", success: res.success, username: widget.member.memberAccount),
+            paket: provider.selectedPaket
+          ),
+        );
+        provider.getAllCustomerWarnet('');
+        Navigator.pop(context);
     } else if (provider.selectedMethod == 'QRIS') {
       TopUpMemberResponse res = await services.topUpMember(
         TopUpMemberRequest(
@@ -67,24 +77,18 @@ class _MemberTopupDialogState extends State<MemberTopupDialog> {
         ),
       );
       if (res.success) {
-        await displayInfoBar(context, builder: (context, close) {
-          return InfoBar(
-            title: Text(
-                'Member ${widget.member.memberAccount} berhasil ditambahkan'),
-            content: Text(
-                '${widget.member.memberAccount} - ${provider.selectedPaket.nama} (${Helper.rupiahFormatter(provider.selectedPaket.harga.toDouble())})'),
-            action: IconButton(
-              icon: Icon(FluentIcons.clear),
-              onPressed: close,
-            ),
-            severity: InfoBarSeverity.success,
-          );
-        });
-        provider.getAllCustomerWarnet('');
+        await showDialog<String>(
+          context: context,
+          builder: (context) => QrisPrintDialog(
+            response: CreateMemberResponse(message: res.message, orderID: res.orderID, password: "", qris: res.qris ?? "", success: res.success, username: widget.member.memberAccount),
+            paket: provider.selectedPaket
+          ),
+        );
       }
       setState(() {
         _isLoading = false;
       });
+      provider.getAllCustomerWarnet('');
       Navigator.pop(context);
     }
   }

@@ -21,41 +21,16 @@ class _MembersSearchListState extends State<MembersSearchList> {
   final ValueNotifier<List<Member>> selectedMembers =
       ValueNotifier<List<Member>>([]);
 
-  late List<Member> _displayed; // what ListView shows
   @override
   void initState() {
     super.initState();
-    _displayed = []; // Defensive: start with empty list
 
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      final provider = context.read<WarnetBackendProvider>();
-      final allCustomers = provider.allWarnetCustomers;
-      if (allCustomers == null || allCustomers.members.isEmpty) return;
-
-      final all = allCustomers.members.sorted(
-        (a, b) => b.memberUpdateLocal
-            .toLowerCase()
-            .compareTo(a.memberUpdateLocal.toLowerCase()),
-      );
-      setState(() {
-        _displayed = List<Member>.from(all);
-      });
-
-      _searchCtrl.addListener(() {
-        if (_asbKey.currentState?.isOverlayVisible ?? false) {
-          _asbKey.currentState?.dismissOverlay();
-        }
-        final q = _searchCtrl.text.trim().toLowerCase();
-        setState(() {
-          if (q.isEmpty) {
-            _displayed = List<Member>.from(all);
-          } else {
-            _displayed = all
-                .where((m) => m.memberAccount.toLowerCase().contains(q))
-                .toList();
-          }
-        });
-      });
+    // Add listener to search controller
+    _searchCtrl.addListener(() {
+      if (_asbKey.currentState?.isOverlayVisible ?? false) {
+        _asbKey.currentState?.dismissOverlay();
+      }
+      setState(() {}); // Trigger rebuild to filter the list
     });
   }
 
@@ -70,7 +45,7 @@ class _MembersSearchListState extends State<MembersSearchList> {
       context: context,
       builder: (context) => MemberTopupDialog(member: member),
     );
-    setState(() {});
+    setState(() {}); // Refresh state after dialog closes
   }
 
   @override
@@ -81,6 +56,20 @@ class _MembersSearchListState extends State<MembersSearchList> {
     if (allCustomers == null || allCustomers.members.isEmpty) {
       return const Center(child: Text('No members found.'));
     }
+
+    // Get the full list of members
+    final all = allCustomers.members.sorted(
+      (a, b) => b.memberUpdateLocal
+          .toLowerCase()
+          .compareTo(a.memberUpdateLocal.toLowerCase()),
+    );
+
+    // Filter the list based on the search query
+    final query = _searchCtrl.text.trim().toLowerCase();
+    final _displayed = query.isEmpty
+        ? all
+        : all.where((m) => m.memberAccount.toLowerCase().contains(query)).toList();
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
@@ -91,9 +80,7 @@ class _MembersSearchListState extends State<MembersSearchList> {
             key: _asbKey,
             controller: _searchCtrl,
             placeholder: 'Cari member yang telah terdaftar',
-            // Give it an empty items list so it won’t pop an overlay.
             items: const <AutoSuggestBoxItem<String>>[],
-            // Belt & suspenders: if something triggers overlay, hide it.
             onOverlayVisibilityChanged: (v) {
               if (v) _asbKey.currentState?.dismissOverlay();
             },
@@ -101,7 +88,7 @@ class _MembersSearchListState extends State<MembersSearchList> {
         ),
         const SizedBox(height: 12),
 
-        // Your selectable list, but feed it from _displayed
+        // List of members
         ValueListenableBuilder<List<Member>>(
           valueListenable: selectedMembers,
           builder: (context, selected, _) {

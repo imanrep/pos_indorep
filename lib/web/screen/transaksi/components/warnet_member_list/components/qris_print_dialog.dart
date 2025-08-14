@@ -1,15 +1,19 @@
-import 'dart:async';
+import 'dart:io';
+
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter_thermal_printer/flutter_thermal_printer.dart';
 import 'package:flutter_thermal_printer/utils/printer.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:image/image.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:pos_indorep/helper/helper.dart';
 import 'package:pos_indorep/web/model/create_member_response.dart';
+import 'package:pos_indorep/web/model/web_model.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
 class QrisPrintDialog extends StatefulWidget {
   final CreateMemberResponse response;
-  const QrisPrintDialog({super.key, required this.response});
+  final WarnetPaket paket;
+  const QrisPrintDialog({super.key, required this.response, required this.paket});
 
   @override
   State<QrisPrintDialog> createState() => _QrisPrintDialogState();
@@ -18,273 +22,323 @@ class QrisPrintDialog extends StatefulWidget {
 class _QrisPrintDialogState extends State<QrisPrintDialog> {
   final _ftp = FlutterThermalPrinter.instance;
 
-  List<Printer> _printers = [];
-  Printer? _selectedPrinter;
-  StreamSubscription<List<Printer>>? _scanSub;
+  // Hardcoded printer details
+  final String _vendorId = "XXXX"; // Replace with your printer's vendorId
+  final String _productId = "YYYY"; // Replace with your printer's productId
 
+  Printer? _selectedPrinter;
   bool _isPrinting = false;
-  bool _isScanning = false;
 
   @override
   void initState() {
     super.initState();
-    _scanUsbPrinters();
+    _initializePrinter();
   }
 
-  @override
-  void dispose() {
-    _scanSub?.cancel();
-    _ftp.stopScan();
-    super.dispose();
-  }
-
-  Future<void> _scanUsbPrinters() async {
-    setState(() => _isScanning = true);
-    _scanSub?.cancel();
-
-    // Triggers a fresh enumeration; results come via devicesStream
-    await _ftp.getPrinters(connectionTypes: [ConnectionType.USB]);
-
-    _scanSub = _ftp.devicesStream.listen((devices) {
-      setState(() {
-        _printers = devices
-            .where((p) => p.connectionType == ConnectionType.USB)
-            .toList();
-        _selectedPrinter ??= _printers.isNotEmpty ? _printers.first : null;
-        _isScanning = false;
-      });
-    });
-  }
-
-  Future<void> _connectSelected() async {
-    if (_selectedPrinter == null) return;
-    final already = _selectedPrinter!.isConnected ?? false;
-    if (!already) {
-      await _ftp.connect(_selectedPrinter!);
-    }
-  }
-
-  /// Your existing receipt layout extracted to a reusable method (for preview & printing)
-  Widget _buildReceipt() {
-    final orderType = widget.response.qris.isEmpty ? 'Cash' : 'QRIS';
-
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Text('INDOREP GAMING & CAFFE',
-            textAlign: TextAlign.center,
-            style: GoogleFonts.robotoMono(
-                fontSize: 28, fontWeight: FontWeight.w800)),
-        const SizedBox(height: 4),
-        Text('Jl. Margonda No. 386, Beji, Kota Depok',
-            textAlign: TextAlign.center,
-            style: GoogleFonts.robotoMono(fontSize: 18)),
-        const SizedBox(height: 24),
-        Text('----------------------------------------------------------------',
-            style: GoogleFonts.robotoMono(fontSize: 18)),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text('IDRPW-${widget.response.orderID}',
-                  style: GoogleFonts.robotoMono(fontSize: 18)),
-              Text(
-                '${Helper.dateFormatterTwo(DateTime.now().toIso8601String())} - '
-                '${Helper.timeFormatterTwo(DateTime.now().toIso8601String())}',
-                style: GoogleFonts.robotoMono(fontSize: 18),
-              ),
-            ],
-          ),
-        ),
-        const SizedBox(height: 8),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text('SUKSES',
-                  style: GoogleFonts.robotoMono(
-                      fontSize: 18, fontWeight: FontWeight.w400)),
-              Text('Via: $orderType',
-                  style: GoogleFonts.robotoMono(
-                      fontSize: 18, fontWeight: FontWeight.w400)),
-            ],
-          ),
-        ),
-        Text('----------------------------------------------------------------',
-            style: GoogleFonts.robotoMono(fontSize: 18)),
-        const SizedBox(height: 12),
-        Align(
-          alignment: Alignment.centerLeft,
-          child: Text('Username: ${widget.response.username}',
-              style: GoogleFonts.robotoMono(
-                  fontSize: 18, fontWeight: FontWeight.w600)),
-        ),
-        const SizedBox(height: 8),
-        Align(
-          alignment: Alignment.centerLeft,
-          child: Text('Password: ${widget.response.password}',
-              style: GoogleFonts.robotoMono(
-                  fontSize: 18, fontWeight: FontWeight.w600)),
-        ),
-        const SizedBox(height: 16),
-        Align(
-          alignment: Alignment.centerLeft,
-          child: Text(
-            'Username dan Password dapat digunakan juga pada SSID WiFi gedung kami @INDOREP-WARNET dan @INDOREP-NET',
-            style: GoogleFonts.robotoMono(
-                fontSize: 14,
-                fontWeight: FontWeight.w400,
-                fontStyle: FontStyle.italic),
-          ),
-        ),
-        const SizedBox(height: 16),
-        if (widget.response.qris.isNotEmpty)
-          Center(
-            child: QrImageView(
-              data: widget.response.qris,
-              version: QrVersions.auto,
-              size: 120.0,
-            ),
-          ),
-        const SizedBox(height: 24),
-        Align(
-          alignment: Alignment.centerRight,
-          child: Text(
-            'Total: ${Helper.rupiahFormatter(10000.toDouble())}',
-            style: GoogleFonts.robotoMono(
-                fontSize: 22, fontWeight: FontWeight.w600),
-          ),
-        ),
-        const SizedBox(height: 32),
-        Text('Info, saran, dan masukan',
-            style: GoogleFonts.robotoMono(
-                fontSize: 18, fontWeight: FontWeight.w400)),
-        Text('business@indorep.com',
-            style: GoogleFonts.robotoMono(
-                fontSize: 18, fontWeight: FontWeight.w400)),
-        const SizedBox(height: 24),
-        Text('Terima Kasih!',
-            style: GoogleFonts.robotoMono(
-                fontSize: 18, fontWeight: FontWeight.w600)),
-        const SizedBox(height: 24),
-      ],
+  Future<void> _initializePrinter() async {
+    // Manually create a Printer object with the vendorId and productId
+    _selectedPrinter = Printer(
+      name: "Kassen Thermal Printer",
+      connectionType: ConnectionType.USB,
+      vendorId: _vendorId,
+      productId: _productId,
     );
-  }
 
-  /// Simplest USB print: render widget -> send via USB
-  Future<void> _printUsb() async {
-    if (_selectedPrinter == null) {
-      await _scanUsbPrinters();
-      if (_selectedPrinter == null) {
-        await displayInfoBar(context, builder: (ctx, close) {
-          return InfoBar(
-            title: const Text('Tidak ada printer'),
-            content: const Text(
-                'Pastikan printer USB terpasang & driver terinstal.'),
-            action: IconButton(
-                icon: const Icon(FluentIcons.clear), onPressed: close),
-            severity: InfoBarSeverity.warning,
-          );
-        });
-        return;
-      }
-    }
-
+    // Attempt to connect to the printer
     try {
-      setState(() => _isPrinting = true);
-
-      await _connectSelected();
-
-      // printOnBle must be false for USB
-      await _ftp.printWidget(
-        context,
-        printer: _selectedPrinter!,
-        printOnBle: false,
-        widget: FluentTheme(
-          data: FluentTheme.of(context), // reuse current Fluent theme
-          child: Directionality(
-            textDirection: Directionality.of(context), // inherit text direction
-            child: Container(
-              color: Colors.white, // solid background for clean capture
-              padding: const EdgeInsets.all(16),
-              child: _buildReceipt(), // your existing Fluent-based receipt
-            ),
-          ),
-        ),
-      );
-
-      await displayInfoBar(context, builder: (ctx, close) {
-        return InfoBar(
-          title: const Text('Berhasil mencetak'),
-          action:
-              IconButton(icon: const Icon(FluentIcons.clear), onPressed: close),
-          severity: InfoBarSeverity.success,
-        );
-      });
+      await _ftp.connect(_selectedPrinter!);
     } catch (e) {
-      await displayInfoBar(context, builder: (ctx, close) {
-        return InfoBar(
-          title: const Text('Gagal mencetak'),
-          content: Text(e.toString()),
-          action:
-              IconButton(icon: const Icon(FluentIcons.clear), onPressed: close),
-          severity: InfoBarSeverity.error,
-        );
-      });
-    } finally {
-      if (mounted) setState(() => _isPrinting = false);
+      debugPrint("Failed to connect to printer: $e");
     }
   }
+
+
+  Future<void> _printUsb() async {
+  if (_selectedPrinter == null) {
+    debugPrint("Printer not initialized.");
+    return;
+  }
+
+  try {
+    setState(() => _isPrinting = true);
+
+    final profile = await CapabilityProfile.load();
+    final generator = Generator(PaperSize.mm58, profile);
+    final List<int> bytes = [];
+
+    final orderType = widget.response.qris.isEmpty ? 'Cash' : 'QRIS';
+    final now = DateTime.now();
+    final formattedDate = Helper.dateFormatterTwo(now.toIso8601String());
+    final formattedTime = Helper.timeFormatterTwo(now.toIso8601String());
+
+    // HEADER
+    bytes.addAll(generator.text(
+      'INDOREP GAMING & CAFFE',
+      styles: const PosStyles(
+        align: PosAlign.center,
+        bold: true,
+        height: PosTextSize.size2,
+        width: PosTextSize.size2,
+      ),
+    ));
+
+    bytes.addAll(generator.feed(1));
+
+
+    bytes.addAll(generator.text(
+      'Jl. Margonda No. 386, Beji, Kota Depok',
+      styles: const PosStyles(align: PosAlign.center),
+    ));
+
+    bytes.addAll(generator.hr());
+
+    // ORDER INFO
+    bytes.addAll(generator.row([
+      PosColumn(
+        text: 'IDRPW-${widget.response.orderID}',
+        width: 5,
+        styles: const PosStyles(align: PosAlign.left),
+      ),
+      PosColumn(
+        text: '$formattedDate $formattedTime',
+        width: 7,
+        styles: const PosStyles(align: PosAlign.right),
+      ),
+    ]));
+
+    bytes.addAll(generator.row([
+      PosColumn(
+        text: widget.paket.nama,
+        width: 6,
+        styles: const PosStyles(align: PosAlign.left),
+      ),
+      PosColumn(
+        text: 'Via: $orderType',
+        width: 6,
+        styles: const PosStyles(align: PosAlign.right),
+      ),
+    ]));
+
+    bytes.addAll(generator.hr());
+
+     bytes.addAll(generator.text(
+      'INDOREP Net Account:',
+      styles: const PosStyles(align: PosAlign.left),
+    ));
+
+    bytes.addAll(generator.feed(1));
+
+    // USER INFO
+    bytes.addAll(generator.text(
+      'Username: ${widget.response.username}',
+      styles: const PosStyles(bold: true, align: PosAlign.center),
+    ));
+
+    bytes.addAll(generator.text(
+      'Password: ${widget.response.password}',
+      styles: const PosStyles(bold: true, align: PosAlign.center),
+    ));
+
+    bytes.addAll(generator.feed(1));
+
+    // NOTICE
+    bytes.addAll(generator.text(
+      'dapat digunakan juga pada WiFi',
+      styles: const PosStyles(align: PosAlign.center, height: PosTextSize.size1, width: PosTextSize.size1),
+    ));
+     bytes.addAll(generator.text(
+      'yang tersedia',
+      styles: const PosStyles(align: PosAlign.center, height: PosTextSize.size1, width: PosTextSize.size1),
+    ));
+    bytes.addAll(generator.text(
+      'INDOREP-WARNET dan INDOREP-NET',
+      styles: const PosStyles(align: PosAlign.center),
+    ));
+    
+
+    // temporary, enable qris via receipt
+    if(orderType == 'QRIS') {
+      String qrData = widget.response.qris;
+      const double qrSize = 340;
+    bytes.addAll(generator.feed(1));
+      try {
+  final uiImg = await QrPainter(
+    data: qrData,
+    version: QrVersions.auto,
+    gapless: false,
+  ).toImageData(qrSize);
+  final dir = await getTemporaryDirectory();
+  final pathName = '${dir.path}/qr_tmp.png';
+  final qrFile = File(pathName);
+  final imgFile = await qrFile.writeAsBytes(uiImg!.buffer.asUint8List());
+  final img = decodeImage(imgFile.readAsBytesSync());
+
+  bytes.addAll(generator.image(img!));
+} catch (e) {
+  print(e);
+}
+    }
+
+    bytes.addAll(generator.feed(1));
+
+    // // QR CODE
+    // if (widget.response.qris.isNotEmpty) {
+    //   bytes.addAll(generator.qrcode(widget.response.qris));
+    //   bytes.addAll(generator.feed(1));
+    // }
+
+    // TOTAL
+    bytes.addAll(generator.text(
+      'Total: ${Helper.rupiahFormatter(widget.paket.harga.toDouble())}',
+      styles: const PosStyles(
+        bold: true,
+        align: PosAlign.right,
+      ),
+    ));
+
+    bytes.addAll(generator.feed(1));
+
+    // FOOTER
+    bytes.addAll(generator.text(
+      'Info, saran, dan masukan',
+      styles: const PosStyles(align: PosAlign.center),
+    ));
+    bytes.addAll(generator.text(
+      'business@indorep.com',
+      styles: const PosStyles(align: PosAlign.center),
+    ));
+
+    bytes.addAll(generator.feed(1));
+
+    bytes.addAll(generator.text(
+      'Terima Kasih!',
+      styles: const PosStyles(
+        bold: true,
+        align: PosAlign.center,
+      ),
+    ));
+    bytes.addAll(generator.cut());
+
+    // SEND TO PRINTER
+    await _ftp.printData(_selectedPrinter!, bytes);
+  } catch (e) {
+    debugPrint("Print error: $e");
+    await displayInfoBar(context, builder: (ctx, close) {
+      return InfoBar(
+        title: const Text('Gagal mencetak'),
+        content: Text(e.toString()),
+        action: IconButton(icon: const Icon(FluentIcons.clear), onPressed: close),
+        severity: InfoBarSeverity.error,
+      );
+    });
+  } finally {
+    if (mounted) setState(() => _isPrinting = false);
+  }
+}
+
 
   @override
   Widget build(BuildContext context) {
     final orderType = widget.response.qris.isEmpty ? 'Cash' : 'QRIS';
 
     return ContentDialog(
-      title: Text('Pembayaran $orderType - ${widget.response.username}'),
-      content: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Printer picker row
-          Row(
+      constraints: BoxConstraints(
+        maxWidth: 450,
+        maxHeight: 650,
+      ),
+      title: Text('Konfirmasi Pembayaran $orderType'),
+      content: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text('Printer:'),
-              const SizedBox(width: 12),
-              Expanded(
-                child: ComboBox<Printer>(
-                  isExpanded: true,
-                  value: _selectedPrinter,
-                  items: _printers.map((p) {
-                    final name =
-                        p.name?.isNotEmpty == true ? p.name! : 'USB Printer';
-                    return ComboBoxItem(
-                      value: p,
-                      child: Text(
-                          '$name  ${p.vendorId ?? ""}:${p.productId ?? ""}'),
-                    );
-                  }).toList(),
-                  onChanged: (p) => setState(() => _selectedPrinter = p),
+              Row(children: [
+                Text(
+                'IDRPW-${widget.response.orderID}',
+                style: FluentTheme.of(context).typography.body!.copyWith(
+                  fontWeight: FontWeight.w500,
+                  fontSize: 18,
                 ),
               ),
-              const SizedBox(width: 8),
-              Button(
-                onPressed: _isScanning ? null : _scanUsbPrinters,
-                child: _isScanning
-                    ? const Text('Scanning...')
-                    : const Text('Rescan'),
+              const Spacer(),
+              Text(
+                '${Helper.dateFormatterTwo(DateTime.now().toIso8601String())} ${Helper.timeFormatterTwo(DateTime.now().toIso8601String())}',
+                 style: FluentTheme.of(context).typography.body!.copyWith(
+                  fontWeight: FontWeight.w500,
+                  fontSize: 18,)
               ),
+              ],),
+              const SizedBox(height: 4),
+               Row(children: [
+                Text(
+                widget.response.username,
+                style: FluentTheme.of(context).typography.body!.copyWith(
+                  fontWeight: FontWeight.w400,
+                  fontSize: 18,
+                ),
+              ),
+              const Spacer(),
+              Text(
+                '${widget.paket.nama} (${Helper.rupiahFormatter(widget.paket.harga.toDouble())})',
+                 style: FluentTheme.of(context).typography.body!.copyWith(
+                  fontWeight: FontWeight.w400,
+                  fontSize: 18,)
+              ),
+              ],),
+              const SizedBox(height: 16),
+              if(widget.response.qris.isEmpty)
+                Center(
+                  child: Text(
+                    'Silakan lakukan pembayaran melalui kasir.',
+                    style: FluentTheme.of(context).typography.body!.copyWith(
+                      fontWeight: FontWeight.w500,
+                      fontSize: 16,
+                    ),
+                  ),
+                )
+              else
+              Column(
+                children: [
+                  Center(
+                    child: Text(
+                      'Silakan lakukan pembayaran melalui QRIS berikut:',
+                      style: FluentTheme.of(context).typography.body!.copyWith(
+                        fontWeight: FontWeight.w500,
+                        fontSize: 16,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+              Align(
+                alignment: Alignment.center,
+                child: Card(
+                  padding: const EdgeInsets.all(8.0),
+                  backgroundColor: Colors.white,
+                  child: QrImageView(
+                    data: widget.response.qris,
+                    version: QrVersions.auto,
+                    size: 200.0,
+                    gapless: false,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+              Center(
+                child: Text(
+                  '${Helper.rupiahFormatter(widget.paket.harga.toDouble())}',
+                  style: FluentTheme.of(context).typography.body!.copyWith(
+                    fontWeight: FontWeight.w500,
+                    fontSize: 18,
+                  ),
+                ),
+              ),
+                ],
+              ),
+              
             ],
           ),
-          const SizedBox(height: 12),
-          // Receipt preview (scrollable)
-          Expanded(
-            child: SingleChildScrollView(
-              child: _buildReceipt(),
-            ),
-          ),
-        ],
+        ),
       ),
       actions: [
         Button(

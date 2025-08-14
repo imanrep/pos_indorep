@@ -1,4 +1,5 @@
 import 'package:fluent_ui/fluent_ui.dart';
+import 'package:flutter/services.dart';
 import 'package:pos_indorep/helper/helper.dart';
 import 'package:pos_indorep/provider/web/warnet_backend_provider.dart';
 import 'package:pos_indorep/provider/web/web_transaksi_provider.dart';
@@ -58,12 +59,19 @@ class _NewTopupDialogState extends State<NewTopupDialog> {
             severity: InfoBarSeverity.success,
           );
         });
-        provider.getAllCustomerWarnet('');
       }
       setState(() {
         _isLoading = false;
       });
-      Navigator.pop(context);
+      await showDialog<String>(
+          context: context,
+          builder: (context) => QrisPrintDialog(
+            response: res,
+            paket: provider.selectedPaket
+          ),
+        );
+        provider.getAllCustomerWarnet('');
+        Navigator.pop(context);
     } else if (provider.selectedMethod == 'QRIS') {
       var res = await services.createMember(
         CreateMemberRequest(
@@ -79,12 +87,14 @@ class _NewTopupDialogState extends State<NewTopupDialog> {
           context: context,
           builder: (context) => QrisPrintDialog(
             response: res,
+            paket: provider.selectedPaket
           ),
         );
       }
       setState(() {
         _isLoading = false;
       });
+      provider.getAllCustomerWarnet('');
       Navigator.pop(context);
     }
   }
@@ -114,6 +124,10 @@ class _NewTopupDialogState extends State<NewTopupDialog> {
                   builder: (context, provider, child) {
                     return TextBox(
                       controller: usernameController,
+                      autofocus: true,
+                      inputFormatters: [
+                         FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z0-9/\s]')),
+                      ],
                       placeholder: 'Username',
                       maxLength: 20,
                       onChanged: (_) => setState(() {}),
