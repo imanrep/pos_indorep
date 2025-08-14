@@ -8,7 +8,7 @@ import 'package:pos_indorep/screen/transaction/components/rekap/list_transaksi_d
 import 'package:pos_indorep/screen/transaction/components/widget/date_bar.dart';
 import 'package:pos_indorep/screen/transaction/components/widget/date_range_bar.dart';
 import 'package:pos_indorep/screen/transaction/components/widget/summary_box_widget.dart';
-import 'package:pos_indorep/services/irepbe_services.dart';
+import 'package:pos_indorep/services/cafe_backend_services.dart';
 
 class RekapBottomSheet extends StatefulWidget {
   const RekapBottomSheet({
@@ -37,7 +37,7 @@ class _RekapBottomSheetState extends State<RekapBottomSheet> {
   }
 
   Future<void> _initSummaryData() async {
-    var irepBE = IrepBE();
+    var irepBE = CafeBackendServices();
 
     SummaryResponse allSummaryResponse =
         await irepBE.getSummary('all', null, null);
@@ -100,7 +100,7 @@ class _RekapBottomSheetState extends State<RekapBottomSheet> {
                   selectedDate = newDate;
                   String formattedDate =
                       DateFormat('dd-MM-yyyy').format(newDate);
-                  var irepBE = IrepBE();
+                  var irepBE = CafeBackendServices();
                   irepBE
                       .getSummary(null, formattedDate, formattedDate)
                       .then((value) {
@@ -175,7 +175,7 @@ class _RekapBottomSheetState extends State<RekapBottomSheet> {
                     ),
                     onChanged: (value) {
                       if (value != null) {
-                        var irepBE = IrepBE();
+                        var irepBE = CafeBackendServices();
                         if (value == 'all') {
                           irepBE.getSummary('all', null, null).then((value) {
                             setState(() {
@@ -222,7 +222,7 @@ class _RekapBottomSheetState extends State<RekapBottomSheet> {
                                   newRange; // update the label state
                             });
 
-                            var irepBE = IrepBE();
+                            var irepBE = CafeBackendServices();
                             irepBE
                                 .getSummary(
                               null,

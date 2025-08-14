@@ -1,7 +1,9 @@
+import 'dart:convert';
+
 class PcResponse {
   final int code;
   final String message;
-  final List<PcData> data;
+  final Data data;
 
   PcResponse({
     required this.code,
@@ -13,91 +15,123 @@ class PcResponse {
     return PcResponse(
       code: json['code'],
       message: json['message'],
-      data: List<PcData>.from(json['data'].map((x) => PcData.fromJson(x))),
+      data: Data.fromJson(json['data']),
     );
   }
 
-  Map<String, dynamic> toJson() => {
-        'code': code,
-        'message': message,
-        'data': List<dynamic>.from(data.map((x) => x.toJson())),
-      };
+  Map<String, dynamic> toJson() {
+    return {
+      'code': code,
+      'message': message,
+      'data': data.toJson(),
+    };
+  }
 }
 
-class PcData {
-  final int pcIcafeId;
-  final String pcIp;
-  final String pcName;
-  final String pcMac;
-  final String pcComment;
-  final int pcConsoleType;
-  final int pcGroupId;
-  final String pcAreaName;
-  final String pcBoxPosition;
-  final int? pcBoxTop;
-  final int? pcBoxLeft;
-  final int pcEnabled;
-  final int pcMiningEnabled;
-  final String pcMiningTool;
-  final String pcMiningOptions;
-  final int pcInUsing;
+class Data {
+  final PcsInit pcsInit;
 
-  PcData({
-    required this.pcIcafeId,
-    required this.pcIp,
-    required this.pcName,
-    required this.pcMac,
-    required this.pcComment,
-    required this.pcConsoleType,
-    required this.pcGroupId,
-    required this.pcAreaName,
-    required this.pcBoxPosition,
-    this.pcBoxTop,
-    this.pcBoxLeft,
-    required this.pcEnabled,
-    required this.pcMiningEnabled,
-    required this.pcMiningTool,
-    required this.pcMiningOptions,
-    required this.pcInUsing,
+  Data({
+    required this.pcsInit,
   });
 
-  factory PcData.fromJson(Map<String, dynamic> json) {
-    return PcData(
-      pcIcafeId: json['pc_icafe_id'],
-      pcIp: json['pc_ip'],
-      pcName: json['pc_name'],
-      pcMac: json['pc_mac'],
-      pcComment: json['pc_comment'],
-      pcConsoleType: json['pc_console_type'],
-      pcGroupId: json['pc_group_id'],
-      pcAreaName: json['pc_area_name'],
-      pcBoxPosition: json['pc_box_position'],
-      pcBoxTop: json['pc_box_top'],
-      pcBoxLeft: json['pc_box_left'],
-      pcEnabled: json['pc_enabled'],
-      pcMiningEnabled: json['pc_mining_enabled'],
-      pcMiningTool: json['pc_mining_tool'],
-      pcMiningOptions: json['pc_mining_options'],
-      pcInUsing: json['pc_in_using'],
+  factory Data.fromJson(Map<String, dynamic> json) {
+    return Data(
+      pcsInit: PcsInit.fromJson(json['pcs_init']),
     );
   }
 
-  Map<String, dynamic> toJson() => {
-        'pc_icafe_id': pcIcafeId,
-        'pc_ip': pcIp,
-        'pc_name': pcName,
-        'pc_mac': pcMac,
-        'pc_comment': pcComment,
-        'pc_console_type': pcConsoleType,
-        'pc_group_id': pcGroupId,
-        'pc_area_name': pcAreaName,
-        'pc_box_position': pcBoxPosition,
-        'pc_box_top': pcBoxTop,
-        'pc_box_left': pcBoxLeft,
-        'pc_enabled': pcEnabled,
-        'pc_mining_enabled': pcMiningEnabled,
-        'pc_mining_tool': pcMiningTool,
-        'pc_mining_options': pcMiningOptions,
-        'pc_in_using': pcInUsing,
-      };
+  Map<String, dynamic> toJson() {
+    return {
+      'pcs_init': pcsInit.toJson(),
+    };
+  }
+}
+
+class PcsInit {
+  final List<Pc> pcList;
+
+  PcsInit({
+    required this.pcList,
+  });
+
+  factory PcsInit.fromJson(Map<String, dynamic> json) {
+    var list = json['pc_list'] as List;
+    List<Pc> pcList = list.map((i) => Pc.fromJson(i)).toList();
+
+    return PcsInit(pcList: pcList);
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'pc_list': pcList.map((i) => i.toJson()).toList(),
+    };
+  }
+}
+
+class Pc {
+  final String pcName;
+  final String? statusConnectTimeLocal;
+  final String? memberAccount;
+
+  Pc({
+    required this.pcName,
+    this.statusConnectTimeLocal,
+    this.memberAccount,
+  });
+
+  factory Pc.fromJson(Map<String, dynamic> json) {
+    return Pc(
+      pcName: json['pc_name'],
+      statusConnectTimeLocal: json['status_connect_time_local'],
+      memberAccount: json['member_account'],
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'pc_name': pcName,
+      'status_connect_time_local': statusConnectTimeLocal,
+      'member_account': memberAccount,
+    };
+  }
+}
+
+void main() {
+  String jsonString = '''{
+    "code": 200,
+    "message": "success",
+    "data": {
+        "pcs_init": {
+            "pc_list": [
+                {
+                    "pc_name": "INDOREP-01",
+                    "status_connect_time_local": null,
+                    "member_account": null
+                },
+                {
+                    "pc_name": "INDOREP-02",
+                    "status_connect_time_local": null,
+                    "member_account": null
+                }
+            ]
+        }
+    }
+  }''';
+
+  // Parse JSON into the ApiResponse object
+  Map<String, dynamic> jsonData = jsonDecode(jsonString);
+  PcResponse apiResponse = PcResponse.fromJson(jsonData);
+
+  // Print the data
+  print('API Response: ${apiResponse.message}');
+  for (var pc in apiResponse.data.pcsInit.pcList) {
+    print('PC Name: ${pc.pcName}');
+    print('Status Connect Time: ${pc.statusConnectTimeLocal}');
+    print('Member Account: ${pc.memberAccount}');
+  }
+
+  // Convert the ApiResponse back to JSON
+  String jsonStringBack = jsonEncode(apiResponse.toJson());
+  print('JSON Back: $jsonStringBack');
 }

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:package_info_plus/package_info_plus.dart';
-import 'package:pos_indorep/services/irepbe_services.dart';
+import 'package:pos_indorep/services/cafe_backend_services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class MainProvider extends ChangeNotifier {
@@ -96,7 +96,7 @@ class MainProvider extends ChangeNotifier {
   Future<void> checkForAppUpdate() async {
     final packageInfo = await PackageInfo.fromPlatform();
     _appVersion = packageInfo.version;
-    var irepBE = IrepBE();
+    var irepBE = CafeBackendServices();
 
     final fetchedVersion = await irepBE.fetchLatestVersionTag();
     if (fetchedVersion == null) {

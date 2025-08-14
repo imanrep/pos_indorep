@@ -68,12 +68,12 @@ class _TabletDashboardPageState extends State<TabletDashboardPage> {
                                 fontWeight: FontWeight.w600, fontSize: 28.0)),
                       ],
                     ),
+                    const SizedBox(height: 16),
                     DateBar(
                       selectedDate: provider.selectedDate,
+                      isLoading: provider.isLoading,
                       onDateChanged: (newDate) async {
-                        provider.setLoading(true);
                         await provider.setSelectedDateAndFetchSummary(newDate);
-                        provider.setLoading(false);
                       },
                     ),
                     const SizedBox(height: 8),

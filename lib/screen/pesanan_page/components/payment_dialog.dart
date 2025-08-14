@@ -11,7 +11,7 @@ import 'package:pos_indorep/provider/main_provider.dart';
 import 'package:pos_indorep/screen/pesanan_page/components/widget/cash_payment_dialog.dart';
 import 'package:pos_indorep/screen/pesanan_page/print_view.dart';
 import 'package:pos_indorep/screen/pesanan_page/qris_print_view.dart';
-import 'package:pos_indorep/services/irepbe_services.dart';
+import 'package:pos_indorep/services/cafe_backend_services.dart';
 import 'package:provider/provider.dart';
 
 class PaymentDialogBottomSheet extends StatefulWidget {
@@ -54,7 +54,7 @@ class _PaymentDialogBottomSheetState extends State<PaymentDialogBottomSheet> {
 
   Future<void> _handlePayment(QrisOrderRequest request,
       List<CartItem> transaction, int grandTotal) async {
-    IrepBE irepBE = IrepBE();
+    CafeBackendServices irepBE = CafeBackendServices();
     // Handle QRIS payment
     if (request.payment == 'qris') {
       final name = await showDialog(
@@ -567,7 +567,7 @@ class _PaymentDialogBottomSheetState extends State<PaymentDialogBottomSheet> {
                     onPressed: value.text.isEmpty
                         ? null
                         : () async {
-                            var irepBE = IrepBE();
+                            var irepBE = CafeBackendServices();
                             GetVoucherDetailsResponse res =
                                 await irepBE.getVoucherDetails(value.text);
                             Navigator.pop(context, res);

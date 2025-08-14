@@ -47,7 +47,7 @@ class _HomeScreenState extends State<HomeScreen> {
           if (transactionProvider.hasNewData) {
             return Stack(
               children: [
-                Icon(Icons.receipt_long_rounded),
+                Icon(Icons.receipt_long_outlined),
                 Positioned(
                   right: 0,
                   top: 0,
@@ -56,7 +56,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ],
             );
           } else {
-            return Icon(Icons.receipt_long_rounded);
+            return Icon(Icons.receipt_long_outlined);
           }
         }),
         selectedIcon: Consumer<TransactionProvider>(
@@ -64,7 +64,7 @@ class _HomeScreenState extends State<HomeScreen> {
           if (transactionProvider.hasNewData) {
             return Stack(
               children: [
-                Icon(Icons.receipt_long_rounded),
+                Icon(Icons.receipt_long),
                 Positioned(
                   right: 0,
                   top: 0,
@@ -73,7 +73,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ],
             );
           } else {
-            return Icon(Icons.receipt_long_rounded);
+            return Icon(Icons.receipt_long);
           }
         }),
         label: Text('Transaksi'),

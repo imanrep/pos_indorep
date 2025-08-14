@@ -79,7 +79,7 @@ class BeveragesForm extends StatelessWidget {
                           RadioButton(
                             checked: provider.selectedMethod == 'Cash',
                             onChanged: (value) {
-                              if (value) provider.setSSelectedMethod('Cash');
+                              if (value) provider.setSelectedMethod('Cash');
                             },
                             content: const Text('Cash'),
                           ),
@@ -87,7 +87,7 @@ class BeveragesForm extends StatelessWidget {
                           RadioButton(
                             checked: provider.selectedMethod == 'QRIS',
                             onChanged: (value) {
-                              if (value) provider.setSSelectedMethod('QRIS');
+                              if (value) provider.setSelectedMethod('QRIS');
                             },
                             content: const Text('QRIS'),
                           ),

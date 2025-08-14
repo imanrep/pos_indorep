@@ -3,12 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:pos_indorep/web/model/pcs_model.dart';
 
 class PcsGrid extends StatelessWidget {
-  final PcData pcData;
+  final Pc pcData;
   const PcsGrid({super.key, required this.pcData});
 
   @override
   Widget build(BuildContext context) {
-    bool isOnline = pcData.pcInUsing == 1;
+    bool isOnline = pcData.statusConnectTimeLocal != null;
     return Card(
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),

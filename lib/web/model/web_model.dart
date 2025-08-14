@@ -150,19 +150,22 @@ class Beverages {
 class WarnetPaket {
   final String nama;
   final int harga;
+  int? hargaAsli;
 
-  WarnetPaket({required this.nama, required this.harga});
+  WarnetPaket({required this.nama, required this.harga, this.hargaAsli});
 
   factory WarnetPaket.fromJson(Map<String, dynamic> json) {
     return WarnetPaket(
       nama: json['nama'],
       harga: (json['harga'] as num).toInt(),
+      hargaAsli: (json['hargaAsli'] as num?)?.toInt(),
     );
   }
   Map<String, dynamic> toJson() {
     return {
       'nama': nama,
       'harga': harga,
+      'hargaAsli': hargaAsli,
     };
   }
 }

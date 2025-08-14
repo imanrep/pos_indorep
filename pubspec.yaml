@@ -64,6 +64,8 @@ dependencies:
   cloud_firestore: ^5.6.12
   fluent_ui: ^4.12.0
   fl_chart: ^1.0.0
+  flutter_thermal_printer: ^1.2.2
+  esc_pos_utils_plus: ^2.0.4
 
 
 dev_dependencies:

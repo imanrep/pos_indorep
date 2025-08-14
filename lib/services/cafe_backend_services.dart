@@ -4,7 +4,7 @@ import 'package:pos_indorep/model/model.dart';
 import 'package:pos_indorep/model/summary.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class IrepBE {
+class CafeBackendServices {
   bool isOffline = false;
 
   Future<String> getBaseUrl() async {

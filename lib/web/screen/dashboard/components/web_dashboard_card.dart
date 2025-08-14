@@ -1,0 +1,108 @@
+import 'package:fluent_ui/fluent_ui.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:pos_indorep/helper/helper.dart';
+
+class WebDashboardCard extends StatefulWidget {
+  final String title;
+  final String subtitle;
+  // final String performance;
+  final IconData? icon;
+  final bool isWidthExpanded;
+  final VoidCallback? onTap;
+  const WebDashboardCard({
+    super.key,
+    required this.title,
+    required this.subtitle,
+    // required this.performance,
+    this.icon,
+    required this.isWidthExpanded,
+    this.onTap,
+  });
+
+  @override
+  State<WebDashboardCard> createState() => _WebDashboardCardState();
+}
+
+class _WebDashboardCardState extends State<WebDashboardCard> {
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () {
+        if (widget.onTap != null) {
+          widget.onTap!();
+        } else {
+          null;
+        }
+      },
+      child: Card(
+        borderRadius: BorderRadius.circular(12),
+        child: Padding(
+          padding: EdgeInsets.symmetric(
+              horizontal: widget.isWidthExpanded ? 24.0 : 12.0, vertical: 12.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10),
+                      color: IndorepColor.primary.withValues(alpha: 0.2),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Icon(
+                        widget.icon,
+                        size: 24,
+                        color: IndorepColor.primary,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(height: 14),
+              SizedBox(
+                child: Text(
+                  widget.title,
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 1,
+                  style: GoogleFonts.inter(
+                    fontWeight: FontWeight.w400,
+                    fontSize: 14,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+              SizedBox(height: 8),
+              SizedBox(
+                child: Text(
+                  widget.subtitle,
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 1,
+                  style: GoogleFonts.inter(
+                    fontWeight: FontWeight.w600,
+                    fontSize: 16,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 14),
+              Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    'Lihat Detail >',
+                    style: GoogleFonts.inter(
+                      color: IndorepColor.primary,
+                      fontWeight: FontWeight.w600,
+                      fontSize: 14,
+                    ),
+                  )),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}

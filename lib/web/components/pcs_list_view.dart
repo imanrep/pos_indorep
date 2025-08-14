@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:pos_indorep/web/model/pcs_model.dart';
 
 class PcsTableView extends StatelessWidget {
-  final List<PcData> pcs;
+  final List<Pc> pcs;
   const PcsTableView({super.key, required this.pcs});
 
   @override
@@ -16,7 +16,7 @@ class PcsTableView extends StatelessWidget {
         ],
         rows: List.generate(pcs.length, (index) {
           final pc = pcs[index];
-          final isOnline = pc.pcInUsing == 1;
+          final isOnline = pc.statusConnectTimeLocal != null;
           return DataRow(
             cells: [
               DataCell(Row(

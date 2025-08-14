@@ -28,6 +28,13 @@ class Helper {
     return '$formattedDate';
   }
 
+  static String formatPcDateTime(String dateTimeStr) {
+    final dt = DateTime.parse(dateTimeStr);
+    final date = DateFormat('d MMM').format(dt); // 9 Aug
+    final time = DateFormat('HH:mm:ss').format(dt); // 19:14:59
+    return '$date - $time';
+  }
+
   static String timeFormatterTwo(String dateTimeString) {
     final formatter = DateFormat('HH:mm');
     return formatter.format(DateTime.parse(dateTimeString));

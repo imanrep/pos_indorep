@@ -10,6 +10,7 @@ class WarnetForm extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     TextEditingController usernameController = TextEditingController();
+    TextEditingController passwordController = TextEditingController();
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Card(
@@ -36,12 +37,29 @@ class WarnetForm extends StatelessWidget {
               Wrap(
                 children: [
                   SizedBox(
-                    width: 200,
+                    width: 220,
                     child: Consumer<WebTransaksiProvider>(
                       builder: (context, provider, child) {
                         return TextBox(
                           controller: usernameController,
                           placeholder: 'Username',
+                          maxLength: 20,
+                        );
+                      },
+                    ),
+                  ),
+                  const SizedBox(
+                    width: 12,
+                    height: 50,
+                  ),
+                  SizedBox(
+                    width: 220,
+                    child: Consumer<WebTransaksiProvider>(
+                      builder: (context, provider, child) {
+                        return TextBox(
+                          controller: passwordController,
+                          obscureText: true,
+                          placeholder: 'Password',
                           maxLength: 20,
                         );
                       },
@@ -90,8 +108,7 @@ class WarnetForm extends StatelessWidget {
                               RadioButton(
                                 checked: provider.selectedMethod == 'Cash',
                                 onChanged: (value) {
-                                  if (value)
-                                    provider.setSSelectedMethod('Cash');
+                                  if (value) provider.setSelectedMethod('Cash');
                                 },
                                 content: const Text('Cash'),
                               ),
@@ -99,8 +116,7 @@ class WarnetForm extends StatelessWidget {
                               RadioButton(
                                 checked: provider.selectedMethod == 'QRIS',
                                 onChanged: (value) {
-                                  if (value)
-                                    provider.setSSelectedMethod('QRIS');
+                                  if (value) provider.setSelectedMethod('QRIS');
                                 },
                                 content: const Text('QRIS'),
                               ),

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:pos_indorep/helper/helper.dart';
 import 'package:pos_indorep/model/summary.dart';
-import 'package:pos_indorep/services/irepbe_services.dart';
+import 'package:pos_indorep/services/cafe_backend_services.dart';
 
 class DashboardProvider extends ChangeNotifier {
   bool _isLoading = false;
@@ -36,11 +36,6 @@ class DashboardProvider extends ChangeNotifier {
 
   DashboardProvider() {
     _fetchDailySummary();
-  }
-
-  void setLoading(bool loading) {
-    _isLoading = loading;
-    notifyListeners();
   }
 
   void setSelectedDate(DateTime date) {
@@ -79,7 +74,7 @@ class DashboardProvider extends ChangeNotifier {
   }
 
   Future<String> comparePerformance(DateTime currentDate, String type) async {
-    var irepBE = IrepBE();
+    var irepBE = CafeBackendServices();
 
     String dateTimeFormat(DateTime) {
       return DateFormat('dd-MM-yyyy').format(DateTime);
@@ -118,7 +113,7 @@ class DashboardProvider extends ChangeNotifier {
   }
 
   Future<void> _fetchDailySummary() async {
-    var irepBE = IrepBE();
+    var irepBE = CafeBackendServices();
     SummaryResponse allSummaryResponse =
         await irepBE.getSummary('all', null, null);
     SummaryResponse? filteredSummaryResponse =
@@ -139,10 +134,11 @@ class DashboardProvider extends ChangeNotifier {
   }
 
   Future<void> setSelectedDateAndFetchSummary(DateTime newDate) async {
+    _isLoading = true;
+    notifyListeners();
     _selectedDate = newDate;
-
     String formattedDate = DateFormat('dd-MM-yyyy').format(newDate);
-    var irepBE = IrepBE();
+    var irepBE = CafeBackendServices();
     SummaryResponse? summary =
         await irepBE.getSummary(null, formattedDate, formattedDate);
 
@@ -152,7 +148,7 @@ class DashboardProvider extends ChangeNotifier {
     _totalOmzetPerformance = await comparePerformance(newDate, 'omzet');
 
     _dailySummary = summary;
-
+    _isLoading = false;
     notifyListeners();
   }
 }

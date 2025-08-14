@@ -9,6 +9,7 @@ import 'package:pos_indorep/provider/dashboard_provider.dart';
 import 'package:pos_indorep/provider/main_provider.dart';
 import 'package:pos_indorep/provider/menu_provider.dart';
 import 'package:pos_indorep/provider/transaction_provider.dart';
+import 'package:pos_indorep/provider/web/warnet_backend_provider.dart';
 import 'package:pos_indorep/provider/web/web_main_provider.dart';
 import 'package:pos_indorep/provider/web/web_transaksi_provider.dart';
 import 'package:pos_indorep/screen/home_screen.dart';
@@ -50,6 +51,7 @@ void main() async {
         ChangeNotifierProvider(create: (_) => MenuProvider()),
         ChangeNotifierProvider(create: (_) => WebTransaksiProvider()),
         ChangeNotifierProvider(create: (_) => WebMainProvider()),
+        ChangeNotifierProvider(create: (_) => WarnetBackendProvider()),
       ],
       child: GlobalLoaderOverlay(child: kIsWeb ? MyWebApp() : MyApp()),
     ),

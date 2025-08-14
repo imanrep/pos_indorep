@@ -4,8 +4,6 @@ import 'package:pos_indorep/services/web_services.dart';
 import 'package:pos_indorep/web/model/web_model.dart';
 
 class WebTransaksiProvider extends ChangeNotifier {
-  String _cafeId = '';
-  String _authToken = '';
   final WebServices _services = WebServices();
   DateTime _selectedWarnetDate = DateTime.now();
   DateTime _selectedBeveragesDate = DateTime.now();
@@ -37,7 +35,7 @@ class WebTransaksiProvider extends ChangeNotifier {
 
   final List<Beverages> _beverages = [
     Beverages(nama: 'Pristine 400ml', harga: 5000),
-    Beverages(nama: 'Pristine 600ml', harga: 7000),
+    Beverages(nama: 'Aquviva 700ml', harga: 6000),
     Beverages(nama: 'Coca-Cola 390ml', harga: 6000),
     Beverages(nama: 'Teh Pucuk', harga: 5000),
     Beverages(nama: 'Sprite Water', harga: 6000),
@@ -46,9 +44,6 @@ class WebTransaksiProvider extends ChangeNotifier {
   ];
 
   final List<String> _methods = ['Cash', 'QRIS'];
-
-  String get cafeId => _cafeId;
-  String get authToken => _authToken;
 
   DateTime get selectedWarnetDate => _selectedWarnetDate;
   DateTime get selectedBeveragesDate => _selectedBeveragesDate;
@@ -99,7 +94,7 @@ class WebTransaksiProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  void setSSelectedMethod(String method) {
+  void setSelectedMethod(String method) {
     _selectedMethod = method;
     notifyListeners();
   }

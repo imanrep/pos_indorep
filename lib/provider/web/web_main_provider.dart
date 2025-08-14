@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:pos_indorep/services/warnet_backend_services.dart';
 import 'package:pos_indorep/services/web_services.dart';
 
 class WebMainProvider extends ChangeNotifier {
@@ -11,7 +12,14 @@ class WebMainProvider extends ChangeNotifier {
   List<String> get operators => _operators;
 
   WebMainProvider() {
+    _initialize();
     getCurrentOperator();
+  }
+
+  Future<void> _initialize() async {
+    WarnetBackendServices services = WarnetBackendServices();
+    _serverOnline = await services.checkApiStatus('cafeId', 'authToken');
+    notifyListeners();
   }
 
   Future<void> setCurrentOperator(String operator) async {

@@ -6,7 +6,7 @@ import 'package:pos_indorep/helper/helper.dart';
 import 'package:pos_indorep/model/model.dart';
 import 'package:pos_indorep/provider/main_provider.dart';
 import 'package:pos_indorep/screen/pesanan_page/components/order_detail_print_view.dart';
-import 'package:pos_indorep/services/irepbe_services.dart';
+import 'package:pos_indorep/services/cafe_backend_services.dart';
 import 'package:provider/provider.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
@@ -112,7 +112,7 @@ class _QrisPageOneState extends State<QrisPageOne> {
   String statusText = "Pending";
 
   Future<String> getStatus() async {
-    IrepBE irepBE = IrepBE();
+    CafeBackendServices irepBE = CafeBackendServices();
     GetTransacationsResponse response = await irepBE.getTransactions(1);
     String status = response.data
         .where(
@@ -252,7 +252,7 @@ class _QrisPageTwoState extends State<QrisPageTwo> {
   }
 
   Future<String> getStatus() async {
-    IrepBE irepBE = IrepBE();
+    CafeBackendServices irepBE = CafeBackendServices();
     GetTransacationsResponse response = await irepBE.getTransactions(1);
     String status = response.data
         .where(

@@ -14,7 +14,7 @@ class WarnetHomeScreen extends StatefulWidget {
 }
 
 class _WarnetHomeScreenState extends State<WarnetHomeScreen> {
-  int _selectedIndex = 0;
+  int _selectedIndex = 1;
   final moreOptionsController = FlyoutController();
 
   @override
@@ -23,7 +23,7 @@ class _WarnetHomeScreenState extends State<WarnetHomeScreen> {
       List<MenuFlyoutItem> menuItemsOffline = [
         MenuFlyoutItem(
           leading: const Icon(FluentIcons.error),
-          text: Text('Update API Key'),
+          text: Text('Fix API Key'),
           onPressed: () => updateApiKeyDialog(context),
         )
       ];
@@ -31,16 +31,14 @@ class _WarnetHomeScreenState extends State<WarnetHomeScreen> {
       List<MenuFlyoutItem> menuItems = [
         MenuFlyoutItem(
           leading: provider.serverOnline
-              ? const Icon(FluentIcons.check_mark)
+              ? Icon(
+                  FluentIcons.check_mark,
+                  color: Colors.green,
+                )
               : const Icon(FluentIcons.error),
           text: Text('Server Status'),
           onPressed: () {},
         ),
-        MenuFlyoutItem(
-          leading: const Icon(FluentIcons.switch_user),
-          text: Text(provider.currentOperator),
-          onPressed: () {},
-        )
       ];
 
       return NavigationView(
@@ -100,7 +98,14 @@ class _WarnetHomeScreenState extends State<WarnetHomeScreen> {
                 //     }
                 //   },
                 // ),
-                // const SizedBox(width: 16),
+                SizedBox(
+                  height: 34,
+                  child: Button(
+                    child: Icon(FluentIcons.refresh),
+                    onPressed: () {},
+                  ),
+                ),
+                const SizedBox(width: 16),
                 FlyoutTarget(
                     controller: moreOptionsController,
                     child: Button(
@@ -119,7 +124,7 @@ class _WarnetHomeScreenState extends State<WarnetHomeScreen> {
                                   ),
                             const SizedBox(width: 8),
                             provider.serverOnline
-                                ? Text(provider.currentOperator)
+                                ? Text('Online')
                                 : const Text('Offline'),
                           ],
                         ),

@@ -9,7 +9,7 @@ import 'package:pos_indorep/provider/menu_provider.dart';
 import 'package:pos_indorep/screen/pesanan_page/components/add_item_dialog.dart';
 import 'package:pos_indorep/screen/pesanan_page/components/category_button.dart';
 import 'package:pos_indorep/screen/pesanan_page/components/payment_dialog.dart';
-import 'package:pos_indorep/services/irepbe_services.dart';
+import 'package:pos_indorep/services/cafe_backend_services.dart';
 import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
 
@@ -519,7 +519,7 @@ class _PesananPageState extends State<PesananPage> {
                                     var mainProvider =
                                         Provider.of<MainProvider>(context,
                                             listen: false);
-                                    var irepBE = IrepBE();
+                                    var irepBE = CafeBackendServices();
                                     TransactionModel transaction =
                                         TransactionModel(
                                       transactionDate:

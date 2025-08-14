@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:pos_indorep/model/model.dart';
 import 'package:pos_indorep/screen/transaction/transaction_page.dart';
-import 'package:pos_indorep/services/irepbe_services.dart';
+import 'package:pos_indorep/services/cafe_backend_services.dart';
 
 class TransactionProvider extends ChangeNotifier {
   List<TransactionData> _allTransactions = [];
@@ -68,7 +68,7 @@ class TransactionProvider extends ChangeNotifier {
   }
 
   Future<void> getAllTransactions(int page) async {
-    IrepBE irepBE = IrepBE();
+    CafeBackendServices irepBE = CafeBackendServices();
     try {
       GetTransacationsResponse response = await irepBE.getTransactions(page);
       if (response.data.isNotEmpty) {

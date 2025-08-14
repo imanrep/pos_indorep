@@ -73,7 +73,7 @@
 //             physics: const NeverScrollableScrollPhysics(),
 //             itemCount: orders.length,
 //             itemBuilder: (context, index) {
-//               if (widget.summaryType == 'totalTransactions' &&
+//               if (widget.summaryData.summary == 'totalTransactions' &&
 //                   widget.summaryData?.summary.totalOrders == 0) {
 //                 return const SizedBox.shrink();
 //               } else if (widget.summaryType == 'totalIncome' &&
