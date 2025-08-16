@@ -182,4 +182,40 @@ class WebTransaksiProvider extends ChangeNotifier {
       _selectedBeveragesDate = DateTime.now();
     });
   }
+
+Future<void> exportFirestoreToSQL() async {
+  final firestore = FirebaseFirestore.instance;
+
+  // Query sorted by timestamp (oldest first)
+  final snapshot = await firestore
+      .collection('cashier')
+      .orderBy('timestamp', descending: false)
+      .get();
+
+  int id = 737;
+
+  for (var doc in snapshot.docs) {
+    final data = doc.data();
+    final metode = data['metode'] ?? 'cash';
+    final username = data['username'] ?? '';
+    final paket = data['paket'] ?? {};
+    final harga = paket['harga'] ?? 0;
+    final note = paket['nama'] ?? '';
+    final timestamp = data['timestamp'] as Timestamp?;
+
+    final formattedDate = timestamp != null
+        ? timestamp.toDate().toIso8601String().replaceFirst('T', ' ').split('.').first
+        : 'NULL';
+
+    final sql = """
+INSERT INTO billing (id, date, username, password, payment, note, status, amount)
+VALUES ($id, '$formattedDate', '$username', '1234', '$metode', '$note', 'paid', $harga);
+""";
+
+    print(sql);
+    id++;
+  }
+}
+
+
 }

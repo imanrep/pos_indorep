@@ -34,72 +34,75 @@ class _WebDashboardCardState extends State<WebDashboardCard> {
           null;
         }
       },
-      child: Card(
-        borderRadius: BorderRadius.circular(12),
-        child: Padding(
-          padding: EdgeInsets.symmetric(
-              horizontal: widget.isWidthExpanded ? 24.0 : 12.0, vertical: 12.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Container(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(10),
-                      color: IndorepColor.primary.withValues(alpha: 0.2),
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Icon(
-                        widget.icon,
-                        size: 24,
-                        color: IndorepColor.primary,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 8.0),
+        child: Card(
+          borderRadius: BorderRadius.circular(12),
+          child: Padding(
+            padding: EdgeInsets.symmetric(
+                horizontal: widget.isWidthExpanded ? 12.0 : 12.0, vertical: 12.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10),
+                        color: IndorepColor.primary.withValues(alpha: 0.2),
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Icon(
+                          widget.icon,
+                          size: 24,
+                          color: IndorepColor.primary,
+                        ),
                       ),
                     ),
-                  ),
-                ],
-              ),
-              SizedBox(height: 14),
-              SizedBox(
-                child: Text(
-                  widget.title,
-                  overflow: TextOverflow.ellipsis,
-                  maxLines: 1,
-                  style: GoogleFonts.inter(
-                    fontWeight: FontWeight.w400,
-                    fontSize: 14,
-                    color: Colors.white,
-                  ),
+                  ],
                 ),
-              ),
-              SizedBox(height: 8),
-              SizedBox(
-                child: Text(
-                  widget.subtitle,
-                  overflow: TextOverflow.ellipsis,
-                  maxLines: 1,
-                  style: GoogleFonts.inter(
-                    fontWeight: FontWeight.w600,
-                    fontSize: 16,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 14),
-              Align(
-                  alignment: Alignment.centerLeft,
+                SizedBox(height: 14),
+                SizedBox(
                   child: Text(
-                    'Lihat Detail >',
+                    widget.title,
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 1,
                     style: GoogleFonts.inter(
-                      color: IndorepColor.primary,
-                      fontWeight: FontWeight.w600,
+                      fontWeight: FontWeight.w400,
                       fontSize: 14,
+                      color: Colors.white,
                     ),
-                  )),
-            ],
+                  ),
+                ),
+                SizedBox(height: 8),
+                SizedBox(
+                  child: Text(
+                    widget.subtitle,
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 1,
+                    style: GoogleFonts.inter(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 16,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 14),
+                Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      'Lihat Detail >',
+                      style: GoogleFonts.inter(
+                        color: IndorepColor.primary,
+                        fontWeight: FontWeight.w600,
+                        fontSize: 14,
+                      ),
+                    )),
+              ],
+            ),
           ),
         ),
       ),

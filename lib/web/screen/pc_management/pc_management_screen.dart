@@ -1,8 +1,13 @@
+import 'dart:async';
+
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:pos_indorep/helper/helper.dart';
+import 'package:pos_indorep/provider/web/warnet_backend_provider.dart';
 import 'package:pos_indorep/services/warnet_backend_services.dart';
+import 'package:pos_indorep/web/model/member_model.dart';
 import 'package:pos_indorep/web/model/pcs_model.dart';
+import 'package:provider/provider.dart';
 
 class PcManagementScreen extends StatefulWidget {
   const PcManagementScreen({super.key});
@@ -14,9 +19,29 @@ class PcManagementScreen extends StatefulWidget {
 class _PcManagementScreenState extends State<PcManagementScreen> {
   final WarnetBackendServices _icafeServices = WarnetBackendServices();
   final ValueNotifier<List<Pc>> selectedPcs = ValueNotifier<List<Pc>>([]);
+  final commandBarKey = GlobalKey<CommandBarState>();
+  Timer? _timer;
+
+  @override
+  void initState() {
+    super.initState();
+
+    // Fetch data initially
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Provider.of<WarnetBackendProvider>(context, listen: false)
+          .getAllCustomerWarnet('');
+    });
+
+    // Set up a periodic timer to fetch data every 5 seconds
+    _timer = Timer.periodic(Duration(seconds: 5), (_) {
+      Provider.of<WarnetBackendProvider>(context, listen: false)
+          .getAllCustomerWarnet('');
+    });
+  }
 
   @override
   void dispose() {
+    _timer?.cancel();
     selectedPcs.dispose();
     super.dispose();
   }
@@ -35,22 +60,61 @@ class _PcManagementScreenState extends State<PcManagementScreen> {
           borderRadius: BorderRadius.circular(12),
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 0.0, vertical: 4.0),
-            child: FutureBuilder(
-              future: _icafeServices.getPCs(),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
+            child: Consumer<WarnetBackendProvider>(
+              builder: (context, provider, child) {
+                if (provider.totalPC == 0) {
                   return const Center(child: CupertinoActivityIndicator());
                 }
-                if (snapshot.hasError) {
-                  return Center(
-                      child: Text('Error! Cek kembali apakah API online'));
-                }
-                final pcs = snapshot.data!.data.pcsInit.pcList;
+                final pcs = provider.pcs;
                 return ValueListenableBuilder<List<Pc>>(
                   valueListenable: selectedPcs,
                   builder: (context, selected, _) {
+                    final warnetBackendProvider = Provider.of<WarnetBackendProvider>(context);
+    final members = warnetBackendProvider.allWarnetCustomers?.members ?? [];
                     return Column(
                       children: [
+                        CommandBar(
+  key: commandBarKey, 
+  overflowBehavior: CommandBarOverflowBehavior.dynamicOverflow,
+  isCompact: true,
+  primaryItems: [
+    CommandBarButton(
+      icon: const Icon(FluentIcons.add),
+      label: const Text('Top Up'),
+      tooltip: 'Top Up Member',
+      onPressed: () {
+        // Create something new!
+      },
+    ),
+    const CommandBarSeparator(),
+    CommandBarButton(
+      icon: const Icon(FluentIcons.remove),
+      label: const Text('Refund'),
+      tooltip: 'Refund Member',
+      onPressed: () {
+        // Create something new!
+      },
+    ),
+    const CommandBarSeparator(),
+    CommandBarButton(
+      icon: const Icon(FluentIcons.edit),
+      label: const Text('Edit'),
+      tooltip: 'Edit Member!',
+      onPressed: () {
+        // Create something new!
+      },
+    ),
+    const CommandBarSeparator(),
+    CommandBarButton(
+      icon:  Icon(FluentIcons.delete),
+      label:  Text('Delete', style: TextStyle()),
+      tooltip: 'Delete Member',
+      onPressed: () {
+        // Delete what is currently selected!
+      },
+    ),
+  ],
+),
                         ListView.builder(
                           shrinkWrap: true,
                           physics: const NeverScrollableScrollPhysics(),
@@ -59,6 +123,15 @@ class _PcManagementScreenState extends State<PcManagementScreen> {
                             final pc = pcs[index];
                             bool isPcOnline = pc.statusConnectTimeLocal != null;
                             bool checked = selected.contains(pc);
+                            String? timeLeft;
+            if (isPcOnline && pc.memberAccount != null) {
+              final username = pc.memberAccount!;
+             final member = members.firstWhere(
+        (m) => m.memberAccount == username,
+        orElse: () => Member(memberId: 0, memberAccount: "", memberBalance: 0, memberExpireTimeLocal: "", memberIsActive: 0, memberCreateLocal: "", memberUpdateLocal: "", memberIsExpired: 0, memberIsLogined: 1, memberGroupName: "", leftTime: ""),
+      );
+      timeLeft = member.leftTime;
+    }
                             return Expander(
                               leading: Checkbox(
                                   checked: checked,
@@ -70,7 +143,11 @@ class _PcManagementScreenState extends State<PcManagementScreen> {
                                     }
                                     selectedPcs.value = List.from(selected);
                                   }),
-                              trailing: Container(
+                              header: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  const SizedBox(width: 8),
+                                  Container(
                                 decoration: BoxDecoration(
                                   color: isPcOnline
                                       ? Colors.green.withValues(alpha: 0.15)
@@ -87,38 +164,55 @@ class _PcManagementScreenState extends State<PcManagementScreen> {
                                           ? Colors.green
                                           : Colors.red,
                                       fontWeight: FontWeight.w600,
-                                      fontSize: 11,
+                                      fontSize: 12,
                                     ),
                                   ),
                                 ),
                               ),
-                              header: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  const SizedBox(width: 8),
-                                  Text(
+                               const SizedBox(width: 8),
+                               Text(
                                     pc.pcName,
                                     style: TextStyle(
                                         fontWeight: FontWeight.w500,
                                         fontSize: 12),
                                   ),
-                                  const SizedBox(width: 8),
-                                  if (isPcOnline)
-                                    Container(
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 8, vertical: 4),
-                                      decoration: BoxDecoration(
-                                        color:
-                                            Colors.blue.withValues(alpha: 0.15),
-                                        borderRadius: BorderRadius.circular(8),
-                                      ),
-                                      child: Text(
-                                        '${pc.memberAccount}',
-                                        style: TextStyle(
-                                            fontSize: 12,
-                                            fontWeight: FontWeight.w500),
-                                      ),
-                                    )
+                                  isPcOnline ?
+                                    Row(
+                                      children: [
+                                         const SizedBox(width: 8),
+                                        Container(
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 8, vertical: 4),
+                                          decoration: BoxDecoration(
+                                            color:
+                                                Colors.blue.withValues(alpha: 0.15),
+                                            borderRadius: BorderRadius.circular(4),
+                                          ),
+                                          child: Text(
+                                            '${pc.memberAccount}',
+                                            style: TextStyle(
+                                                fontSize: 12,
+                                                fontWeight: FontWeight.w500),
+                                          ),
+                                        ),
+                                        const SizedBox(width: 8),
+                                        Container(
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 8, vertical: 4),
+                                          decoration: BoxDecoration(
+                                            color:
+                                                Colors.blue.withValues(alpha: 0.15),
+                                            borderRadius: BorderRadius.circular(4),
+                                          ),
+                                          child: Text(
+                                            timeLeft ?? 'Personal',
+                                            style: TextStyle(
+                                                fontSize: 12,
+                                                fontWeight: FontWeight.w500),
+                                          ),
+                                        ),
+                                      ],
+                                    ) : const SizedBox.shrink(),
                                 ],
                               ),
                               content: SizedBox(
@@ -168,7 +262,7 @@ class _PcManagementScreenState extends State<PcManagementScreen> {
                                                         const SizedBox(
                                                             height: 4),
                                                         Text(
-                                                          '${Helper.formatPcDateTime(pc.statusConnectTimeLocal!)}',
+                                                          timeLeft ?? 'Personal',
                                                           style: TextStyle(
                                                             fontSize: 12,
                                                             fontWeight:

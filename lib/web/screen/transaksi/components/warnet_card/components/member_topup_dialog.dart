@@ -6,7 +6,7 @@ import 'package:pos_indorep/web/model/create_member_response.dart';
 import 'package:pos_indorep/web/model/member_model.dart';
 import 'package:pos_indorep/web/model/topup_member_request.dart';
 import 'package:pos_indorep/web/model/topup_member_response.dart';
-import 'package:pos_indorep/web/screen/transaksi/components/warnet_member_list/components/qris_print_dialog.dart';
+import 'package:pos_indorep/web/screen/transaksi/components/warnet_card/components/qris_print_dialog.dart';
 import 'package:provider/provider.dart';
 
 class MemberTopupDialog extends StatefulWidget {

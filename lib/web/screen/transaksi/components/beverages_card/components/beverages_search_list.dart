@@ -20,6 +20,7 @@ class _BeveragesSearchListState extends State<BeveragesSearchList> {
       ValueNotifier<List<KulkasItem>>([]);
 
   late List<KulkasItem> _displayed; // what ListView shows
+  final commandBarKey = GlobalKey<CommandBarState>();
   @override
   void initState() {
     super.initState();
@@ -102,7 +103,48 @@ class _BeveragesSearchListState extends State<BeveragesSearchList> {
           ),
         ),
         const SizedBox(height: 12),
-
+         CommandBar(
+  key: commandBarKey, 
+  overflowBehavior: CommandBarOverflowBehavior.dynamicOverflow,
+  isCompact: true,
+  primaryItems: [
+    CommandBarButton(
+      icon: const Icon(FluentIcons.add),
+      label: const Text('Top Up'),
+      tooltip: 'Top Up Member',
+      onPressed: () {
+        // Create something new!
+      },
+    ),
+    const CommandBarSeparator(),
+    CommandBarButton(
+      icon: const Icon(FluentIcons.remove),
+      label: const Text('Refund'),
+      tooltip: 'Refund Member',
+      onPressed: () {
+        // Create something new!
+      },
+    ),
+    const CommandBarSeparator(),
+    CommandBarButton(
+      icon: const Icon(FluentIcons.edit),
+      label: const Text('Edit'),
+      tooltip: 'Edit Member!',
+      onPressed: () {
+        // Create something new!
+      },
+    ),
+    const CommandBarSeparator(),
+    CommandBarButton(
+      icon:  Icon(FluentIcons.delete),
+      label:  Text('Delete', style: TextStyle()),
+      tooltip: 'Delete Member',
+      onPressed: () {
+        // Delete what is currently selected!
+      },
+    ),
+  ],
+),
         // Your selectable list, but feed it from _displayed
         ValueListenableBuilder<List<KulkasItem>>(
           valueListenable: selectedItems,

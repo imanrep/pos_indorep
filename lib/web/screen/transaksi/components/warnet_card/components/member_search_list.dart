@@ -4,8 +4,8 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:pos_indorep/helper/helper.dart';
 import 'package:pos_indorep/provider/web/warnet_backend_provider.dart';
 import 'package:pos_indorep/web/model/member_model.dart';
-import 'package:pos_indorep/web/screen/transaksi/components/warnet_member_list/components/member_info_container.dart';
-import 'package:pos_indorep/web/screen/transaksi/components/warnet_member_list/components/member_topup_dialog.dart';
+import 'package:pos_indorep/web/screen/transaksi/components/warnet_card/components/member_info_container.dart';
+import 'package:pos_indorep/web/screen/transaksi/components/warnet_card/components/member_topup_dialog.dart';
 import 'package:provider/provider.dart';
 
 class MembersSearchList extends StatefulWidget {
@@ -52,6 +52,8 @@ class _MembersSearchListState extends State<MembersSearchList> {
   Widget build(BuildContext context) {
     final provider = context.watch<WarnetBackendProvider>();
     final allCustomers = provider.allWarnetCustomers;
+    final commandBarKey = GlobalKey<CommandBarState>();
+
 
     if (allCustomers == null || allCustomers.members.isEmpty) {
       return const Center(child: Text('No members found.'));
@@ -87,7 +89,48 @@ class _MembersSearchListState extends State<MembersSearchList> {
           ),
         ),
         const SizedBox(height: 12),
-
+        CommandBar(
+  key: commandBarKey, 
+  overflowBehavior: CommandBarOverflowBehavior.dynamicOverflow,
+  isCompact: true,
+  primaryItems: [
+    CommandBarButton(
+      icon: const Icon(FluentIcons.add),
+      label: const Text('Top Up'),
+      tooltip: 'Top Up Member',
+      onPressed: () {
+        // Create something new!
+      },
+    ),
+    const CommandBarSeparator(),
+    CommandBarButton(
+      icon: const Icon(FluentIcons.remove),
+      label: const Text('Refund'),
+      tooltip: 'Refund Member',
+      onPressed: () {
+        // Create something new!
+      },
+    ),
+    const CommandBarSeparator(),
+    CommandBarButton(
+      icon: const Icon(FluentIcons.edit),
+      label: const Text('Edit'),
+      tooltip: 'Edit Member!',
+      onPressed: () {
+        // Create something new!
+      },
+    ),
+    const CommandBarSeparator(),
+    CommandBarButton(
+      icon:  Icon(FluentIcons.delete),
+      label:  Text('Delete', style: TextStyle()),
+      tooltip: 'Delete Member',
+      onPressed: () {
+        // Delete what is currently selected!
+      },
+    ),
+  ],
+),
         // List of members
         ValueListenableBuilder<List<Member>>(
           valueListenable: selectedMembers,

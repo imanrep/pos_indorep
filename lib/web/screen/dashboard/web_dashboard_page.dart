@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/cupertino.dart';
@@ -18,6 +20,32 @@ class WebDashboardPage extends StatefulWidget {
 
 class _WebDashboardPageState extends State<WebDashboardPage> {
   final WebServices _services = WebServices();
+  Timer? _timer;
+
+  @override
+  void initState() {
+    super.initState();
+
+    // Fetch data initially
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Provider.of<WarnetBackendProvider>(context, listen: false)
+          .init();
+    });
+
+    // Set up a periodic timer to fetch data every 5 seconds
+    _timer = Timer.periodic(Duration(seconds: 5), (_) {
+      Provider.of<WarnetBackendProvider>(context, listen: false)
+          .init();
+    });
+  }
+
+   @override
+  void dispose() {
+    // Cancel the timer when the widget is disposed
+    _timer?.cancel();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return ScaffoldPage.scrollable(
@@ -29,80 +57,96 @@ class _WebDashboardPageState extends State<WebDashboardPage> {
       ),
       children: [
         Consumer<WarnetBackendProvider>(builder: (context, provider, child) {
-          return Column(
+                    return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               DateBar(
                 selectedDate: provider.selectedSummaryDate,
                 onDateChanged: provider.onSummaryDateChanged,
               ),
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: 7.0, vertical: 7.0),
-                child: LayoutBuilder(
-                  builder: (context, constraints) {
-                    bool isWide = constraints.maxWidth > 800;
-                    double cardWidth = 200; // Set your card width here
-                    int cardsPerRow = isWide
-                        ? (constraints.maxWidth / (cardWidth + 12)).floor()
-                        : 1;
-
-                    List<Widget> cards = [
-                      WebDashboardCard(
-                        title: "Jumlah Member",
-                        subtitle: provider.jumlahMember.toString(),
-                        icon: FluentIcons.user_gauge,
-                        isWidthExpanded: false,
-                      ),
-                      WebDashboardCard(
-                        title: "Jumlah Item Kulkas",
-                        subtitle: provider.jumlahItemKulkas.toString(),
-                        icon: FluentIcons.eat_drink,
-                        isWidthExpanded: false,
-                      ),
-                      WebDashboardCard(
-                        title: "Transaksi Warnet",
-                        subtitle: provider.totalTransaksiWarnet.toString(),
-                        icon: FluentIcons.receipt_processing,
-                        isWidthExpanded: false,
-                      ),
-                      WebDashboardCard(
-                        title: "Transaksi Kulkas",
-                        subtitle: "0",
-                        icon: FluentIcons.column,
-                        isWidthExpanded: false,
-                      ),
-                      WebDashboardCard(
-                        title: "Omzet Warnet",
-                        subtitle: "0",
-                        icon: FluentIcons.money,
-                        isWidthExpanded: false,
-                      ),
-                      WebDashboardCard(
-                        title: "Omzet Kulkas",
-                        subtitle: "0",
-                        icon: FluentIcons.circle_dollar,
-                        isWidthExpanded: false,
-                      ),
-                    ];
-
-                    return Align(
-                      alignment: Alignment.topLeft,
-                      child: SizedBox(
-                        width: isWide ? constraints.maxWidth : double.infinity,
-                        child: Wrap(
-                          alignment: WrapAlignment.start,
-                          runAlignment: WrapAlignment.start,
-                          spacing: 12,
-                          runSpacing: 12,
-                          children: cards
-                              .map((card) =>
-                                  SizedBox(width: cardWidth, child: card))
-                              .toList(),
-                        ),
-                      ),
-                    );
-                  },
-                ),
-              ),
+                           LayoutBuilder(
+                             builder: (context, constraints) {
+                               bool isWide = constraints.maxWidth > 800;
+                               double cardWidth = isWide
+                                   ? constraints.maxWidth / 4 - 12 // Four cards per row
+                                   : constraints.maxWidth; // One card per row
+                                         
+                               List<Widget> cards = [
+                                 WebDashboardCard(
+                                   title: "Jumlah Member",
+                                   subtitle: provider.jumlahMember.toString(),
+                                   icon: FluentIcons.user_gauge,
+                                   isWidthExpanded: false,
+                                 ),
+                                 WebDashboardCard(
+                                   title: "Jumlah Item Kulkas",
+                                   subtitle: provider.jumlahItemKulkas.toString(),
+                                   icon: FluentIcons.eat_drink,
+                                   isWidthExpanded: false,
+                                 ),
+                                 WebDashboardCard(
+                                   title: "Transaksi Warnet",
+                                   subtitle: provider.totalTransaksiWarnet.toString(),
+                                   icon: FluentIcons.receipt_processing,
+                                   isWidthExpanded: false,
+                                 ),
+                                 WebDashboardCard(
+                                   title: "Transaksi Kulkas",
+                                   subtitle: "0",
+                                   icon: FluentIcons.column,
+                                   isWidthExpanded: false,
+                                 ),
+                                 WebDashboardCard(
+                                   title: "Omzet Warnet",
+                                   subtitle: "0",
+                                   icon: FluentIcons.money,
+                                   isWidthExpanded: false,
+                                 ),
+                                 WebDashboardCard(
+                                   title: "Omzet Kulkas",
+                                   subtitle: "0",
+                                   icon: FluentIcons.circle_dollar,
+                                   isWidthExpanded: false,
+                                 ),
+                                 WebDashboardCard(
+                                   title: "Total PC",
+                                   subtitle: provider.totalPC.toString(),
+                                   icon: FluentIcons.circle_dollar,
+                                   isWidthExpanded: false,
+                                 ),
+                                 WebDashboardCard(
+                                   title: "PC Online",
+                                   subtitle: provider.totalPCOnline.toString(),
+                                   icon: FluentIcons.circle_dollar,
+                                   isWidthExpanded: false,
+                                 ),
+                               ];
+                                         
+                               if (isWide) {
+                                 // Split cards into rows of 4
+                                 return Wrap(
+                                  
+                                  alignment: WrapAlignment.start, 
+                                   children: cards.map((card) {
+                                     return SizedBox(
+                                       width: cardWidth,
+                                       child: card,
+                                     );
+                                   }).toList(),
+                                 );
+                               } else {
+                                 // Show one card per row
+                                 return Column(
+                                   children: cards.map((card) {
+                                     return SizedBox(
+                                       width: cardWidth,
+                                       child: card,
+                                     );
+                                   }).toList(),
+                                 );
+                               }
+                             },
+                           ),
               LayoutBuilder(
                 builder: (context, constraints) {
                   bool isWide = constraints.maxWidth > 800;

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:pos_indorep/services/warnet_backend_services.dart';
 import 'package:pos_indorep/web/model/kulkas_item_response.dart';
 import 'package:pos_indorep/web/model/member_model.dart';
+import 'package:pos_indorep/web/model/pcs_model.dart';
 import 'package:pos_indorep/web/model/web_model.dart';
 
 class WarnetBackendProvider extends ChangeNotifier {
@@ -19,10 +20,15 @@ class WarnetBackendProvider extends ChangeNotifier {
   int _totalTransaksiKulkas = 0;
   int _omzetWarnet = 0;
   int _omzetKulkas = 0;
+  int _totalPC = 0;
+  List<Pc> _pcs = [];
+  
+  int _totalPCOnline = 0;
 
   List<KulkasItem> _kulkasItems = [];
 
   final List<WarnetPaket> _packages = [
+    WarnetPaket(nama: 'Paket Dev Testing', harga: 100, hargaAsli: 100),
     WarnetPaket(nama: 'Paket 1 Jam', harga: 15000, hargaAsli: 15000),
     WarnetPaket(nama: 'Paket 2 Jam', harga: 30000, hargaAsli: 30000),
     WarnetPaket(nama: 'Paket 3 Jam', harga: 45000, hargaAsli: 45000),
@@ -41,6 +47,7 @@ class WarnetBackendProvider extends ChangeNotifier {
   List<WarnetPaket> get packages => _packages;
   List<String> get methods => _methods;
   DateTime get selectedSummaryDate => _selectedSummaryDate;
+  
 
   int get jumlahMember => _jumlahMember;
   int get jumlahItemKulkas => _jumlahItemKulkas;
@@ -48,13 +55,18 @@ class WarnetBackendProvider extends ChangeNotifier {
   int get totalTransaksiKulkas => _totalTransaksiKulkas;
   int get omzetWarnet => _omzetWarnet;
   int get omzetKulkas => _omzetKulkas;
+  int get totalPC => _totalPC;
+  int get totalPCOnline => _totalPCOnline;
+  List<Pc> get pcs => _pcs;
 
   WarnetBackendProvider() {
     init();
   }
 
   Future<void> init() async {
+    await getTotalPC();
     await getAllCustomerWarnet('');
+    await getPCOnline();
     await getKulkasItem();
     setJumlahMember(allWarnetCustomers!.members.length);
     setTotalTransaksiWarnet(allWarnetCustomers!.totalTransactions);
@@ -117,5 +129,24 @@ class WarnetBackendProvider extends ChangeNotifier {
       _omzetKulkas = 0;
       notifyListeners();
     }
+  }
+
+  Future<void> getTotalPC() async{
+    WarnetBackendServices services = WarnetBackendServices();
+    var res = await services.getPCs();
+    _totalPC = res.data.pcsInit.pcList.length;
+    _pcs = res.data.pcsInit.pcList;
+    notifyListeners();
+  }
+
+  Future<void> getPCOnline() async{
+    var count = 0;
+   allWarnetCustomers?.members.forEach((member) {
+      if (member.memberIsLogined == 1) {
+        count++;
+      }
+    });
+    _totalPCOnline = count;
+    notifyListeners();
   }
 }

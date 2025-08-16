@@ -2,6 +2,7 @@ import 'package:pos_indorep/web/model/create_member_request.dart';
 import 'package:pos_indorep/web/model/create_member_response.dart';
 import 'package:pos_indorep/web/model/create_order_kulkas_request.dart';
 import 'package:pos_indorep/web/model/create_order_kulkas_response.dart';
+import 'package:pos_indorep/web/model/get_transaction_warnet_response.dart';
 import 'package:pos_indorep/web/model/kulkas_item_response.dart';
 import 'package:pos_indorep/web/model/member_model.dart';
 import 'package:pos_indorep/web/model/pcs_model.dart';
@@ -192,5 +193,28 @@ class WarnetBackendServices {
     } catch (e) {
       throw Exception("Error creating order: $e");
     }
+  }
+
+  Future<GetTransactionWarnetResponse> getTransactionWarnet(int page) async {
+    String baseUrl = "https://warnet-api.indorep.com";
+    final url = Uri.parse('${baseUrl}/getTransactionWarnet?page=${page}');
+    try {
+      final response = await http.get(url);
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> data = jsonDecode(response.body);
+        return GetTransactionWarnetResponse.fromJson(data);
+      } else {
+        print('Failed to load transactions: ${response.body}');
+      }
+    } catch (e) {
+      print('Error loading transactions: $e');
+    }
+
+    return GetTransactionWarnetResponse(
+      data: [],
+      currentPage: 1,
+      totalPages: 0,
+      totalTransaction: 0,
+    );
   }
 }

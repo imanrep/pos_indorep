@@ -15,12 +15,11 @@ class WarnetHomeScreen extends StatefulWidget {
 }
 
 class _WarnetHomeScreenState extends State<WarnetHomeScreen> {
-  int _selectedIndex = 1;
+  int _selectedIndex = 0;
   final moreOptionsController = FlyoutController();
 
   @override
   Widget build(BuildContext context) {
-    final warnetState = Provider.of<WarnetBackendProvider>(context, listen: false);
     return Consumer<WebMainProvider>(builder: (context, provider, child) {
       List<MenuFlyoutItem> menuItemsOffline = [
         MenuFlyoutItem(
@@ -105,7 +104,8 @@ class _WarnetHomeScreenState extends State<WarnetHomeScreen> {
                   child: Button(
                     child: Icon(FluentIcons.refresh),
                     onPressed: () {
-                      warnetState.init();
+                       Provider.of<WarnetBackendProvider>(context, listen: false)
+          .getAllCustomerWarnet('');
                     },
                   ),
                 ),

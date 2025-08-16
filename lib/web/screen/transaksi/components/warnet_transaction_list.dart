@@ -36,6 +36,10 @@ class WarnetTransactionList extends StatelessWidget {
                     ),
                   ),
                 ),
+                Button(child: Text('Export'),
+                onPressed: () {
+                  provider.exportFirestoreToSQL();
+                }),
                 DateBar(
                   selectedDate: provider.selectedWarnetDate,
                   onDateChanged: (date) {

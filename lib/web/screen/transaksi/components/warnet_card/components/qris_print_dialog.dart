@@ -78,7 +78,8 @@ class _QrisPrintDialogState extends State<QrisPrintDialog> {
         align: PosAlign.center,
         bold: true,
         height: PosTextSize.size2,
-        width: PosTextSize.size2,
+        width: PosTextSize.size2
+        , fontType:  PosFontType.fontA
       ),
     ));
 
@@ -87,7 +88,7 @@ class _QrisPrintDialogState extends State<QrisPrintDialog> {
 
     bytes.addAll(generator.text(
       'Jl. Margonda No. 386, Beji, Kota Depok',
-      styles: const PosStyles(align: PosAlign.center),
+      styles: const PosStyles(align: PosAlign.center, fontType: PosFontType.fontB),
     ));
 
     bytes.addAll(generator.hr());
@@ -97,12 +98,12 @@ class _QrisPrintDialogState extends State<QrisPrintDialog> {
       PosColumn(
         text: 'IDRPW-${widget.response.orderID}',
         width: 5,
-        styles: const PosStyles(align: PosAlign.left),
+        styles: const PosStyles(align: PosAlign.left, fontType:  PosFontType.fontA),
       ),
       PosColumn(
         text: '$formattedDate $formattedTime',
         width: 7,
-        styles: const PosStyles(align: PosAlign.right),
+        styles: const PosStyles(align: PosAlign.right, fontType:  PosFontType.fontA),
       ),
     ]));
 
@@ -110,20 +111,20 @@ class _QrisPrintDialogState extends State<QrisPrintDialog> {
       PosColumn(
         text: widget.paket.nama,
         width: 6,
-        styles: const PosStyles(align: PosAlign.left),
+        styles: const PosStyles(align: PosAlign.left, fontType:  PosFontType.fontA),
       ),
       PosColumn(
         text: 'Via: $orderType',
         width: 6,
-        styles: const PosStyles(align: PosAlign.right),
+        styles: const PosStyles(align: PosAlign.right, fontType:  PosFontType.fontA),
       ),
     ]));
 
     bytes.addAll(generator.hr());
 
      bytes.addAll(generator.text(
-      'INDOREP Net Account:',
-      styles: const PosStyles(align: PosAlign.left),
+      'Akun Warnet dan WiFi:',
+      styles: const PosStyles(align: PosAlign.left, fontType:  PosFontType.fontA),
     ));
 
     bytes.addAll(generator.feed(1));
@@ -131,30 +132,13 @@ class _QrisPrintDialogState extends State<QrisPrintDialog> {
     // USER INFO
     bytes.addAll(generator.text(
       'Username: ${widget.response.username}',
-      styles: const PosStyles(bold: true, align: PosAlign.center),
+      styles: const PosStyles(bold: true, align: PosAlign.center, fontType:  PosFontType.fontA),
     ));
 
     bytes.addAll(generator.text(
       'Password: ${widget.response.password}',
-      styles: const PosStyles(bold: true, align: PosAlign.center),
+      styles: const PosStyles(bold: true, align: PosAlign.center, fontType:  PosFontType.fontA),
     ));
-
-    bytes.addAll(generator.feed(1));
-
-    // NOTICE
-    bytes.addAll(generator.text(
-      'dapat digunakan juga pada WiFi',
-      styles: const PosStyles(align: PosAlign.center, height: PosTextSize.size1, width: PosTextSize.size1),
-    ));
-     bytes.addAll(generator.text(
-      'yang tersedia',
-      styles: const PosStyles(align: PosAlign.center, height: PosTextSize.size1, width: PosTextSize.size1),
-    ));
-    bytes.addAll(generator.text(
-      'INDOREP-WARNET dan INDOREP-NET',
-      styles: const PosStyles(align: PosAlign.center),
-    ));
-    
 
     // temporary, enable qris via receipt
     if(orderType == 'QRIS') {
@@ -192,7 +176,7 @@ class _QrisPrintDialogState extends State<QrisPrintDialog> {
       'Total: ${Helper.rupiahFormatter(widget.paket.harga.toDouble())}',
       styles: const PosStyles(
         bold: true,
-        align: PosAlign.right,
+        align: PosAlign.right, fontType:  PosFontType.fontA
       ),
     ));
 
@@ -201,11 +185,11 @@ class _QrisPrintDialogState extends State<QrisPrintDialog> {
     // FOOTER
     bytes.addAll(generator.text(
       'Info, saran, dan masukan',
-      styles: const PosStyles(align: PosAlign.center),
+      styles: const PosStyles(align: PosAlign.center, fontType: PosFontType.fontB),
     ));
     bytes.addAll(generator.text(
       'business@indorep.com',
-      styles: const PosStyles(align: PosAlign.center),
+      styles: const PosStyles(align: PosAlign.center, fontType:  PosFontType.fontB),
     ));
 
     bytes.addAll(generator.feed(1));
@@ -214,7 +198,7 @@ class _QrisPrintDialogState extends State<QrisPrintDialog> {
       'Terima Kasih!',
       styles: const PosStyles(
         bold: true,
-        align: PosAlign.center,
+        align: PosAlign.center, fontType:  PosFontType.fontA
       ),
     ));
     bytes.addAll(generator.cut());

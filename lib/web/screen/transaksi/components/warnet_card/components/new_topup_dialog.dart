@@ -5,7 +5,7 @@ import 'package:pos_indorep/provider/web/warnet_backend_provider.dart';
 import 'package:pos_indorep/provider/web/web_transaksi_provider.dart';
 import 'package:pos_indorep/services/warnet_backend_services.dart';
 import 'package:pos_indorep/web/model/create_member_request.dart';
-import 'package:pos_indorep/web/screen/transaksi/components/warnet_member_list/components/qris_print_dialog.dart';
+import 'package:pos_indorep/web/screen/transaksi/components/warnet_card/components/qris_print_dialog.dart';
 import 'package:provider/provider.dart';
 
 class NewTopupDialog extends StatefulWidget {
@@ -20,15 +20,16 @@ class _NewTopupDialogState extends State<NewTopupDialog> {
 
   final TextEditingController usernameController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
-
-  bool isFormValid(WarnetBackendProvider provider) {
-    return usernameController.text.trim().isNotEmpty &&
-        !provider.allWarnetCustomers!.members
-            .any((m) => m.memberAccount == usernameController.text.trim()) &&
-        passwordController.text.trim().isNotEmpty &&
-        provider.selectedMethod.isNotEmpty &&
-        provider.selectedPaket.harga > 0;
-  }
+  
+bool isFormValid(WarnetBackendProvider provider) {
+  return usernameController.text.trim().isNotEmpty &&
+      usernameController.text.trim().length >= 4 && // Ensure minimum 4 characters
+      !provider.allWarnetCustomers!.members
+          .any((m) => m.memberAccount == usernameController.text.trim()) &&
+      passwordController.text.trim().isNotEmpty &&
+      provider.selectedMethod.isNotEmpty &&
+      provider.selectedPaket.harga > 0;
+}
 
   Future<void> _handlePayment(WarnetBackendProvider provider) async {
     WarnetBackendServices services = WarnetBackendServices();

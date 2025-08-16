@@ -2,8 +2,8 @@ import 'package:fluent_ui/fluent_ui.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:pos_indorep/provider/web/warnet_backend_provider.dart';
 import 'package:pos_indorep/web/model/member_model.dart';
-import 'package:pos_indorep/web/screen/transaksi/components/warnet_member_list/components/member_search_list.dart';
-import 'package:pos_indorep/web/screen/transaksi/components/warnet_member_list/components/new_topup_dialog.dart';
+import 'package:pos_indorep/web/screen/transaksi/components/warnet_card/components/member_search_list.dart';
+import 'package:pos_indorep/web/screen/transaksi/components/warnet_card/components/new_topup_dialog.dart';
 import 'package:provider/provider.dart';
 
 class WarnetMemberList extends StatefulWidget {
