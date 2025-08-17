@@ -92,15 +92,33 @@ class _WebDashboardCardState extends State<WebDashboardCard> {
                 ),
                 const SizedBox(height: 14),
                 Align(
-                    alignment: Alignment.centerLeft,
-                    child: Text(
-                      'Lihat Detail >',
-                      style: GoogleFonts.inter(
-                        color: IndorepColor.primary,
+                    alignment: Alignment.centerRight,
+                    child: IconButton(
+                      icon: 
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                      'Lihat Detail',
+                      style: TextStyle(
                         fontWeight: FontWeight.w600,
                         fontSize: 14,
                       ),
-                    )),
+                    ),
+                    const SizedBox(width: 8),
+                        Icon(FluentIcons.open_in_new_window,
+                          size: 18,
+                          
+                        ),
+                      ],
+                    ), 
+                        onPressed: () {
+                          if (widget.onTap != null) {
+                            widget.onTap!();
+                          } else {
+                            null;
+                          }
+                        })),
               ],
             ),
           ),

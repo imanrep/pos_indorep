@@ -2,6 +2,7 @@ import 'package:pos_indorep/web/model/create_member_request.dart';
 import 'package:pos_indorep/web/model/create_member_response.dart';
 import 'package:pos_indorep/web/model/create_order_kulkas_request.dart';
 import 'package:pos_indorep/web/model/create_order_kulkas_response.dart';
+import 'package:pos_indorep/web/model/get_food_info_response.dart';
 import 'package:pos_indorep/web/model/get_transaction_warnet_response.dart';
 import 'package:pos_indorep/web/model/kulkas_item_response.dart';
 import 'package:pos_indorep/web/model/member_model.dart';
@@ -217,4 +218,25 @@ class WarnetBackendServices {
       totalTransaction: 0,
     );
   }
+
+  Future<List<GetFoodInfoResponse>> getFoodInfo() async {
+  final url = Uri.parse('https://warnet-api.indorep.com/getFoodInfo');
+
+  try {
+    final response = await http.get(url);
+
+    if (response.statusCode == 200) {
+      final List<dynamic> jsonList = jsonDecode(response.body);
+
+      return jsonList
+          .map((json) => GetFoodInfoResponse.fromJson(json))
+          .toList();
+    } else {
+      throw Exception("Failed to load food info. Status code: ${response.statusCode}");
+    }
+  } catch (e) {
+    print("Error fetching food info: $e");
+    rethrow;
+  }
+}
 }

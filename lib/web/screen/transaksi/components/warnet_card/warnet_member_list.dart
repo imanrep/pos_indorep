@@ -1,4 +1,5 @@
 import 'package:fluent_ui/fluent_ui.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:pos_indorep/provider/web/warnet_backend_provider.dart';
 import 'package:pos_indorep/web/model/member_model.dart';
@@ -28,7 +29,7 @@ class _WarnetMemberListState extends State<WarnetMemberList> {
         ValueNotifier<List<Member>>([]);
     String? selectedMember;
 
-    return Consumer<WarnetBackendProvider>(
+    return Consumer<WarnetTransaksiProvider>(
       builder: (context, provider, child) {
         return Padding(
           padding: const EdgeInsets.all(8.0),
@@ -50,7 +51,7 @@ class _WarnetMemberListState extends State<WarnetMemberList> {
                 provider.isLoadingEntries
                     ? const Padding(
                         padding: EdgeInsets.all(16.0),
-                        child: Center(child: ProgressRing()),
+                        child: Center(child: CupertinoActivityIndicator()),
                       )
                     : provider.allWarnetCustomers == null
                         ? Padding(

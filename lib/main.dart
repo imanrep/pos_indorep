@@ -12,6 +12,7 @@ import 'package:pos_indorep/provider/main_provider.dart';
 import 'package:pos_indorep/provider/menu_provider.dart';
 import 'package:pos_indorep/provider/transaction_provider.dart';
 import 'package:pos_indorep/provider/web/warnet_backend_provider.dart';
+import 'package:pos_indorep/provider/web/warnet_dashboard_provider.dart';
 import 'package:pos_indorep/provider/web/web_main_provider.dart';
 import 'package:pos_indorep/provider/web/web_transaksi_provider.dart';
 import 'package:pos_indorep/screen/home_screen.dart';
@@ -54,9 +55,11 @@ void main() async {
         ChangeNotifierProvider(create: (_) => MenuProvider()),
         ChangeNotifierProvider(create: (_) => WebTransaksiProvider()),
         ChangeNotifierProvider(create: (_) => WebMainProvider()),
-        ChangeNotifierProvider(create: (_) => WarnetBackendProvider()),
+        ChangeNotifierProvider(create: (_) => WarnetDashboardProvider()),
+        ChangeNotifierProvider(create: (_) => WarnetTransaksiProvider()),
       ],
-      child: GlobalLoaderOverlay(child: kIsWeb || Platform.isWindows ? MyWebApp() : MyApp()),
+      child: GlobalLoaderOverlay(
+          child: kIsWeb || Platform.isWindows ? MyWebApp() : MyApp()),
     ),
   );
 }

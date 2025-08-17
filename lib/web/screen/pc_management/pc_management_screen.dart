@@ -4,7 +4,7 @@ import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:pos_indorep/helper/helper.dart';
 import 'package:pos_indorep/provider/web/warnet_backend_provider.dart';
-import 'package:pos_indorep/services/warnet_backend_services.dart';
+import 'package:pos_indorep/provider/web/warnet_dashboard_provider.dart';
 import 'package:pos_indorep/web/model/member_model.dart';
 import 'package:pos_indorep/web/model/pcs_model.dart';
 import 'package:provider/provider.dart';
@@ -17,7 +17,6 @@ class PcManagementScreen extends StatefulWidget {
 }
 
 class _PcManagementScreenState extends State<PcManagementScreen> {
-  final WarnetBackendServices _icafeServices = WarnetBackendServices();
   final ValueNotifier<List<Pc>> selectedPcs = ValueNotifier<List<Pc>>([]);
   final commandBarKey = GlobalKey<CommandBarState>();
   Timer? _timer;
@@ -28,14 +27,14 @@ class _PcManagementScreenState extends State<PcManagementScreen> {
 
     // Fetch data initially
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      Provider.of<WarnetBackendProvider>(context, listen: false)
-          .getAllCustomerWarnet('');
+      Provider.of<WarnetDashboardProvider>(context, listen: false)
+          .init();
     });
 
     // Set up a periodic timer to fetch data every 5 seconds
     _timer = Timer.periodic(Duration(seconds: 5), (_) {
-      Provider.of<WarnetBackendProvider>(context, listen: false)
-          .getAllCustomerWarnet('');
+      Provider.of<WarnetDashboardProvider>(context, listen: false)
+          .init;
     });
   }
 
@@ -60,7 +59,7 @@ class _PcManagementScreenState extends State<PcManagementScreen> {
           borderRadius: BorderRadius.circular(12),
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 0.0, vertical: 4.0),
-            child: Consumer<WarnetBackendProvider>(
+            child: Consumer<WarnetDashboardProvider>(
               builder: (context, provider, child) {
                 if (provider.totalPC == 0) {
                   return const Center(child: CupertinoActivityIndicator());
@@ -69,7 +68,7 @@ class _PcManagementScreenState extends State<PcManagementScreen> {
                 return ValueListenableBuilder<List<Pc>>(
                   valueListenable: selectedPcs,
                   builder: (context, selected, _) {
-                    final warnetBackendProvider = Provider.of<WarnetBackendProvider>(context);
+                    final warnetBackendProvider = Provider.of<WarnetTransaksiProvider>(context);
     final members = warnetBackendProvider.allWarnetCustomers?.members ?? [];
                     return Column(
                       children: [

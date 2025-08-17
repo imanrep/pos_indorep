@@ -28,13 +28,13 @@ Timer? _timer;
 
     // Fetch data initially
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      Provider.of<WarnetBackendProvider>(context, listen: false)
+      Provider.of<WarnetTransaksiProvider>(context, listen: false)
           .getAllCustomerWarnet('');
     });
 
     // Set up a periodic timer to fetch data every 5 seconds
     _timer = Timer.periodic(Duration(seconds: 5), (_) {
-      Provider.of<WarnetBackendProvider>(context, listen: false)
+      Provider.of<WarnetTransaksiProvider>(context, listen: false)
           .getAllCustomerWarnet('');
     });
   }
@@ -49,7 +49,7 @@ Timer? _timer;
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<WarnetBackendProvider>(builder: (context, provider, child) {
+    return Consumer<WarnetTransaksiProvider>(builder: (context, provider, child) {
       return ScaffoldPage.scrollable(
         header: PageHeader(
           title: Text(

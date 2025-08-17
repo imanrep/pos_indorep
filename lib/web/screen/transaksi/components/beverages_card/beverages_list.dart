@@ -1,9 +1,9 @@
 import 'package:fluent_ui/fluent_ui.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:pos_indorep/provider/web/warnet_backend_provider.dart';
 import 'package:pos_indorep/web/model/member_model.dart';
 import 'package:pos_indorep/web/screen/transaksi/components/beverages_card/components/beverages_search_list.dart';
-import 'package:pos_indorep/web/screen/transaksi/components/warnet_card/components/member_search_list.dart';
 import 'package:pos_indorep/web/screen/transaksi/components/warnet_card/components/new_topup_dialog.dart';
 import 'package:provider/provider.dart';
 
@@ -29,7 +29,7 @@ class _BeveragesListState extends State<BeveragesList> {
         ValueNotifier<List<Member>>([]);
     String? selectedMember;
 
-    return Consumer<WarnetBackendProvider>(
+    return Consumer<WarnetTransaksiProvider>(
       builder: (context, provider, child) {
         return Padding(
           padding: const EdgeInsets.all(8.0),
@@ -51,7 +51,7 @@ class _BeveragesListState extends State<BeveragesList> {
                 provider.isLoadingEntries
                     ? const Padding(
                         padding: EdgeInsets.all(16.0),
-                        child: Center(child: ProgressRing()),
+                        child: Center(child: CupertinoActivityIndicator()),
                       )
                     : provider.allWarnetCustomers == null
                         ? Padding(

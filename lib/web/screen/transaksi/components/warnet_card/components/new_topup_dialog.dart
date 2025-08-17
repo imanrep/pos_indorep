@@ -21,7 +21,7 @@ class _NewTopupDialogState extends State<NewTopupDialog> {
   final TextEditingController usernameController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   
-bool isFormValid(WarnetBackendProvider provider) {
+bool isFormValid(WarnetTransaksiProvider provider) {
   return usernameController.text.trim().isNotEmpty &&
       usernameController.text.trim().length >= 4 && // Ensure minimum 4 characters
       !provider.allWarnetCustomers!.members
@@ -31,7 +31,7 @@ bool isFormValid(WarnetBackendProvider provider) {
       provider.selectedPaket.harga > 0;
 }
 
-  Future<void> _handlePayment(WarnetBackendProvider provider) async {
+  Future<void> _handlePayment(WarnetTransaksiProvider provider) async {
     WarnetBackendServices services = WarnetBackendServices();
     setState(() {
       _isLoading = true;
@@ -159,7 +159,7 @@ bool isFormValid(WarnetBackendProvider provider) {
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Consumer<WarnetBackendProvider>(
+              Consumer<WarnetTransaksiProvider>(
                   builder: (context, provider, child) {
                 return ComboBox<String>(
                   value: provider.selectedPaket.nama,
@@ -185,7 +185,7 @@ bool isFormValid(WarnetBackendProvider provider) {
                 );
               }),
               const SizedBox(width: 12),
-              Consumer<WarnetBackendProvider>(
+              Consumer<WarnetTransaksiProvider>(
                   builder: (context, provider, child) {
                 return ComboBox<String>(
                   value: provider.selectedMethod,
@@ -215,7 +215,7 @@ bool isFormValid(WarnetBackendProvider provider) {
             Navigator.pop(context);
           },
         ),
-        Consumer<WarnetBackendProvider>(
+        Consumer<WarnetTransaksiProvider>(
           builder: (context, provider, child) {
             final isValid = isFormValid(provider);
             return FilledButton(

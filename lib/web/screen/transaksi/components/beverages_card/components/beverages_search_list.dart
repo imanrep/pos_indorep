@@ -27,7 +27,7 @@ class _BeveragesSearchListState extends State<BeveragesSearchList> {
     _displayed = []; // Defensive: start with empty list
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final provider = context.read<WarnetBackendProvider>();
+      final provider = context.read<WarnetTransaksiProvider>();
       final kulkasItems = provider.kulkasItems;
       if (kulkasItems.isEmpty) return;
 
@@ -71,7 +71,7 @@ class _BeveragesSearchListState extends State<BeveragesSearchList> {
 
   @override
   Widget build(BuildContext context) {
-    final provider = context.watch<WarnetBackendProvider>();
+    final provider = context.watch<WarnetTransaksiProvider>();
     final kulkasItems = provider.kulkasItems;
 
     // Update _displayed if kulkasItems changes and _searchCtrl is empty

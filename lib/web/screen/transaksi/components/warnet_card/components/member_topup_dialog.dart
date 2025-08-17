@@ -20,12 +20,12 @@ class MemberTopupDialog extends StatefulWidget {
 class _MemberTopupDialogState extends State<MemberTopupDialog> {
   bool _isLoading = false;
 
-  bool isFormValid(WarnetBackendProvider provider) {
+  bool isFormValid(WarnetTransaksiProvider provider) {
     return provider.selectedMethod.isNotEmpty &&
         provider.selectedPaket.harga > 0;
   }
 
-  Future<void> _handlePayment(WarnetBackendProvider provider) async {
+  Future<void> _handlePayment(WarnetTransaksiProvider provider) async {
     WarnetBackendServices services = WarnetBackendServices();
     setState(() {
       _isLoading = true;
@@ -95,7 +95,7 @@ class _MemberTopupDialogState extends State<MemberTopupDialog> {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<WarnetBackendProvider>(builder: (context, provider, child) {
+    return Consumer<WarnetTransaksiProvider>(builder: (context, provider, child) {
       return ContentDialog(
         constraints: BoxConstraints(
           maxWidth: 450,
@@ -104,7 +104,7 @@ class _MemberTopupDialogState extends State<MemberTopupDialog> {
         content: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Consumer<WarnetBackendProvider>(
+            Consumer<WarnetTransaksiProvider>(
                 builder: (context, provider, child) {
               return ComboBox<String>(
                 value: provider.selectedPaket.nama,
@@ -156,7 +156,7 @@ class _MemberTopupDialogState extends State<MemberTopupDialog> {
               // Delete file here
             },
           ),
-          Consumer<WarnetBackendProvider>(
+          Consumer<WarnetTransaksiProvider>(
             builder: (context, provider, child) {
               final isValid = isFormValid(provider);
               return FilledButton(

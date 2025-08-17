@@ -104,7 +104,7 @@ class _WarnetHomeScreenState extends State<WarnetHomeScreen> {
                   child: Button(
                     child: Icon(FluentIcons.refresh),
                     onPressed: () {
-                       Provider.of<WarnetBackendProvider>(context, listen: false)
+                       Provider.of<WarnetTransaksiProvider>(context, listen: false)
           .getAllCustomerWarnet('');
                     },
                   ),

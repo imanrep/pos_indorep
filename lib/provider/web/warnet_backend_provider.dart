@@ -2,28 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:pos_indorep/services/warnet_backend_services.dart';
 import 'package:pos_indorep/web/model/kulkas_item_response.dart';
 import 'package:pos_indorep/web/model/member_model.dart';
-import 'package:pos_indorep/web/model/pcs_model.dart';
 import 'package:pos_indorep/web/model/web_model.dart';
 
-class WarnetBackendProvider extends ChangeNotifier {
+class WarnetTransaksiProvider extends ChangeNotifier {
   AllCustomersResult? _allWarnetCustomers;
   bool _isLoadingEntries = true;
   WarnetPaket _selectedPaket =
       WarnetPaket(nama: 'Paket 1 Jam', harga: 15000, hargaAsli: 15000);
   String _selectedMethod = 'Cash';
   bool _isPaketMalam = false;
-  DateTime _selectedSummaryDate = DateTime.now();
-
-  int _jumlahMember = 0;
-  int _jumlahItemKulkas = 0;
-  int _totalTransaksiWarnet = 0;
-  int _totalTransaksiKulkas = 0;
-  int _omzetWarnet = 0;
-  int _omzetKulkas = 0;
-  int _totalPC = 0;
-  List<Pc> _pcs = [];
-  
-  int _totalPCOnline = 0;
+ 
 
   List<KulkasItem> _kulkasItems = [];
 
@@ -31,8 +19,10 @@ class WarnetBackendProvider extends ChangeNotifier {
     WarnetPaket(nama: 'Paket Dev Testing', harga: 100, hargaAsli: 100),
     WarnetPaket(nama: 'Paket 1 Jam', harga: 15000, hargaAsli: 15000),
     WarnetPaket(nama: 'Paket 2 Jam', harga: 30000, hargaAsli: 30000),
+    WarnetPaket(nama: 'PaMer 5 Jam', harga: 44999, hargaAsli: 75000),
     WarnetPaket(nama: 'Paket 3 Jam', harga: 45000, hargaAsli: 45000),
     WarnetPaket(nama: 'Paket Bocah', harga: 50000, hargaAsli: 75000),
+     WarnetPaket(nama: 'PaMer 12 Jam', harga: 80000, hargaAsli: 180000),
     WarnetPaket(nama: 'Paket Levelling', harga: 100000, hargaAsli: 180000),
   ];
 
@@ -46,30 +36,18 @@ class WarnetBackendProvider extends ChangeNotifier {
   List<KulkasItem> get kulkasItems => _kulkasItems;
   List<WarnetPaket> get packages => _packages;
   List<String> get methods => _methods;
-  DateTime get selectedSummaryDate => _selectedSummaryDate;
-  
 
-  int get jumlahMember => _jumlahMember;
-  int get jumlahItemKulkas => _jumlahItemKulkas;
-  int get totalTransaksiWarnet => _totalTransaksiWarnet;
-  int get totalTransaksiKulkas => _totalTransaksiKulkas;
-  int get omzetWarnet => _omzetWarnet;
-  int get omzetKulkas => _omzetKulkas;
-  int get totalPC => _totalPC;
-  int get totalPCOnline => _totalPCOnline;
-  List<Pc> get pcs => _pcs;
 
-  WarnetBackendProvider() {
+  WarnetTransaksiProvider() {
     init();
   }
 
   Future<void> init() async {
-    await getTotalPC();
+    _isLoadingEntries = true;
     await getAllCustomerWarnet('');
-    await getPCOnline();
     await getKulkasItem();
-    setJumlahMember(allWarnetCustomers!.members.length);
-    setTotalTransaksiWarnet(allWarnetCustomers!.totalTransactions);
+    _isLoadingEntries = false;
+    notifyListeners();
   }
 
   void setSelectedMethod(String method) {
@@ -82,33 +60,15 @@ class WarnetBackendProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  void setJumlahMember(int jumlah) {
-    _jumlahMember = jumlah;
-    notifyListeners();
-  }
-
-  void setTotalTransaksiWarnet(int total) {
-    _totalTransaksiWarnet = total;
-    notifyListeners();
-  }
-
-  Future<void> onSummaryDateChanged(DateTime newDate) async {
-    _selectedSummaryDate = newDate;
-    notifyListeners();
-    // await fetchWarnetEntriesByDate(newDate);
-  }
 
   Future<void> getAllCustomerWarnet(String username) async {
     WarnetBackendServices services = WarnetBackendServices();
     try {
-      _isLoadingEntries = true;
       var result = await services.fetchAllCustomers(username);
       _allWarnetCustomers = result;
       notifyListeners();
-      _isLoadingEntries = false;
     } catch (e) {
       _allWarnetCustomers = null;
-      _isLoadingEntries = false;
     }
   }
 
@@ -117,36 +77,13 @@ class WarnetBackendProvider extends ChangeNotifier {
     try {
       var result = await services.getKulkasItem();
       if (result.success) {
-        _jumlahItemKulkas = result.message.length;
-        _totalTransaksiKulkas = 0;
-        _omzetKulkas = 0;
         _kulkasItems = result.message;
         notifyListeners();
       }
     } catch (e) {
-      _jumlahItemKulkas = 0;
-      _totalTransaksiKulkas = 0;
-      _omzetKulkas = 0;
       notifyListeners();
     }
   }
 
-  Future<void> getTotalPC() async{
-    WarnetBackendServices services = WarnetBackendServices();
-    var res = await services.getPCs();
-    _totalPC = res.data.pcsInit.pcList.length;
-    _pcs = res.data.pcsInit.pcList;
-    notifyListeners();
-  }
 
-  Future<void> getPCOnline() async{
-    var count = 0;
-   allWarnetCustomers?.members.forEach((member) {
-      if (member.memberIsLogined == 1) {
-        count++;
-      }
-    });
-    _totalPCOnline = count;
-    notifyListeners();
-  }
 }

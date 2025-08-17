@@ -50,7 +50,7 @@ class _MembersSearchListState extends State<MembersSearchList> {
 
   @override
   Widget build(BuildContext context) {
-    final provider = context.watch<WarnetBackendProvider>();
+    final provider = context.watch<WarnetTransaksiProvider>();
     final allCustomers = provider.allWarnetCustomers;
     final commandBarKey = GlobalKey<CommandBarState>();
 
@@ -201,6 +201,27 @@ class _MembersSearchListState extends State<MembersSearchList> {
                           style: GoogleFonts.inter()),
                       content: Column(
                         children: [
+                          Align(alignment: Alignment.topRight,
+                          child: 
+                           Button(
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(4.0),
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Icon(FluentIcons.history, size: 12),
+                                        const SizedBox(width: 8),
+                                        Text(
+                                          'Member History',
+                                          style:
+                                              GoogleFonts.inter(fontSize: 12),
+                                        )
+                                      ],
+                                    ),
+                                  ),
+                                  onPressed: () {},
+                                ),),
+                          const SizedBox(height: 12),
                           Wrap(
                             children: [
                               MemberInfoContainer(
@@ -231,10 +252,10 @@ class _MembersSearchListState extends State<MembersSearchList> {
                                 FilledButton(
                                   child: Padding(
                                     padding: const EdgeInsets.all(4.0),
-                                    child: Column(
+                                    child: Row(
                                       children: [
-                                        Icon(FluentIcons.add, size: 16),
-                                        const SizedBox(height: 8),
+                                        Icon(FluentIcons.add, size: 12),
+                                        const SizedBox(width: 8),
                                         Text(
                                           'Top Up',
                                           style:
@@ -251,10 +272,10 @@ class _MembersSearchListState extends State<MembersSearchList> {
                                 Button(
                                   child: Padding(
                                     padding: const EdgeInsets.all(4.0),
-                                    child: Column(
+                                    child: Row(
                                       children: [
-                                        Icon(FluentIcons.remove, size: 16),
-                                        const SizedBox(height: 8),
+                                        Icon(FluentIcons.remove, size: 12),
+                                        const SizedBox(width: 8),
                                         Text(
                                           'Refund',
                                           style:
@@ -273,11 +294,11 @@ class _MembersSearchListState extends State<MembersSearchList> {
                                   ),
                                   child: Padding(
                                     padding: const EdgeInsets.all(4.0),
-                                    child: Column(
+                                    child: Row(
                                       children: [
                                         Icon(FluentIcons.delete,
                                             size: 16, color: Colors.white),
-                                        const SizedBox(height: 8),
+                                        const SizedBox(width: 8),
                                         Text(
                                           'Delete',
                                           style: GoogleFonts.inter(
