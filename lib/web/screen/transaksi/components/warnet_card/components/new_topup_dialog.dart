@@ -20,16 +20,17 @@ class _NewTopupDialogState extends State<NewTopupDialog> {
 
   final TextEditingController usernameController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
-  
-bool isFormValid(WarnetTransaksiProvider provider) {
-  return usernameController.text.trim().isNotEmpty &&
-      usernameController.text.trim().length >= 4 && // Ensure minimum 4 characters
-      !provider.allWarnetCustomers!.members
-          .any((m) => m.memberAccount == usernameController.text.trim()) &&
-      passwordController.text.trim().isNotEmpty &&
-      provider.selectedMethod.isNotEmpty &&
-      provider.selectedPaket.harga > 0;
-}
+
+  bool isFormValid(WarnetTransaksiProvider provider) {
+    return usernameController.text.trim().isNotEmpty &&
+        usernameController.text.trim().length >=
+            4 && // Ensure minimum 4 characters
+        !provider.allWarnetCustomers!.members
+            .any((m) => m.memberAccount == usernameController.text.trim()) &&
+        passwordController.text.trim().isNotEmpty &&
+        provider.selectedMethod.isNotEmpty &&
+        provider.selectedPaket.harga > 0;
+  }
 
   Future<void> _handlePayment(WarnetTransaksiProvider provider) async {
     WarnetBackendServices services = WarnetBackendServices();
@@ -65,14 +66,12 @@ bool isFormValid(WarnetTransaksiProvider provider) {
         _isLoading = false;
       });
       await showDialog<String>(
-          context: context,
-          builder: (context) => QrisPrintDialog(
-            response: res,
-            paket: provider.selectedPaket
-          ),
-        );
-        provider.getAllCustomerWarnet('');
-        Navigator.pop(context);
+        context: context,
+        builder: (context) =>
+            QrisPrintDialog(response: res, paket: provider.selectedPaket),
+      );
+      provider.getAllCustomerWarnet('');
+      Navigator.pop(context);
     } else if (provider.selectedMethod == 'QRIS') {
       var res = await services.createMember(
         CreateMemberRequest(
@@ -86,10 +85,8 @@ bool isFormValid(WarnetTransaksiProvider provider) {
       if (res.success) {
         await showDialog<String>(
           context: context,
-          builder: (context) => QrisPrintDialog(
-            response: res,
-            paket: provider.selectedPaket
-          ),
+          builder: (context) =>
+              QrisPrintDialog(response: res, paket: provider.selectedPaket),
         );
       }
       setState(() {
@@ -127,7 +124,8 @@ bool isFormValid(WarnetTransaksiProvider provider) {
                       controller: usernameController,
                       autofocus: true,
                       inputFormatters: [
-                         FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z0-9/\s]')),
+                        FilteringTextInputFormatter.allow(
+                            RegExp(r'[a-zA-Z0-9/\s]')),
                       ],
                       placeholder: 'Username',
                       maxLength: 20,
@@ -232,7 +230,7 @@ bool isFormValid(WarnetTransaksiProvider provider) {
                         strokeWidth: 3,
                       ))
                   : Text(
-                      'Top Up',
+                      'Tambah',
                     ),
             );
           },

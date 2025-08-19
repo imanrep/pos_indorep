@@ -8,6 +8,7 @@ import 'package:pos_indorep/web/model/kulkas_item_response.dart';
 import 'package:pos_indorep/web/model/member_model.dart';
 import 'package:pos_indorep/web/model/pcs_model.dart';
 import 'package:http/http.dart' as http;
+import 'package:pos_indorep/web/model/reset_display_response.dart';
 import 'package:pos_indorep/web/model/topup_member_request.dart';
 import 'dart:convert';
 
@@ -220,23 +221,44 @@ class WarnetBackendServices {
   }
 
   Future<List<GetFoodInfoResponse>> getFoodInfo() async {
-  final url = Uri.parse('https://warnet-api.indorep.com/getFoodInfo');
+    final url = Uri.parse('https://warnet-api.indorep.com/getFoodInfo');
 
-  try {
-    final response = await http.get(url);
+    try {
+      final response = await http.get(url);
 
-    if (response.statusCode == 200) {
-      final List<dynamic> jsonList = jsonDecode(response.body);
+      if (response.statusCode == 200) {
+        final List<dynamic> jsonList = jsonDecode(response.body);
 
-      return jsonList
-          .map((json) => GetFoodInfoResponse.fromJson(json))
-          .toList();
-    } else {
-      throw Exception("Failed to load food info. Status code: ${response.statusCode}");
+        return jsonList
+            .map((json) => GetFoodInfoResponse.fromJson(json))
+            .toList();
+      } else {
+        throw Exception(
+            "Failed to load food info. Status code: ${response.statusCode}");
+      }
+    } catch (e) {
+      print("Error fetching food info: $e");
+      rethrow;
     }
-  } catch (e) {
-    print("Error fetching food info: $e");
-    rethrow;
   }
-}
+
+  Future<ResetDisplayResponse> resetDisplay() async {
+    String baseUrl = "https://warnet-api.indorep.com";
+    final url = Uri.parse('${baseUrl}/reset');
+    try {
+      final response = await http.get(url);
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> data = jsonDecode(response.body);
+        return ResetDisplayResponse.fromJson(data);
+      } else {
+        print('Failed to reset display: ${response.body}');
+      }
+    } catch (e) {
+      print('Error loading transactions: $e');
+    }
+
+    return ResetDisplayResponse(
+      success: false,
+    );
+  }
 }
