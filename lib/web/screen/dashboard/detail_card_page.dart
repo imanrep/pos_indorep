@@ -202,47 +202,47 @@ class _DetailCardPageState extends State<DetailCardPage> {
                               ),
                             ),
                           ),
-                          title: Row(
-                            children: [
-                              // Wrap the text in an Expanded widget to handle overflow
-                              Expanded(
-                                child: Text(
-                                  '$dateInHours - ${transaction.username}',
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                  overflow: TextOverflow
-                                      .ellipsis, // Handle overflow with ellipsis
-                                  maxLines: 1, // Limit to a single line
-                                ),
-                              ),
-                              const SizedBox(width: 4.0),
-                              // Wrap the container in a Flexible widget to prevent overflow
-                              Flexible(
-                                child: Container(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 8, vertical: 4),
-                                  decoration: BoxDecoration(
-                                    color:
-                                        IndorepColor.primary.withOpacity(0.2),
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                  child: Text(
-                                    '${transaction.note}',
-                                    style: const TextStyle(fontSize: 14),
-                                    overflow: TextOverflow
-                                        .ellipsis, // Handle overflow with ellipsis
-                                    maxLines: 1, // Limit to a single line
-                                  ),
-                                ),
-                              ),
-                            ],
+                          title: Text(
+                            '$dateInHours - ${transaction.note}',
+                            style: const TextStyle(
+                              fontWeight: FontWeight.w600,
+                            ),
+                            overflow: TextOverflow
+                                .ellipsis, // Handle overflow with ellipsis
+                            maxLines: 1, // Limit to a single line
                           ),
                           subtitle: Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 4),
-                            child: Text(
-                                '$dateWithoutTime | ${Helper.rupiahFormatterTwo(transaction.amount)} (${transaction.payment.toUpperCase()})',
-                                style: TextStyle(fontSize: 14)),
+                            padding: const EdgeInsets.symmetric(vertical: 2.0),
+                            child: Row(
+                              children: [
+                                Padding(
+                                  padding:
+                                      const EdgeInsets.symmetric(vertical: 4),
+                                  child: Text(
+                                      '$dateWithoutTime | ${Helper.rupiahFormatterTwo(transaction.amount)} | ${transaction.payment.toUpperCase()}',
+                                      style: TextStyle(fontSize: 14)),
+                                ),
+                                const SizedBox(width: 8.0),
+                                Flexible(
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 8, vertical: 2),
+                                    decoration: BoxDecoration(
+                                      color:
+                                          IndorepColor.primary.withOpacity(0.2),
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    child: Text(
+                                      '${transaction.username}',
+                                      style: const TextStyle(fontSize: 14),
+                                      overflow: TextOverflow
+                                          .ellipsis, // Handle overflow with ellipsis
+                                      maxLines: 1, // Limit to a single line
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                           onPressed: () {
                             setState(() => _selectedIndex = index);

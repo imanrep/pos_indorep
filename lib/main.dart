@@ -21,8 +21,15 @@ import 'package:provider/provider.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:flutter/services.dart';
 
+import 'package:pos_indorep/helper/window_stub.dart'
+    if (dart.library.io) 'helper/window_desktop.dart' as winman;
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Initialize window only on Windows (no-op elsewhere)
+  await winman.initWindowForDesktop();
+
   await initializeDateFormatting('id_ID', null);
   if (kIsWeb || Platform.isWindows) {
     await Firebase.initializeApp(
