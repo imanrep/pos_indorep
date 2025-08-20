@@ -1,6 +1,6 @@
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:pos_indorep/helper/helper.dart';
-import 'package:pos_indorep/provider/web/warnet_backend_provider.dart';
+import 'package:pos_indorep/provider/web/warnet_transaksi_provider.dart';
 import 'package:pos_indorep/services/warnet_backend_services.dart';
 import 'package:pos_indorep/web/model/create_member_response.dart';
 import 'package:pos_indorep/web/model/member_model.dart';
@@ -59,14 +59,19 @@ class _MemberTopupDialogState extends State<MemberTopupDialog> {
         _isLoading = false;
       });
       await showDialog<String>(
-          context: context,
-          builder: (context) => QrisPrintDialog(
-            response: CreateMemberResponse(message: res.message, orderID: res.orderID, password: "", qris: res.qris ?? "", success: res.success, username: widget.member.memberAccount),
-            paket: provider.selectedPaket
-          ),
-        );
-        provider.getAllCustomerWarnet('');
-        Navigator.pop(context);
+        context: context,
+        builder: (context) => QrisPrintDialog(
+            response: CreateMemberResponse(
+                message: res.message,
+                orderID: res.orderID,
+                password: "",
+                qris: res.qris ?? "",
+                success: res.success,
+                username: widget.member.memberAccount),
+            paket: provider.selectedPaket),
+      );
+      provider.getAllCustomerWarnet('');
+      Navigator.pop(context);
     } else if (provider.selectedMethod == 'QRIS') {
       TopUpMemberResponse res = await services.topUpMember(
         TopUpMemberRequest(
@@ -77,12 +82,27 @@ class _MemberTopupDialogState extends State<MemberTopupDialog> {
         ),
       );
       if (res.success) {
+        await displayInfoBar(context, builder: (ctx, close) {
+          return InfoBar(
+            title: const Text('Topup berhasil dibuat'),
+            content: Text(
+                'Silakan scan QRIS di layar. Total: ${Helper.rupiahFormatter(provider.selectedPaket.harga.toDouble())}'),
+            action: IconButton(
+                icon: const Icon(FluentIcons.clear), onPressed: close),
+            severity: InfoBarSeverity.success,
+          );
+        });
         await showDialog<String>(
           context: context,
           builder: (context) => QrisPrintDialog(
-            response: CreateMemberResponse(message: res.message, orderID: res.orderID, password: "", qris: res.qris ?? "", success: res.success, username: widget.member.memberAccount),
-            paket: provider.selectedPaket
-          ),
+              response: CreateMemberResponse(
+                  message: res.message,
+                  orderID: res.orderID,
+                  password: "",
+                  qris: res.qris ?? "",
+                  success: res.success,
+                  username: widget.member.memberAccount),
+              paket: provider.selectedPaket),
         );
       }
       setState(() {
@@ -95,7 +115,8 @@ class _MemberTopupDialogState extends State<MemberTopupDialog> {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<WarnetTransaksiProvider>(builder: (context, provider, child) {
+    return Consumer<WarnetTransaksiProvider>(
+        builder: (context, provider, child) {
       return ContentDialog(
         constraints: BoxConstraints(
           maxWidth: 450,

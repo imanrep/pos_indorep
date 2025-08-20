@@ -1,11 +1,14 @@
+import 'dart:io' show Platform;
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:pos_indorep/provider/web/warnet_backend_provider.dart';
+import 'package:pos_indorep/provider/web/warnet_transaksi_provider.dart';
 import 'package:pos_indorep/web/model/member_model.dart';
 import 'package:pos_indorep/web/screen/transaksi/components/beverages_card/components/beverages_search_list.dart';
-import 'package:pos_indorep/web/screen/transaksi/components/warnet_card/components/new_topup_dialog.dart';
 import 'package:provider/provider.dart';
+
+import 'package:pos_indorep/web/screen/transaksi/components/beverages_card/components/beverages_buy_dialog_stub.dart'
+    if (dart.library.io) 'package:pos_indorep/web/screen/transaksi/components/beverages_card/components/beverages_buy_dialog.dart';
 
 class BeveragesList extends StatefulWidget {
   const BeveragesList({super.key});
@@ -18,7 +21,7 @@ class _BeveragesListState extends State<BeveragesList> {
   void showContentDialog(BuildContext context) async {
     final result = await showDialog<String>(
       context: context,
-      builder: (context) => NewTopupDialog(),
+      builder: (context) => BeveragesBuyDialog(),
     );
     setState(() {});
   }
@@ -72,44 +75,40 @@ class _BeveragesListState extends State<BeveragesList> {
                               mainAxisSize: MainAxisSize.min,
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text('Beli Item',
-                                    style: GoogleFonts.inter(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.w600)),
-                                const SizedBox(
-                                  height: 16,
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 8.0),
-                                  child: FilledButton(
-                                      child: Padding(
-                                        padding: const EdgeInsets.all(4.0),
-                                        child: Row(
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: [
-                                            Icon(FluentIcons.add, size: 12),
-                                            const SizedBox(
-                                              width: 8,
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text('Penjualan Snack',
+                                        style: GoogleFonts.inter(
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.w600)),
+                                    Platform.isWindows
+                                        ? FilledButton(
+                                            child: Padding(
+                                              padding:
+                                                  const EdgeInsets.all(4.0),
+                                              child: Row(
+                                                mainAxisSize: MainAxisSize.min,
+                                                children: [
+                                                  Icon(FluentIcons.add,
+                                                      size: 12),
+                                                  const SizedBox(
+                                                    width: 8,
+                                                  ),
+                                                  Text('Tambah Penjualan',
+                                                      style: GoogleFonts.inter(
+                                                          fontWeight:
+                                                              FontWeight.w500)),
+                                                ],
+                                              ),
                                             ),
-                                            Text('Beli',
-                                                style: GoogleFonts.inter(
-                                                    fontWeight:
-                                                        FontWeight.w500)),
-                                          ],
-                                        ),
-                                      ),
-                                      onPressed: () async {
-                                        showContentDialog(context);
-                                      }),
+                                            onPressed: () async {
+                                              showContentDialog(context);
+                                            })
+                                        : const Spacer()
+                                  ],
                                 ),
-                                const SizedBox(
-                                  height: 16,
-                                ),
-                                Text('Manage Item',
-                                    style: GoogleFonts.inter(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.w600)),
                                 const SizedBox(
                                   height: 16,
                                 ),

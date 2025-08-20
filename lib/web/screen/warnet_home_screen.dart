@@ -1,6 +1,7 @@
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:pos_indorep/provider/web/warnet_backend_provider.dart';
+import 'package:pos_indorep/provider/web/warnet_transaksi_provider.dart';
+import 'package:pos_indorep/provider/web/warnet_dashboard_provider.dart';
 import 'package:pos_indorep/provider/web/web_main_provider.dart';
 import 'package:pos_indorep/web/screen/dashboard/web_dashboard_page.dart';
 import 'package:pos_indorep/web/screen/pc_management/pc_management_screen.dart';
@@ -17,6 +18,7 @@ class WarnetHomeScreen extends StatefulWidget {
 class _WarnetHomeScreenState extends State<WarnetHomeScreen> {
   int _selectedIndex = 0;
   final moreOptionsController = FlyoutController();
+  bool _isRefresh = false;
 
   @override
   Widget build(BuildContext context) {
@@ -103,10 +105,38 @@ class _WarnetHomeScreenState extends State<WarnetHomeScreen> {
                   height: 34,
                   child: Button(
                     child: Icon(FluentIcons.refresh),
-                    onPressed: () {
-                       Provider.of<WarnetTransaksiProvider>(context, listen: false)
-          .getAllCustomerWarnet('');
-                    },
+                    onPressed: _isRefresh
+                        ? null
+                        : () async {
+                            Provider.of<WarnetDashboardProvider>(context,
+                                    listen: false)
+                                .setLoading(true);
+                            setState(() {
+                              _isRefresh = true;
+                            });
+                            await Provider.of<WarnetTransaksiProvider>(context,
+                                    listen: false)
+                                .getAllCustomerWarnet('');
+                            setState(() {
+                              _isRefresh = false;
+                            });
+                            Provider.of<WarnetDashboardProvider>(context,
+                                    listen: false)
+                                .setLoading(false);
+                            await displayInfoBar(context,
+                                builder: (context, close) {
+                              return InfoBar(
+                                title: const Text('Done'),
+                                content: const Text(
+                                    'Data has been refreshed successfully.'),
+                                action: IconButton(
+                                  icon: const Icon(FluentIcons.clear),
+                                  onPressed: close,
+                                ),
+                                severity: InfoBarSeverity.success,
+                              );
+                            });
+                          },
                   ),
                 ),
                 const SizedBox(width: 16),

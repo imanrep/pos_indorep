@@ -1,11 +1,14 @@
+import 'dart:io';
+
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:pos_indorep/provider/web/warnet_backend_provider.dart';
+import 'package:pos_indorep/provider/web/warnet_transaksi_provider.dart';
 import 'package:pos_indorep/web/model/member_model.dart';
 import 'package:pos_indorep/web/screen/transaksi/components/warnet_card/components/member_search_list.dart';
-import 'package:pos_indorep/web/screen/transaksi/components/warnet_card/components/new_topup_dialog.dart';
 import 'package:provider/provider.dart';
+import 'package:pos_indorep/web/screen/transaksi/components/beverages_card/components/beverages_buy_dialog_stub.dart'
+    if (dart.library.io) 'package:pos_indorep/web/screen/transaksi/components/warnet_card/components/new_topup_dialog.dart';
 
 class WarnetMemberList extends StatefulWidget {
   const WarnetMemberList({super.key});
@@ -72,44 +75,42 @@ class _WarnetMemberListState extends State<WarnetMemberList> {
                               mainAxisSize: MainAxisSize.min,
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text('Member Baru',
-                                    style: GoogleFonts.inter(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.w600)),
-                                const SizedBox(
-                                  height: 16,
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 8.0),
-                                  child: FilledButton(
-                                      child: Padding(
-                                        padding: const EdgeInsets.all(4.0),
-                                        child: Row(
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: [
-                                            Icon(FluentIcons.add, size: 12),
-                                            const SizedBox(
-                                              width: 8,
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    Text('Member',
+                                        style: GoogleFonts.inter(
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.w600)),
+                                    Platform.isWindows
+                                        ? FilledButton(
+                                            child: Padding(
+                                              padding:
+                                                  const EdgeInsets.all(4.0),
+                                              child: Row(
+                                                mainAxisSize: MainAxisSize.min,
+                                                children: [
+                                                  Icon(FluentIcons.add,
+                                                      size: 12),
+                                                  const SizedBox(
+                                                    width: 8,
+                                                  ),
+                                                  Text('Tambah Member',
+                                                      style: GoogleFonts.inter(
+                                                          fontWeight:
+                                                              FontWeight.w500,
+                                                          fontSize: 14)),
+                                                ],
+                                              ),
                                             ),
-                                            Text('Tambah Member',
-                                                style: GoogleFonts.inter(
-                                                    fontWeight:
-                                                        FontWeight.w500)),
-                                          ],
-                                        ),
-                                      ),
-                                      onPressed: () async {
-                                        showContentDialog(context);
-                                      }),
+                                            onPressed: () async {
+                                              showContentDialog(context);
+                                            })
+                                        : const Spacer(),
+                                  ],
                                 ),
-                                const SizedBox(
-                                  height: 16,
-                                ),
-                                Text('Cari Member',
-                                    style: GoogleFonts.inter(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.w600)),
                                 const SizedBox(
                                   height: 16,
                                 ),

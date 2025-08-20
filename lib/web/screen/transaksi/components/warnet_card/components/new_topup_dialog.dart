@@ -1,7 +1,7 @@
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/services.dart';
 import 'package:pos_indorep/helper/helper.dart';
-import 'package:pos_indorep/provider/web/warnet_backend_provider.dart';
+import 'package:pos_indorep/provider/web/warnet_transaksi_provider.dart';
 import 'package:pos_indorep/provider/web/web_transaksi_provider.dart';
 import 'package:pos_indorep/services/warnet_backend_services.dart';
 import 'package:pos_indorep/web/model/create_member_request.dart';
@@ -83,6 +83,16 @@ class _NewTopupDialogState extends State<NewTopupDialog> {
         ),
       );
       if (res.success) {
+        await displayInfoBar(context, builder: (ctx, close) {
+          return InfoBar(
+            title: const Text('Member berhasil dibuat'),
+            content: Text(
+                'Silakan scan QRIS di layar. Total: ${Helper.rupiahFormatter(provider.selectedPaket.harga.toDouble())}'),
+            action: IconButton(
+                icon: const Icon(FluentIcons.clear), onPressed: close),
+            severity: InfoBarSeverity.success,
+          );
+        });
         await showDialog<String>(
           context: context,
           builder: (context) =>
@@ -109,102 +119,103 @@ class _NewTopupDialogState extends State<NewTopupDialog> {
     return ContentDialog(
       constraints: BoxConstraints(
         maxWidth: 450,
-        maxHeight: 260,
       ),
       title: Text('Tambah Member'),
-      content: Column(
-        children: [
-          Row(
-            children: [
-              SizedBox(
-                width: 220,
-                child: Consumer<WebTransaksiProvider>(
-                  builder: (context, provider, child) {
-                    return TextBox(
-                      controller: usernameController,
-                      autofocus: true,
-                      inputFormatters: [
-                        FilteringTextInputFormatter.allow(
-                            RegExp(r'[a-zA-Z0-9/\s]')),
-                      ],
-                      placeholder: 'Username',
-                      maxLength: 20,
-                      onChanged: (_) => setState(() {}),
-                    );
-                  },
-                ),
-              ),
-              const SizedBox(
-                width: 12,
-                height: 50,
-              ),
-              SizedBox(
-                width: 170,
-                child: Consumer<WebTransaksiProvider>(
-                  builder: (context, provider, child) {
-                    return TextBox(
-                      controller: passwordController,
-                      obscureText: true,
-                      placeholder: 'Password',
-                      maxLength: 20,
-                      onChanged: (_) => setState(() {}),
-                    );
-                  },
-                ),
-              ),
-            ],
-          ),
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Consumer<WarnetTransaksiProvider>(
-                  builder: (context, provider, child) {
-                return ComboBox<String>(
-                  value: provider.selectedPaket.nama,
-                  placeholder: const Text('Pilih Paket'),
-                  items: provider.packages
-                      .map((p) => ComboBoxItem<String>(
-                            value: p.nama,
-                            child: Text(
-                                '${p.nama} - ${Helper.rupiahFormatter(p.harga.toDouble())}'),
-                          ))
-                      .toList(),
-                  onChanged: (val) {
-                    if (val != null) {
-                      provider.setSelectedPaket(
-                        provider.packages.firstWhere(
-                          (p) => p.nama == val,
-                          orElse: () => provider.packages.first,
-                        ),
+      content: SingleChildScrollView(
+        child: Column(
+          children: [
+            Row(
+              children: [
+                SizedBox(
+                  width: 220,
+                  child: Consumer<WebTransaksiProvider>(
+                    builder: (context, provider, child) {
+                      return TextBox(
+                        controller: usernameController,
+                        autofocus: true,
+                        inputFormatters: [
+                          FilteringTextInputFormatter.allow(
+                              RegExp(r'[a-zA-Z0-9/\s]')),
+                        ],
+                        placeholder: 'Username',
+                        maxLength: 20,
+                        onChanged: (_) => setState(() {}),
                       );
-                      setState(() {});
-                    }
-                  },
-                );
-              }),
-              const SizedBox(width: 12),
-              Consumer<WarnetTransaksiProvider>(
-                  builder: (context, provider, child) {
-                return ComboBox<String>(
-                  value: provider.selectedMethod,
-                  placeholder: const Text('Metode pembayaran'),
-                  items: provider.methods
-                      .map((m) => ComboBoxItem<String>(
-                            value: m,
-                            child: Text(m),
-                          ))
-                      .toList(),
-                  onChanged: (val) {
-                    if (val != null) {
-                      provider.setSelectedMethod(val);
-                      setState(() {});
-                    }
-                  },
-                );
-              }),
-            ],
-          ),
-        ],
+                    },
+                  ),
+                ),
+                const SizedBox(
+                  width: 12,
+                  height: 50,
+                ),
+                SizedBox(
+                  width: 170,
+                  child: Consumer<WebTransaksiProvider>(
+                    builder: (context, provider, child) {
+                      return TextBox(
+                        controller: passwordController,
+                        obscureText: true,
+                        placeholder: 'Password',
+                        maxLength: 20,
+                        onChanged: (_) => setState(() {}),
+                      );
+                    },
+                  ),
+                ),
+              ],
+            ),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Consumer<WarnetTransaksiProvider>(
+                    builder: (context, provider, child) {
+                  return ComboBox<String>(
+                    value: provider.selectedPaket.nama,
+                    placeholder: const Text('Pilih Paket'),
+                    items: provider.packages
+                        .map((p) => ComboBoxItem<String>(
+                              value: p.nama,
+                              child: Text(
+                                  '${p.nama} - ${Helper.rupiahFormatter(p.harga.toDouble())}'),
+                            ))
+                        .toList(),
+                    onChanged: (val) {
+                      if (val != null) {
+                        provider.setSelectedPaket(
+                          provider.packages.firstWhere(
+                            (p) => p.nama == val,
+                            orElse: () => provider.packages.first,
+                          ),
+                        );
+                        setState(() {});
+                      }
+                    },
+                  );
+                }),
+                const SizedBox(width: 12),
+                Consumer<WarnetTransaksiProvider>(
+                    builder: (context, provider, child) {
+                  return ComboBox<String>(
+                    value: provider.selectedMethod,
+                    placeholder: const Text('Metode pembayaran'),
+                    items: provider.methods
+                        .map((m) => ComboBoxItem<String>(
+                              value: m,
+                              child: Text(m),
+                            ))
+                        .toList(),
+                    onChanged: (val) {
+                      if (val != null) {
+                        provider.setSelectedMethod(val);
+                        setState(() {});
+                      }
+                    },
+                  );
+                }),
+              ],
+            ),
+          ],
+        ),
       ),
       actions: [
         Button(

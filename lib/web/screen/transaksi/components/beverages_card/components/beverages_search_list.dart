@@ -2,7 +2,7 @@ import 'package:collection/collection.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:pos_indorep/helper/helper.dart';
-import 'package:pos_indorep/provider/web/warnet_backend_provider.dart';
+import 'package:pos_indorep/provider/web/warnet_transaksi_provider.dart';
 import 'package:pos_indorep/web/model/kulkas_item_response.dart';
 import 'package:provider/provider.dart';
 
@@ -103,48 +103,48 @@ class _BeveragesSearchListState extends State<BeveragesSearchList> {
           ),
         ),
         const SizedBox(height: 12),
-         CommandBar(
-  key: commandBarKey, 
-  overflowBehavior: CommandBarOverflowBehavior.dynamicOverflow,
-  isCompact: true,
-  primaryItems: [
-    CommandBarButton(
-      icon: const Icon(FluentIcons.add),
-      label: const Text('Top Up'),
-      tooltip: 'Top Up Member',
-      onPressed: () {
-        // Create something new!
-      },
-    ),
-    const CommandBarSeparator(),
-    CommandBarButton(
-      icon: const Icon(FluentIcons.remove),
-      label: const Text('Refund'),
-      tooltip: 'Refund Member',
-      onPressed: () {
-        // Create something new!
-      },
-    ),
-    const CommandBarSeparator(),
-    CommandBarButton(
-      icon: const Icon(FluentIcons.edit),
-      label: const Text('Edit'),
-      tooltip: 'Edit Member!',
-      onPressed: () {
-        // Create something new!
-      },
-    ),
-    const CommandBarSeparator(),
-    CommandBarButton(
-      icon:  Icon(FluentIcons.delete),
-      label:  Text('Delete', style: TextStyle()),
-      tooltip: 'Delete Member',
-      onPressed: () {
-        // Delete what is currently selected!
-      },
-    ),
-  ],
-),
+        CommandBar(
+          key: commandBarKey,
+          overflowBehavior: CommandBarOverflowBehavior.dynamicOverflow,
+          isCompact: true,
+          primaryItems: [
+            CommandBarButton(
+              icon: const Icon(FluentIcons.add),
+              label: const Text('Top Up'),
+              tooltip: 'Top Up Member',
+              onPressed: () {
+                // Create something new!
+              },
+            ),
+            const CommandBarSeparator(),
+            CommandBarButton(
+              icon: const Icon(FluentIcons.remove),
+              label: const Text('Refund'),
+              tooltip: 'Refund Member',
+              onPressed: () {
+                // Create something new!
+              },
+            ),
+            const CommandBarSeparator(),
+            CommandBarButton(
+              icon: const Icon(FluentIcons.edit),
+              label: const Text('Edit'),
+              tooltip: 'Edit Member!',
+              onPressed: () {
+                // Create something new!
+              },
+            ),
+            const CommandBarSeparator(),
+            CommandBarButton(
+              icon: Icon(FluentIcons.delete),
+              label: Text('Delete', style: TextStyle()),
+              tooltip: 'Delete Member',
+              onPressed: () {
+                // Delete what is currently selected!
+              },
+            ),
+          ],
+        ),
         // Your selectable list, but feed it from _displayed
         ValueListenableBuilder<List<KulkasItem>>(
           valueListenable: selectedItems,

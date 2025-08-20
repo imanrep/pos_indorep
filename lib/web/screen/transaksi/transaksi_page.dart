@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:pos_indorep/provider/web/warnet_backend_provider.dart';
+import 'package:pos_indorep/provider/web/warnet_transaksi_provider.dart';
 import 'package:pos_indorep/services/web_services.dart';
 import 'package:pos_indorep/web/screen/transaksi/components/beverages_form.dart';
 import 'package:pos_indorep/web/screen/transaksi/components/beverages_card/beverages_list.dart';
@@ -20,7 +20,7 @@ class TransaksiPage extends StatefulWidget {
 
 class _TransaksiPageState extends State<TransaksiPage> {
   final WebServices _services = WebServices();
-Timer? _timer;
+  Timer? _timer;
 
   @override
   void initState() {
@@ -46,10 +46,10 @@ Timer? _timer;
     super.dispose();
   }
 
-
   @override
   Widget build(BuildContext context) {
-    return Consumer<WarnetTransaksiProvider>(builder: (context, provider, child) {
+    return Consumer<WarnetTransaksiProvider>(
+        builder: (context, provider, child) {
       return ScaffoldPage.scrollable(
         header: PageHeader(
           title: Text(
@@ -98,15 +98,18 @@ Timer? _timer;
                       isWide ? constraints.maxWidth / 2 - 12 : double.infinity,
                   child: provider.allWarnetCustomers == null
                       ? Padding(
-                          padding: const EdgeInsets.all(16.0),
-                          child: Center(child: ProgressRing()),
+                          padding: const EdgeInsets.all(64.0),
+                          child: Center(child: CupertinoActivityIndicator()),
                         )
                       : WarnetMemberList());
               Widget beveragesListSection = SizedBox(
                   width:
                       isWide ? constraints.maxWidth / 2 - 12 : double.infinity,
                   child: provider.allWarnetCustomers == null
-                      ? Center(child: ProgressRing())
+                      ? Padding(
+                          padding: const EdgeInsets.all(64.0),
+                          child: Center(child: CupertinoActivityIndicator()),
+                        )
                       : BeveragesList());
               if (isWide) {
                 return Column(
@@ -133,8 +136,6 @@ Timer? _timer;
                   children: [
                     memberListSection,
                     beveragesListSection,
-                    warnetSection,
-                    beveragesSection,
                   ],
                 );
               }

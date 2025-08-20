@@ -11,7 +11,7 @@ import 'package:pos_indorep/provider/dashboard_provider.dart';
 import 'package:pos_indorep/provider/main_provider.dart';
 import 'package:pos_indorep/provider/menu_provider.dart';
 import 'package:pos_indorep/provider/transaction_provider.dart';
-import 'package:pos_indorep/provider/web/warnet_backend_provider.dart';
+import 'package:pos_indorep/provider/web/warnet_transaksi_provider.dart';
 import 'package:pos_indorep/provider/web/warnet_dashboard_provider.dart';
 import 'package:pos_indorep/provider/web/web_main_provider.dart';
 import 'package:pos_indorep/provider/web/web_transaksi_provider.dart';

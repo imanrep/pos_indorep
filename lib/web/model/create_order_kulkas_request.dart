@@ -1,33 +1,16 @@
-class CreateOrderKulkasRequest {
-  final List<OrderKulkas> orders;
-  final String payment;
-
-  CreateOrderKulkasRequest({
-    required this.orders,
-    required this.payment,
-  });
-
-  Map<String, dynamic> toJson() {
-    return {
-      'orders': orders.map((e) => e.toJson()).toList(),
-      'payment': payment,
-    };
-  }
-}
-
-class OrderKulkas {
+class KulkasOrderItem {
   final int id;
   final int qty;
+  KulkasOrderItem({required this.id, required this.qty});
+  Map<String, dynamic> toJson() => {'id': id, 'qty': qty};
+}
 
-  OrderKulkas({
-    required this.id,
-    required this.qty,
-  });
-
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'qty': qty,
-    };
-  }
+class CreateOrderKulkasRequest {
+  final String payment; // "cash" | "qris"
+  final List<KulkasOrderItem> orders;
+  CreateOrderKulkasRequest({required this.payment, required this.orders});
+  Map<String, dynamic> toJson() => {
+        'payment': payment,
+        'orders': orders.map((e) => e.toJson()).toList(),
+      };
 }

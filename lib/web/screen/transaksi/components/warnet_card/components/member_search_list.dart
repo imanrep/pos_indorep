@@ -1,12 +1,16 @@
+import 'dart:io';
+
 import 'package:collection/collection.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:pos_indorep/helper/helper.dart';
-import 'package:pos_indorep/provider/web/warnet_backend_provider.dart';
+import 'package:pos_indorep/provider/web/warnet_transaksi_provider.dart';
 import 'package:pos_indorep/web/model/member_model.dart';
 import 'package:pos_indorep/web/screen/transaksi/components/warnet_card/components/member_info_container.dart';
-import 'package:pos_indorep/web/screen/transaksi/components/warnet_card/components/member_topup_dialog.dart';
 import 'package:provider/provider.dart';
+
+import 'package:pos_indorep/web/screen/transaksi/components/beverages_card/components/beverages_buy_dialog_stub.dart'
+    if (dart.library.io) 'package:pos_indorep/web/screen/transaksi/components/warnet_card/components/member_topup_dialog.dart';
 
 class MembersSearchList extends StatefulWidget {
   const MembersSearchList({super.key});
@@ -40,7 +44,7 @@ class _MembersSearchListState extends State<MembersSearchList> {
     super.dispose();
   }
 
-  void showContentDialog(BuildContext context, Member member) async {
+  void showTopUpDialog(BuildContext context, Member member) async {
     final result = await showDialog<String>(
       context: context,
       builder: (context) => MemberTopupDialog(member: member),
@@ -53,7 +57,6 @@ class _MembersSearchListState extends State<MembersSearchList> {
     final provider = context.watch<WarnetTransaksiProvider>();
     final allCustomers = provider.allWarnetCustomers;
     final commandBarKey = GlobalKey<CommandBarState>();
-
 
     if (allCustomers == null || allCustomers.members.isEmpty) {
       return const Center(child: Text('No members found.'));
@@ -70,7 +73,9 @@ class _MembersSearchListState extends State<MembersSearchList> {
     final query = _searchCtrl.text.trim().toLowerCase();
     final _displayed = query.isEmpty
         ? all
-        : all.where((m) => m.memberAccount.toLowerCase().contains(query)).toList();
+        : all
+            .where((m) => m.memberAccount.toLowerCase().contains(query))
+            .toList();
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -90,47 +95,47 @@ class _MembersSearchListState extends State<MembersSearchList> {
         ),
         const SizedBox(height: 12),
         CommandBar(
-  key: commandBarKey, 
-  overflowBehavior: CommandBarOverflowBehavior.dynamicOverflow,
-  isCompact: true,
-  primaryItems: [
-    CommandBarButton(
-      icon: const Icon(FluentIcons.add),
-      label: const Text('Top Up'),
-      tooltip: 'Top Up Member',
-      onPressed: () {
-        // Create something new!
-      },
-    ),
-    const CommandBarSeparator(),
-    CommandBarButton(
-      icon: const Icon(FluentIcons.remove),
-      label: const Text('Refund'),
-      tooltip: 'Refund Member',
-      onPressed: () {
-        // Create something new!
-      },
-    ),
-    const CommandBarSeparator(),
-    CommandBarButton(
-      icon: const Icon(FluentIcons.edit),
-      label: const Text('Edit'),
-      tooltip: 'Edit Member!',
-      onPressed: () {
-        // Create something new!
-      },
-    ),
-    const CommandBarSeparator(),
-    CommandBarButton(
-      icon:  Icon(FluentIcons.delete),
-      label:  Text('Delete', style: TextStyle()),
-      tooltip: 'Delete Member',
-      onPressed: () {
-        // Delete what is currently selected!
-      },
-    ),
-  ],
-),
+          key: commandBarKey,
+          overflowBehavior: CommandBarOverflowBehavior.dynamicOverflow,
+          isCompact: true,
+          primaryItems: [
+            CommandBarButton(
+              icon: const Icon(FluentIcons.add),
+              label: const Text('Top Up'),
+              tooltip: 'Top Up Member',
+              onPressed: () {
+                // Create something new!
+              },
+            ),
+            const CommandBarSeparator(),
+            CommandBarButton(
+              icon: const Icon(FluentIcons.remove),
+              label: const Text('Refund'),
+              tooltip: 'Refund Member',
+              onPressed: () {
+                // Create something new!
+              },
+            ),
+            const CommandBarSeparator(),
+            CommandBarButton(
+              icon: const Icon(FluentIcons.edit),
+              label: const Text('Edit'),
+              tooltip: 'Edit Member!',
+              onPressed: () {
+                // Create something new!
+              },
+            ),
+            const CommandBarSeparator(),
+            CommandBarButton(
+              icon: Icon(FluentIcons.delete),
+              label: Text('Delete', style: TextStyle()),
+              tooltip: 'Delete Member',
+              onPressed: () {
+                // Delete what is currently selected!
+              },
+            ),
+          ],
+        ),
         // List of members
         ValueListenableBuilder<List<Member>>(
           valueListenable: selectedMembers,
@@ -201,27 +206,6 @@ class _MembersSearchListState extends State<MembersSearchList> {
                           style: GoogleFonts.inter()),
                       content: Column(
                         children: [
-                          Align(alignment: Alignment.topRight,
-                          child: 
-                           Button(
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(4.0),
-                                    child: Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        Icon(FluentIcons.history, size: 12),
-                                        const SizedBox(width: 8),
-                                        Text(
-                                          'Member History',
-                                          style:
-                                              GoogleFonts.inter(fontSize: 12),
-                                        )
-                                      ],
-                                    ),
-                                  ),
-                                  onPressed: () {},
-                                ),),
-                          const SizedBox(height: 12),
                           Wrap(
                             children: [
                               MemberInfoContainer(
@@ -243,31 +227,62 @@ class _MembersSearchListState extends State<MembersSearchList> {
                             ],
                           ),
                           const SizedBox(height: 8),
-                          Divider(),
-                          Padding(
-                            padding: EdgeInsets.symmetric(
-                                vertical: 8.0, horizontal: 8.0),
+                          Align(
+                            alignment: Alignment.topRight,
                             child: Row(
+                              mainAxisSize: MainAxisSize.min,
                               children: [
-                                FilledButton(
+                                Button(
                                   child: Padding(
                                     padding: const EdgeInsets.all(4.0),
                                     child: Row(
+                                      mainAxisSize: MainAxisSize.min,
                                       children: [
-                                        Icon(FluentIcons.add, size: 12),
+                                        Icon(FluentIcons.history, size: 12),
                                         const SizedBox(width: 8),
                                         Text(
-                                          'Top Up',
+                                          'History',
                                           style:
                                               GoogleFonts.inter(fontSize: 12),
                                         )
                                       ],
                                     ),
                                   ),
-                                  onPressed: () async {
-                                    showContentDialog(context, member);
-                                  },
+                                  onPressed: () {},
                                 ),
+                                const SizedBox(width: 8),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          Divider(),
+                          const SizedBox(height: 8),
+                          Padding(
+                            padding: EdgeInsets.symmetric(
+                                vertical: 8.0, horizontal: 8.0),
+                            child: Row(
+                              children: [
+                                Platform.isWindows
+                                    ? FilledButton(
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(4.0),
+                                          child: Row(
+                                            children: [
+                                              Icon(FluentIcons.add, size: 12),
+                                              const SizedBox(width: 8),
+                                              Text(
+                                                'Top Up',
+                                                style: GoogleFonts.inter(
+                                                    fontSize: 12),
+                                              )
+                                            ],
+                                          ),
+                                        ),
+                                        onPressed: () async {
+                                          showTopUpDialog(context, member);
+                                        },
+                                      )
+                                    : const Spacer(),
                                 const SizedBox(width: 8),
                                 Button(
                                   child: Padding(
@@ -287,6 +302,25 @@ class _MembersSearchListState extends State<MembersSearchList> {
                                   onPressed: () {},
                                 ),
                                 const Spacer(),
+                                Button(
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(4.0),
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Icon(FluentIcons.edit, size: 12),
+                                        const SizedBox(width: 8),
+                                        Text(
+                                          'Edit',
+                                          style:
+                                              GoogleFonts.inter(fontSize: 12),
+                                        )
+                                      ],
+                                    ),
+                                  ),
+                                  onPressed: () {},
+                                ),
+                                const SizedBox(width: 8),
                                 FilledButton(
                                   style: ButtonStyle(
                                     backgroundColor:
@@ -294,19 +328,8 @@ class _MembersSearchListState extends State<MembersSearchList> {
                                   ),
                                   child: Padding(
                                     padding: const EdgeInsets.all(4.0),
-                                    child: Row(
-                                      children: [
-                                        Icon(FluentIcons.delete,
-                                            size: 16, color: Colors.white),
-                                        const SizedBox(width: 8),
-                                        Text(
-                                          'Delete',
-                                          style: GoogleFonts.inter(
-                                              fontSize: 12,
-                                              color: Colors.white),
-                                        )
-                                      ],
-                                    ),
+                                    child: Icon(FluentIcons.delete,
+                                        size: 16, color: Colors.white),
                                   ),
                                   onPressed: () {},
                                 ),

@@ -4,14 +4,14 @@ import 'package:pos_indorep/helper/helper.dart';
 import 'package:pos_indorep/services/warnet_backend_services.dart';
 import 'package:pos_indorep/web/model/get_transaction_warnet_response.dart';
 
-class DetailCardPage extends StatefulWidget {
-  const DetailCardPage({super.key});
+class DetailTransaksiPage extends StatefulWidget {
+  const DetailTransaksiPage({super.key});
 
   @override
-  State<DetailCardPage> createState() => _DetailCardPageState();
+  State<DetailTransaksiPage> createState() => _DetailTransaksiPageState();
 }
 
-class _DetailCardPageState extends State<DetailCardPage> {
+class _DetailTransaksiPageState extends State<DetailTransaksiPage> {
   final TextEditingController _search = TextEditingController();
   int _selectedIndex = -1;
   final services = WarnetBackendServices();

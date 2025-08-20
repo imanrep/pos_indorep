@@ -3,6 +3,7 @@ import 'package:pos_indorep/web/model/create_member_response.dart';
 import 'package:pos_indorep/web/model/create_order_kulkas_request.dart';
 import 'package:pos_indorep/web/model/create_order_kulkas_response.dart';
 import 'package:pos_indorep/web/model/get_food_info_response.dart';
+import 'package:pos_indorep/web/model/get_sales_summary_warnet.dart';
 import 'package:pos_indorep/web/model/get_transaction_warnet_response.dart';
 import 'package:pos_indorep/web/model/kulkas_item_response.dart';
 import 'package:pos_indorep/web/model/member_model.dart';
@@ -260,5 +261,111 @@ class WarnetBackendServices {
     return ResetDisplayResponse(
       success: false,
     );
+  }
+
+  Future<GetSalesSummaryWarnet> getSalesSummaryWarnet(
+      String? period, String? from, String? until) async {
+    String baseUrl = "https://warnet-api.indorep.com";
+
+    String getSummaryUrl() {
+      if (period == null) {
+        String fromString = from!;
+        String untilString = until!;
+        return '$baseUrl/salesSummaryWarnet?date_from=$fromString&date_until=$untilString';
+      } else {
+        return '$baseUrl/salesSummaryWarnet?period=$period';
+      }
+    }
+
+    final url = Uri.parse(getSummaryUrl());
+    print('Fetching summary from: $url');
+
+    try {
+      final response = await http.get(url);
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> data = jsonDecode(response.body);
+        return GetSalesSummaryWarnet.fromJson(data);
+      } else {
+        print('Failed to load summary: ${response.body}');
+      }
+    } catch (e) {
+      print('Error loading summary: $e');
+    }
+
+    return GetSalesSummaryWarnet(
+      orders: [],
+      packages: [],
+      summary: Summary(
+        period: '',
+        from: '',
+        until: '',
+        totalIncome: 0,
+        totalItems: 0,
+        totalOrders: 0,
+      ),
+    );
+  }
+
+  Future<CreateOrderKulkasResponse> createOrderKulkas({
+    required CreateOrderKulkasRequest request,
+    // Duration timeout = const Duration(seconds: 20),
+  }) async {
+    const String baseUrl = 'https://warnet-api.indorep.com';
+    const String path = '/create_order_kulkas';
+    final uri = Uri.parse('$baseUrl$path');
+    print(request.toJson());
+
+    try {
+      final resp = await http.post(
+        uri,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode(request.toJson()),
+      );
+
+      // Success path (200 OK expected from backend)
+      if (resp.statusCode >= 200 && resp.statusCode < 300) {
+        final jsonBody = jsonDecode(resp.body) as Map<String, dynamic>;
+        return CreateOrderKulkasResponse.fromJson(jsonBody);
+      }
+
+      // Error path: backend usually returns {"message": "..."}
+      try {
+        final jsonBody = jsonDecode(resp.body);
+        final msg = (jsonBody is Map && jsonBody['message'] != null)
+            ? jsonBody['message'].toString()
+            : 'Request failed with status ${resp.statusCode}';
+        throw Exception(msg);
+      } catch (_) {
+        throw Exception('Request failed with status ${resp.statusCode}');
+      }
+    } catch (e) {
+      throw Exception('Error creating order: $e');
+    }
+    // final resp = await http.post(
+    //   uri,
+    //   headers: {
+    //     'Content-Type': 'application/json',
+    //   },
+    //   body: jsonEncode(request.toJson()),
+    // );
+
+    // // Success path (200 OK expected from backend)
+    // if (resp.statusCode >= 200 && resp.statusCode < 300) {
+    //   final jsonBody = jsonDecode(resp.body) as Map<String, dynamic>;
+    //   return CreateOrderKulkasResponse.fromJson(jsonBody);
+    // }
+
+    // // Error path: backend usually returns {"message": "..."}
+    // try {
+    //   final jsonBody = jsonDecode(resp.body);
+    //   final msg = (jsonBody is Map && jsonBody['message'] != null)
+    //       ? jsonBody['message'].toString()
+    //       : 'Request failed with status ${resp.statusCode}';
+    //   throw Exception(msg);
+    // } catch (_) {
+    //   throw Exception('Request failed with status ${resp.statusCode}');
+    // }
   }
 }

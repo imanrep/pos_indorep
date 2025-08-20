@@ -233,153 +233,175 @@ class _QrisPrintDialogState extends State<QrisPrintDialog> {
     final orderType = widget.response.qris.isEmpty ? 'Cash' : 'QRIS';
     var checked = false;
     return ContentDialog(
-      constraints: BoxConstraints(
-        maxWidth: 450,
-        maxHeight: 650,
-      ),
-      title: Text('Konfirmasi Pembayaran $orderType'),
-      content: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Text(
-                    'IDRPW-${widget.response.orderID}',
-                    style: FluentTheme.of(context).typography.body!.copyWith(
-                          fontWeight: FontWeight.w500,
-                          fontSize: 18,
-                        ),
-                  ),
-                  const Spacer(),
-                  Text(
-                      '${Helper.dateFormatterTwo(DateTime.now().toIso8601String())} ${Helper.timeFormatterTwo(DateTime.now().toIso8601String())}',
+        constraints: BoxConstraints(
+          maxWidth: 450,
+        ),
+        title: Text('Konfirmasi Pembayaran $orderType'),
+        content: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Text(
+                      'IDRPW-${widget.response.orderID}',
                       style: FluentTheme.of(context).typography.body!.copyWith(
                             fontWeight: FontWeight.w500,
                             fontSize: 18,
-                          )),
-                ],
-              ),
-              const SizedBox(height: 4),
-              Row(
-                children: [
-                  Text(
-                    widget.response.username,
-                    style: FluentTheme.of(context).typography.body!.copyWith(
-                          fontWeight: FontWeight.w400,
-                          fontSize: 18,
-                        ),
-                  ),
-                  const Spacer(),
-                  Text(
-                      '${widget.paket.nama} (${Helper.rupiahFormatter(widget.paket.harga.toDouble())})',
-                      style: FluentTheme.of(context).typography.body!.copyWith(
-                            fontWeight: FontWeight.w400,
-                            fontSize: 18,
-                          )),
-                ],
-              ),
-              const SizedBox(height: 16),
-              if (widget.response.qris.isEmpty)
-                Center(
-                  child: Text(
-                    'Silakan lakukan pembayaran melalui kasir.',
-                    style: FluentTheme.of(context).typography.body!.copyWith(
-                          fontWeight: FontWeight.w500,
-                          fontSize: 16,
-                        ),
-                  ),
-                )
-              else
-                Column(
-                  children: [
-                    Center(
-                      child: Text(
-                        'Silakan lakukan pembayaran melalui QRIS berikut:',
-                        style:
-                            FluentTheme.of(context).typography.body!.copyWith(
-                                  fontWeight: FontWeight.w500,
-                                  fontSize: 16,
-                                ),
-                      ),
+                          ),
                     ),
-                    const SizedBox(height: 16),
-                    Align(
-                      alignment: Alignment.center,
-                      child: Card(
-                        padding: const EdgeInsets.all(8.0),
-                        backgroundColor: Colors.white,
-                        child: QrImageView(
-                          data: widget.response.qris,
-                          version: QrVersions.auto,
-                          size: 200.0,
-                          gapless: false,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    Center(
-                      child: Text(
-                        Helper.rupiahFormatter(widget.paket.harga.toDouble()),
+                    const Spacer(),
+                    Text(
+                        '${Helper.dateFormatterTwo(DateTime.now().toIso8601String())} ${Helper.timeFormatterTwo(DateTime.now().toIso8601String())}',
                         style:
                             FluentTheme.of(context).typography.body!.copyWith(
                                   fontWeight: FontWeight.w500,
                                   fontSize: 18,
-                                ),
+                                )),
+                  ],
+                ),
+                const SizedBox(height: 4),
+                Row(
+                  children: [
+                    Text(
+                      widget.response.username,
+                      style: FluentTheme.of(context).typography.body!.copyWith(
+                            fontWeight: FontWeight.w400,
+                            fontSize: 18,
+                          ),
+                    ),
+                    const Spacer(),
+                    Text(
+                        '${widget.paket.nama} (${Helper.rupiahFormatter(widget.paket.harga.toDouble())})',
+                        style:
+                            FluentTheme.of(context).typography.body!.copyWith(
+                                  fontWeight: FontWeight.w400,
+                                  fontSize: 18,
+                                )),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                if (widget.response.qris.isEmpty)
+                  Center(
+                    child: Text(
+                      'Silakan lakukan pembayaran melalui kasir.',
+                      style: FluentTheme.of(context).typography.body!.copyWith(
+                            fontWeight: FontWeight.w500,
+                            fontSize: 16,
+                          ),
+                    ),
+                  )
+                else
+                  Column(
+                    children: [
+                      Center(
+                        child: Text(
+                          'Silakan lakukan pembayaran melalui QRIS berikut:',
+                          style:
+                              FluentTheme.of(context).typography.body!.copyWith(
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: 16,
+                                  ),
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      Align(
+                        alignment: Alignment.center,
+                        child: Card(
+                          padding: const EdgeInsets.all(8.0),
+                          backgroundColor: Colors.white,
+                          child: QrImageView(
+                            data: widget.response.qris,
+                            version: QrVersions.auto,
+                            size: 200.0,
+                            gapless: false,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      Center(
+                        child: Text(
+                          Helper.rupiahFormatter(widget.paket.harga.toDouble()),
+                          style:
+                              FluentTheme.of(context).typography.body!.copyWith(
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: 18,
+                                  ),
+                        ),
+                      ),
+                    ],
+                  ),
+              ],
+            ),
+          ),
+        ),
+        actions: [
+          (orderType == "QRIS")
+              ? Column(
+                  children: [
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: Checkbox(
+                        checked: _checked,
+                        onChanged: (value) {
+                          setState(() {
+                            _checked = value ?? false;
+                          });
+                        },
+                        content: const Text(
+                          'Cetak QRIS ke Struk',
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 18),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Button(
+                            child: const Text('Close'),
+                            onPressed: () async {
+                              Navigator.of(context).pop();
+                              var services = WarnetBackendServices();
+                              await services.resetDisplay();
+                            },
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: FilledButton(
+                            child: _isPrinting
+                                ? const Text('Printing...')
+                                : const Text('Print'),
+                            onPressed: _isPrinting ? null : _printUsb,
+                          ),
+                        ),
+                      ],
+                    )
+                  ],
+                )
+              : Row(
+                  children: [
+                    Expanded(
+                      child: Button(
+                        child: const Text('Close'),
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: FilledButton(
+                        child: _isPrinting
+                            ? const Text('Printing...')
+                            : const Text('Print'),
+                        onPressed: _isPrinting ? null : _printUsb,
                       ),
                     ),
                   ],
-                ),
-            ],
-          ),
-        ),
-      ),
-      actions: [
-        Column(
-          children: [
-            Align(
-              alignment: Alignment.centerRight,
-              child: Checkbox(
-                checked: _checked,
-                onChanged: (value) {
-                  setState(() {
-                    _checked = value ?? false;
-                  });
-                },
-                content: const Text(
-                  'Cetak QRIS ke Struk',
-                ),
-              ),
-            ),
-            const SizedBox(height: 18),
-            Row(
-              children: [
-                Expanded(
-                  child: Button(
-                    child: const Text('Close'),
-                    onPressed: () async {
-                      var services = WarnetBackendServices();
-                      await services.resetDisplay();
-                      Navigator.of(context).pop();
-                    },
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: FilledButton(
-                    child: _isPrinting
-                        ? const Text('Printing...')
-                        : const Text('Print'),
-                    onPressed: _isPrinting ? null : _printUsb,
-                  ),
-                ),
-              ],
-            )
-          ],
-        )
-      ],
-    );
+                )
+        ]);
   }
 }
